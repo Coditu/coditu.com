@@ -4,475 +4,53 @@ on:
   push:
     branches: [main]
   pull_request:
-  # ── Because a pull request can stop producing runs entirely ───────────────
-  #
-  # Measured 2026-08-31. A push to a pull request branch produced **no workflow
-  # run at all** — no queued job, no failure, no `github-actions` check suite on
-  # the commit, while Vercel built the very same push. Close-and-reopen did not
-  # help either. It presents as "CI silently stopped", which is the worst shape
-  # a control can have, and it froze `main` for twenty minutes.
-  #
-  # The cause was ordinary and the symptom was not: the pull request had gone
-  # **DIRTY** — a merge conflict with `main`. GitHub runs `pull_request`
-  # workflows against `refs/pull/N/merge`, and a conflicting branch has no merge
-  # ref to build, so nothing is scheduled. Resolving the conflict produced a run
-  # within seconds. Nothing warns you; the checks list simply stays empty, which
-  # reads exactly like "CI has not started yet".
-  #
-  # `workflow_dispatch` is the way back in when that happens, and it is useful
-  # for its own sake: re-running the suite without inventing a commit.
+  # The way back in when a pull request stops producing runs (a conflicting
+  # branch has no merge ref, so nothing is scheduled), and a way to re-run the
+  # suite without inventing a commit.
   workflow_dispatch:
 
 permissions:
   contents: read
 
-# ── Where these jobs run ────────────────────────────────────────────────────
-#
-# **Since 2026-10-12 this repository is PUBLIC, and every job runs on
-# GitHub-hosted `ubuntu-latest`: the `CI_RUNNER` variable is set to
-# `["ubuntu-latest"]` and must stay set.** Hosted minutes are free for a public
-# repository, so the reason below for leaving them no longer applies — and the
-# reason the Mac was safe no longer holds. A fork PR's workflow is the fork
-# author's code; on a self-hosted runner it runs on Mohamed's Mac, as him. The
-# `coditu-mac` runner was deregistered the same day. **Do not register a
-# self-hosted runner on this repository while it is public.** With `CI_RUNNER`
-# unset, every job waits for that missing runner: queued, never run.
-#
-# What follows is why CI ran on the Mac from 2026-08-31 to 2026-10-12. It is
-# kept because the shared-allowance reasoning still governs the private
-# recovery repository.
-#
-# On 2026-08-31 the account's Actions allowance ran out. Every job in both
-# repositories began finishing in two seconds with zero steps; `main` froze,
-# because the one required check could not run; and the nightly backup stopped.
-# The measured burn was 4.3x sustainable — ~234 runs against ~54 the 3,000
-# minutes support — so a bigger allowance does not fix it and a smaller CI
-# barely dents it.
-#
-# **Actions minutes meter GitHub-HOSTED runners only.** A self-hosted runner is
-# free and unmetered. This repository is private with a single writer, so the
-# reason self-hosted runners are normally dangerous — a fork PR executing an
-# attacker's code on your hardware — cannot arise here: a fork PR cannot run a
-# workflow at all without an approving write-access review, and there is nobody
-# to fork it. That is a property of this repository, not a general safe rule,
-# and it stops being true the day a second contributor arrives.
-#
-# `CI_RUNNER` is the escape hatch. Unset — the normal state — every job runs on
-# `coditu-mac`. Set it to `["ubuntu-latest"]` and the whole file goes back to
-# the metered pool for as long as it stays set.
-#
-# The fallback is deliberately MANUAL. An automatic one — try the Mac, fall
-# back when it is asleep — is precisely how the allowance went the first time:
-# it would spend minutes without anybody choosing to. A Mac that is off makes
-# these jobs QUEUE, which is visible on the pull request and costs nothing;
-# nothing merges until somebody either wakes the Mac or decides to pay. And
-# every job prints where it ran into the run summary, so a switch that was
-# flipped and forgotten is a line you read rather than a bill you discover.
-#
-# `keepalive.yml` and `rollback-drill.yml` stay on `ubuntu-latest` ON PURPOSE.
-# The line is: the metered runner is for the jobs whose whole reason to exist
-# is to work when this Mac does not. Keeping the database awake and rolling
-# production back are both of those. CI is not.
+# This repository is PUBLIC, so every job runs on a GitHub-hosted runner. A fork
+# PR's workflow is the fork author's code: do not register a self-hosted runner
+# here.
 
 jobs:
-  # GitHub Actions minutes are ONE pool. CI, the nightly backup, the freshness
-  # canary and the keepalive all draw on the same free monthly allowance, and
-  # the failure mode is not "CI gets slow" — it is that the allowance runs out
-  # mid-month and THE NIGHTLY BACKUP SILENTLY STOPS. Shipping speed and backup
-  # survival are coupled, so the expensive report-only jobs are not run on a
-  # change that cannot possibly affect them.
-  #
-  # Measured 2026-08-29: 102 of this repository's last 119 commits — 86% — touch
-  # only Markdown, because the ledger is updated in the same commit as the work.
-  # The browser job is the single largest line item in the budget. Not running
-  # it on a ledger edit is the cheapest minute available.
-  #
-  # This job costs one billed minute to save roughly forty. It fails SAFE: if
-  # the changed-file list cannot be determined for any reason, it reports
-  # `code=true` and everything runs.
-  scope:
-    name: what changed
-    runs-on: ${{ fromJSON(vars.CI_RUNNER || '["self-hosted","coditu-mac"]') }}
-    timeout-minutes: 5
-    outputs:
-      code: ${{ steps.classify.outputs.code }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: ./.github/actions/runner-identity
-
-      - id: classify
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          EVENT: ${{ github.event_name }}
-          BEFORE: ${{ github.event.before }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: |
-          set -uo pipefail
-          changed=""
-          if [ "$EVENT" = pull_request ] && [ -n "${BASE_SHA:-}" ]; then
-            changed=$(git diff --name-only "$BASE_SHA" "$GITHUB_SHA" 2>/dev/null)
-          elif [ -n "${BEFORE:-}" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ]; then
-            changed=$(git diff --name-only "$BEFORE" "$GITHUB_SHA" 2>/dev/null)
-          fi
-
-          if [ -z "$changed" ]; then
-            echo "::notice::could not determine the changed files; running everything"
-            echo "code=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          echo "changed files:"
-          printf '%s\n' "$changed" | sed 's/^/  /'
-
-          # Anything that is not documentation counts as code. Written as "not
-          # in the docs allowlist" rather than as a list of code paths, because
-          # a new top-level directory must default to running the suite, not to
-          # skipping it.
-          #
-          # Counted rather than tested with `grep -qv`. The two are equivalent
-          # on GNU grep, but this form states the decision in numbers that land
-          # in the log, so a wrong skip can be diagnosed from the run page
-          # instead of by re-deriving a regex.
-          total=$(printf '%s\n' "$changed" | grep -c '')
-          docs=$(printf '%s\n' "$changed" | grep -cE '^(docs/.+|[^/]+\.md)$' || true)
-          echo "$docs of $total changed paths are documentation"
-
-          if [ "$total" -eq "$docs" ]; then
-            echo "code=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::documentation only; skipping the browser and lighthouse jobs"
-          else
-            echo "code=true" >> "$GITHUB_OUTPUT"
-            echo "::notice::this change touches more than documentation; running the full suite"
-          fi
-
   check:
     name: blocking release checks
-    runs-on: ${{ fromJSON(vars.CI_RUNNER || '["self-hosted","coditu-mac"]') }}
-    timeout-minutes: 35
-
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/runner-identity
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          # ── Not on the self-hosted runner, and this is measured ────────────
-          #
-          # `cache: npm` archives `~/.npm` and uploads it to GitHub's cache
-          # service, so that the NEXT ephemeral machine does not download the
-          # registry again. A self-hosted runner is not ephemeral: `~/.npm` is
-          # still there next run, having never been lost.
-          #
-          # So the whole exchange is a round trip to replace something that did
-          # not go anywhere — and on the first run of this change it cost more
-          # than everything it was helping. Lint, typecheck, 589 unit tests, the
-          # RLS suite, a production build, budgets, the degraded-dependency
-          # pause: **5 minutes**. `Post Run actions/setup-node@v4`, uploading
-          # the cache: **15 and still going.**
-          #
-          # Written the long way round on purpose. `x && '' || 'npm'` looks
-          # right and returns `npm` in both branches, because an empty string is
-          # falsy in a GitHub expression and the `||` takes over.
-          cache: ${{ runner.environment == 'github-hosted' && 'npm' || '' }}
-
+          cache: npm
       - run: npm ci
-
-      # The local Supabase stack. The RLS assertions and every e2e spec that
-      # compares the screen to the database need a real Postgres — a mock would
-      # prove nothing about the policies, which is the point of having them.
-      - uses: supabase/setup-cli@v1
-        with:
-          # Keep CI on the same proved database image/tooling shape as the
-          # backup and isolated 441-test rehearsal. `latest` already changed
-          # grant behaviour underneath this repository once.
-          version: 2.109.1
-      - uses: ./.github/actions/isolated-supabase
-      - run: supabase start
-      - run: supabase db reset
-
-      # Write the real values into `.env.local` rather than hardcoding ports in
-      # this file. This project runs on the 544xx block, not Supabase's default
-      # 543xx, and a hardcoded port here is a workflow that fails on every push
-      # for a reason nobody looking at the app would guess.
-      - name: Point the app at the local stack
-        run: |
-          set -euo pipefail
-          eval "$(supabase status -o env)"
-          {
-            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
-            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY"
-            echo "NEXT_PUBLIC_SITE_URL=http://localhost:3000"
-            echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
-            echo "REPORT_TOKEN_SECRET=ci-only-not-a-secret"
-            echo "E2E_DATABASE_URL=$DB_URL"
-          } > .env.local
-
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test
-      - run: npm run db:test
-
-      - name: Generated database types match the clean schema
-        run: |
-          npm run db:types
-          git diff --exit-code -- lib/supabase/database.types.ts
-
       - run: npm run build
-      # Greps the BUILT stylesheet. Tailwind prunes rules it does not recognise
-      # as used, and an attribute selector is not a class name — the reveal
-      # tiers have vanished from a green build before.
       - run: ./scripts/verify-tokens.sh
-
-      # `check-budgets.mjs` measures transferred bytes by loading each route in a
-      # real browser, and `check-degraded-dependency.mjs` renders a PDF, so both
-      # need Chromium. This job never installed one — only the `browser` job did
-      # — so the budget step has been dying on
-      # `browserType.launch: Executable doesn't exist` every time it was reached,
-      # which until today was never, because `db:test` failed first. It works
-      # locally, where a browser is already on the machine. Another check that
-      # only ran when somebody remembered.
-      #
-      # The headless shell rather than full Chromium: it is the binary these two
-      # scripts actually launch, and it is the smaller download of the two on a
-      # job that runs on every push.
-      - run: npx playwright install --with-deps chromium-headless-shell
-
-      # Fails the build when a route's own JavaScript exceeds its cap.
-      - run: SKIP_BUILD=1 ./scripts/with-prod-server.sh node scripts/check-budgets.mjs
-
-      # Every Server Action call must inspect failure and protect optimistic
-      # state. This was in the local gate but missing from the hosted one.
-      - run: npm run resilience
-
-      # The copy of the backup tooling that `MooTamer/coditu-recovery` carries
-      # must still match this repository's. It compares digests and needs no
-      # network. `components:check` cannot run here — it reads a second checkout
-      # that is not on the runner — but this one can, and until today it ran
-      # nowhere at all.
-      - run: npm run recovery:check
-
-      # Pauses the Supabase gateway and asserts the app degrades instead of
-      # hanging: marketing untouched, /app failing fast and CLOSED, automatic
-      # recovery. Last, because it takes the database away from everything.
-      - run: SKIP_BUILD=1 npm run degraded
-
-      # A hosted runner is deleted when the job ends. This Mac is not. Nine
-      # containers left behind after every run would fill a 6 GiB Colima VM in
-      # an afternoon and take the developer's own stack down with it — a CI job
-      # whose failure mode is somebody else's broken machine. `always()`, so a
-      # red suite still cleans up after itself.
-      # ── `--project-id`, and it is not belt-and-braces ─────────────────────
-      #
-      # `--no-backup` means "delete all data volumes after stopping". Without
-      # `--project-id` the target is resolved from `supabase/config.toml` in
-      # the workspace — so the blast radius of this line depends on a file
-      # having been edited correctly by an earlier step, and `always()` means
-      # it runs even when that step did not.
-      #
-      # Naming the project makes the destructive flag unable to reach anything
-      # but CI's own stack, whatever state the config is in. On 2026-08-31 the
-      # developer's `coditu` stack and its data volume disappeared during this
-      # work and could not be attributed with certainty; the logs show every
-      # teardown correctly scoped to `codituci`. That uncertainty is the whole
-      # argument — a destructive command should not be one file edit away from
-      # a different target.
-      - name: Tear the CI stack down
-        if: ${{ always() && runner.environment == 'self-hosted' }}
-        run: supabase stop --project-id codituci --no-backup || true
-
-  # ── The timeout belongs on the STEPS, and that is not a detail ─────────────
-  #
-  # A job that exceeds its own `timeout-minutes` is CANCELLED, and
-  # `continue-on-error` does not cover a cancellation — it covers a failure. So
-  # this report-only job hit 70 minutes on `main` at `cdbd011` and took the
-  # whole run's conclusion to `cancelled` with it, while `blocking release
-  # checks` had passed and the deploy had correctly skipped.
-  #
-  # That is the same defect this repository spent a day removing, arriving from
-  # the other side: a check that gates nothing decided what colour the trunk is.
-  #
-  # A STEP that exceeds `timeout-minutes` FAILS, and a step-level
-  # `continue-on-error: true` swallows that. So the budget moves down to the two
-  # suite steps, the job ceiling sits above their sum where it can never fire,
-  # and a suite that runs long reads as a red report instead of a cancelled run.
-  # The last step still turns either outcome into a visible red job.
-  #
-  # 70 minutes was not enough for a reason worth recording: that run logged
-  # **37 retries**, and `retries: 2` makes every failure cost three times. A
-  # clean serial run of the same tree on a developer machine is 21.6 minutes.
-  browser:
-    name: browser baseline (report-only through the ten-run review)
-    # `deploy` is in `needs` so the release is never queued behind an
-    # 85-minute report on the single self-hosted runner. See `lighthouse`.
-    needs: [scope, check, deploy]
-    if: >-
-      always() && needs.scope.outputs.code == 'true'
-      && needs.check.result == 'success'
-    continue-on-error: true
-    runs-on: ${{ fromJSON(vars.CI_RUNNER || '["self-hosted","coditu-mac"]') }}
-    timeout-minutes: 85
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/runner-identity
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          # ── Not on the self-hosted runner, and this is measured ────────────
-          #
-          # `cache: npm` archives `~/.npm` and uploads it to GitHub's cache
-          # service, so that the NEXT ephemeral machine does not download the
-          # registry again. A self-hosted runner is not ephemeral: `~/.npm` is
-          # still there next run, having never been lost.
-          #
-          # So the whole exchange is a round trip to replace something that did
-          # not go anywhere — and on the first run of this change it cost more
-          # than everything it was helping. Lint, typecheck, 589 unit tests, the
-          # RLS suite, a production build, budgets, the degraded-dependency
-          # pause: **5 minutes**. `Post Run actions/setup-node@v4`, uploading
-          # the cache: **15 and still going.**
-          #
-          # Written the long way round on purpose. `x && '' || 'npm'` looks
-          # right and returns `npm` in both branches, because an empty string is
-          # falsy in a GitHub expression and the `||` takes over.
-          cache: ${{ runner.environment == 'github-hosted' && 'npm' || '' }}
-
-      - run: npm ci
-
-      - uses: supabase/setup-cli@v1
-        with:
-          version: 2.109.1
-      - uses: ./.github/actions/isolated-supabase
-      - run: supabase start
-      - run: supabase db reset
-
-      - name: Point the browser suites at the isolated CI stack
-        run: |
-          set -euo pipefail
-          eval "$(supabase status -o env)"
-          # Web Push needs VAPID keys or the control renders `not-configured`,
-          # and `push.spec.ts` asserts `off` — the state a real person meets.
-          # Without them that spec fails here for a reason that has nothing to
-          # do with the application, which is how it read on an isolated stack
-          # before this line existed.
-          #
-          # Generated per run rather than committed. They are throwaway by
-          # construction — the only thing this private half can do is sign a
-          # push to a subscription created in this same job, which dies with the
-          # runner — and a private key in a repository is a habit worth not
-          # having even when the key is worthless.
-          eval "$(node -e '
-            const { generateVAPIDKeys } = require("web-push");
-            const k = generateVAPIDKeys();
-            process.stdout.write(`VAPID_PUBLIC=${k.publicKey}\nVAPID_PRIVATE=${k.privateKey}\n`);
-          ')"
-          {
-            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
-            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY"
-            echo "NEXT_PUBLIC_SITE_URL=http://localhost:3000"
-            echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
-            echo "REPORT_TOKEN_SECRET=ci-only-not-a-secret"
-            echo "E2E_DATABASE_URL=$DB_URL"
-            echo "NEXT_PUBLIC_VAPID_PUBLIC_KEY=$VAPID_PUBLIC"
-            echo "VAPID_PRIVATE_KEY=$VAPID_PRIVATE"
-            echo "VAPID_SUBJECT=mailto:ci@coditu.local"
-          } > .env.local
-
       - run: npx playwright install --with-deps chromium webkit
-
-      # Keep both outcomes visible and run both passes even if the first one is
-      # red. Job-level continue-on-error keeps this observer out of the release
-      # dependency until ten consecutive runs of this exact configuration pass.
-      - name: Development-server browser suite
-        id: development_e2e
-        continue-on-error: true
-        timeout-minutes: 60
-        run: npm run e2e
-
-      - name: Production-build browser assertions
-        id: production_e2e
-        continue-on-error: true
-        timeout-minutes: 15
-        run: npm run e2e:prod
-
+      - run: SKIP_BUILD=1 ./scripts/with-prod-server.sh node scripts/check-budgets.mjs
+      - run: npm run e2e
       - uses: actions/upload-artifact@v4
-        if: ${{ always() && (steps.development_e2e.outcome == 'failure' || steps.production_e2e.outcome == 'failure') }}
+        if: ${{ failure() }}
         with:
-          name: browser-baseline-${{ github.run_id }}
+          name: e2e-${{ github.run_id }}
           path: |
             playwright-report/
             test-results/
           retention-days: 7
 
-      - name: Preserve a visible red result without blocking release
-        if: ${{ steps.development_e2e.outcome == 'failure' || steps.production_e2e.outcome == 'failure' }}
-        run: exit 1
-
-      # A hosted runner is deleted when the job ends. This Mac is not. Nine
-      # containers left behind after every run would fill a 6 GiB Colima VM in
-      # an afternoon and take the developer's own stack down with it — a CI job
-      # whose failure mode is somebody else's broken machine. `always()`, so a
-      # red suite still cleans up after itself.
-      # ── `--project-id`, and it is not belt-and-braces ─────────────────────
-      #
-      # `--no-backup` means "delete all data volumes after stopping". Without
-      # `--project-id` the target is resolved from `supabase/config.toml` in
-      # the workspace — so the blast radius of this line depends on a file
-      # having been edited correctly by an earlier step, and `always()` means
-      # it runs even when that step did not.
-      #
-      # Naming the project makes the destructive flag unable to reach anything
-      # but CI's own stack, whatever state the config is in. On 2026-08-31 the
-      # developer's `coditu` stack and its data volume disappeared during this
-      # work and could not be attributed with certainty; the logs show every
-      # teardown correctly scoped to `codituci`. That uncertainty is the whole
-      # argument — a destructive command should not be one file edit away from
-      # a different target.
-      - name: Tear the CI stack down
-        if: ${{ always() && runner.environment == 'self-hosted' }}
-        run: supabase stop --project-id codituci --no-backup || true
-
-  # ── Why this job exists, and why it is not an `if:` on the deploy job ───────
-  #
-  # The deploy job used to carry a first step that asserted every deploy value
-  # was non-empty and exited 1 otherwise. That is the right instinct — a deploy
-  # that cannot verify the hosted schema must not run — and the wrong colour.
-  # `VERCEL_TOKEN` and `HOSTED_SCHEMA_DB_URL` are not set yet, so EVERY push to
-  # `main` painted the trunk red for a condition that is a setup gap, not a
-  # broken build. A permanently-red trunk teaches people to stop reading red,
-  # and then the one that matters goes unnoticed.
-  #
-  # `secrets` is not available in a job-level `if:` — GitHub evaluates those
-  # before secrets are in scope — so the test cannot live there directly. The
-  # documented idiom is this: a job that CAN read secrets turns their presence
-  # into a plain string output, and the dependent job keys its `if:` on that.
-  #
-  # It reports presence only. No value is ever echoed, and `set -u` is not used
-  # around the indirect expansion because an unset name is the answer here, not
-  # an error.
-  #
-  # A skipped deploy reads "not configured". A failed deploy reads "broken".
-  # Only one of those is true, and the two must never look alike.
-  #
-  # ── This is deliberately the OPPOSITE of the canary ─────────────────────────
-  #
-  # `backup-canary.yml` now FAILS when `HEARTBEAT_URL` is absent. This one
-  # SKIPS. The rule that produces both: a DEPLOY that is not configured should
-  # be skipped, because not deploying is safe. An ALARM that is not configured
-  # must be loud, because not alarming is not safe. See ADR 2026-08-30.
-  #
-  # Skipping is not the same as being silent. The absence is a warning
-  # annotation on the run page and a line in the job summary that names every
-  # missing value, so "not configured" is something you read rather than
-  # something you infer from a job that did not appear.
+  # A missing secret is "not configured", not "broken": the deploy is skipped
+  # with a summary that says so, instead of failing every push to `main`.
   preflight:
     name: is the production deploy configured
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ${{ fromJSON(vars.CI_RUNNER || '["self-hosted","coditu-mac"]') }}
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     environment: Production
     outputs:
@@ -481,23 +59,14 @@ jobs:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      HOSTED_SCHEMA_DB_URL: ${{ secrets.HOSTED_SCHEMA_DB_URL }}
       PRODUCTION_BASE_URL: ${{ vars.PRODUCTION_BASE_URL }}
-
     steps:
-      # This job needs no source of its own — it reads secrets and prints their
-      # names. It checks out anyway, because `runner-identity` is a local
-      # action and a job that will not say where it ran is the one place a
-      # silent return to the metered pool could hide.
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/runner-identity
-
       - id: probe
         name: Report which deploy values are present, by name only
         run: |
           set -uo pipefail
           missing=""
-          for required in VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN HOSTED_SCHEMA_DB_URL PRODUCTION_BASE_URL; do
+          for required in VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN PRODUCTION_BASE_URL; do
             if [ -n "${!required:-}" ]; then
               printf '  present  %s\n' "$required"
             else
@@ -505,38 +74,34 @@ jobs:
               missing="$missing $required"
             fi
           done
-
           if [ -z "$missing" ]; then
             echo "configured=true" >> "$GITHUB_OUTPUT"
             echo "the production deploy is configured" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-
           echo "configured=false" >> "$GITHUB_OUTPUT"
           echo "::warning title=Production deploy is not configured::missing:$missing"
           {
             echo "### Production deploy: NOT CONFIGURED"
             echo
             echo "This commit was **not deployed**. The deploy job was skipped, not failed."
-            echo "Nothing is broken; these values have never been set:"
+            echo "These values are not set:"
             echo
             for required in $missing; do echo "- \`$required\`"; done
             echo
-            echo "See \`docs/13-DEPLOYMENT-RUNBOOK.md\` §1. Until they are set, production"
-            echo "stays on whatever commit it is already serving."
+            echo "Until they are set, production stays on whatever commit it is already serving."
           } >> "$GITHUB_STEP_SUMMARY"
 
+  # Production deploys from here on green, not from a push: `vercel.json`
+  # disables Git deployments for `main`. Stage, smoke, promote, and roll back if
+  # the public smoke fails — see `scripts/deploy-production.sh`.
   deploy:
     name: production deploy after blocking checks
     needs: [check, preflight]
-    # The branch test is repeated rather than inherited from `preflight`. It is
-    # inherited today — a skipped `needs` skips its dependents — but that is a
-    # property of the other job's `if:`, and this job's own guarantee should not
-    # be one edit away in a file somebody else is changing.
     if: >-
       github.event_name == 'push' && github.ref == 'refs/heads/main'
       && needs.preflight.outputs.configured == 'true'
-    runs-on: ${{ fromJSON(vars.CI_RUNNER || '["self-hosted","coditu-mac"]') }}
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: Production
     concurrency:
@@ -546,198 +111,37 @@ jobs:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      HOSTED_SCHEMA_DB_URL: ${{ secrets.HOSTED_SCHEMA_DB_URL }}
       PRODUCTION_BASE_URL: ${{ vars.PRODUCTION_BASE_URL }}
-
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/runner-identity
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          # ── Not on the self-hosted runner, and this is measured ────────────
-          #
-          # `cache: npm` archives `~/.npm` and uploads it to GitHub's cache
-          # service, so that the NEXT ephemeral machine does not download the
-          # registry again. A self-hosted runner is not ephemeral: `~/.npm` is
-          # still there next run, having never been lost.
-          #
-          # So the whole exchange is a round trip to replace something that did
-          # not go anywhere — and on the first run of this change it cost more
-          # than everything it was helping. Lint, typecheck, 589 unit tests, the
-          # RLS suite, a production build, budgets, the degraded-dependency
-          # pause: **5 minutes**. `Post Run actions/setup-node@v4`, uploading
-          # the cache: **15 and still going.**
-          #
-          # Written the long way round on purpose. `x && '' || 'npm'` looks
-          # right and returns `npm` in both branches, because an empty string is
-          # falsy in a GitHub expression and the `||` takes over.
-          cache: ${{ runner.environment == 'github-hosted' && 'npm' || '' }}
-
-      # `preflight` already answered this, so reaching here with a value missing
-      # means it was deleted between the two jobs. That is a real fault and this
-      # step is right to be red about it — unlike the version this replaces,
-      # which was red for a setup gap and painted the trunk red on every push.
-      # Kept because the gate is now a string passed between jobs, and a string
-      # is easier to get wrong than a `test -n`.
-      - name: Re-assert the deploy values at the point of use
-        run: |
-          set -euo pipefail
-          for required in VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN HOSTED_SCHEMA_DB_URL PRODUCTION_BASE_URL; do
-            if [ -z "${!required:-}" ]; then
-              echo "::error::$required was present at preflight and is empty now; refusing to deploy"
-              exit 1
-            fi
-          done
-
-      - run: npm ci
-
-      # `HOSTED_SCHEMA_DB_URL` names `postgres`, not `coditu_backup`, because the
-      # narrower role's password was not reachable when the secret was set. The
-      # preflight's contract is `coditu_backup`, so the deviation is named here
-      # rather than removed from the check: unset, the strict contract applies
-      # and this deploy stops. It is in this file, in git, so that narrowing the
-      # URL is a one-line deletion somebody can see in a diff — and so that the
-      # exception cannot outlive the reason for it unnoticed.
-      #
-      # What actually bounds the wider role is not this line. The check opens
-      # `begin read only` and PROVES it: it reads `transaction_read_only` and
-      # attempts a write that must be refused with 25006. See ADR 2026-08-31.
-      - name: Prove the hosted schema can serve this commit
-        env:
-          HOSTED_SCHEMA_PRIVILEGED_ROLE: postgres
-        run: node scripts/check-hosted-schema.mjs
-
-      # This step used to be `vercel pull` + `vercel build`, shipping the result
-      # with `--prebuilt`. It cannot work here and the first real run proved it:
-      #
-      #   ! 4 Secret values cannot be pulled from the `production` Environment.
-      #     Wrote "[SENSITIVE]" as placeholders …
-      #   Error: Supabase environment is not configured
-      #     (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY).
-      #
-      # A Sensitive environment variable on Vercel is WRITE-ONLY by design. No
-      # token can read one back, so a build outside Vercel cannot have them, and
-      # the answer is not to downgrade four production variables to readable.
-      # Vercel builds instead — as it has for every production deploy this
-      # project has ever had — and the gate is unmoved: this job still runs only
-      # after the blocking checks and the hosted-schema preflight, on a commit
-      # already on `main` through a green pull request. See ADR 2026-08-31.
       - name: Stamp the commit this release claims to be
         run: |
           npm install --global vercel@59.9.1
           node scripts/write-build-health.mjs
-
       - name: Stage, smoke and promote the checked commit
         id: production_deploy
         run: ./scripts/deploy-production.sh
-
       - name: Record the promoted deployment
         run: |
           printf 'Production deployment: %s\n' "${{ steps.production_deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
 
+  # Report-only: Lantern is a simulation and its scores move on an identical
+  # build, so a red here is something to read, not something that blocks.
   lighthouse:
-    name: lighthouse (marketing)
-    # ── `deploy` is in `needs` so that it goes FIRST ──────────────────────────
-    #
-    # There is one self-hosted runner, so every job in a run is serialised, and
-    # GitHub picks among ready jobs in no order you can rely on. Measured
-    # 2026-08-31 on the merge of #10: `blocking release checks` went green, and
-    # then **`lighthouse` took the runner while the production deploy waited**.
-    # A report that gates nothing had got in front of the release.
-    #
-    # This repository already learned the neighbouring lesson — a report-only
-    # job must not decide what colour the trunk is. The single runner adds the
-    # other half: it must not decide *when the trunk ships*.
-    #
-    # `always()` is what keeps this from being a regression on pull requests,
-    # where `deploy` is skipped: a skipped `needs` normally skips its dependents,
-    # and `always()` stops that while `needs.check.result` keeps the real
-    # dependency.
-    needs: [scope, check, deploy]
-    if: >-
-      always() && needs.scope.outputs.code == 'true'
-      && needs.check.result == 'success'
-    runs-on: ${{ fromJSON(vars.CI_RUNNER || '["self-hosted","coditu-mac"]') }}
+    name: lighthouse (report-only)
+    needs: [check]
+    runs-on: ubuntu-latest
     timeout-minutes: 20
-    # Reports rather than gates. Accessibility, best practices, and SEO sit at
-    # 100; Performance sits at 93 against §5's 95, and the whole gap is
-    # Lighthouse's SIMULATED LCP on a payload that is 139KB framework floor
-    # before a line of this repository's code runs. Measured with real 4G and
-    # 4x CPU throttling the same page reaches LCP in ~1.0s, inside §5's 2.0s.
-    # See docs/05-DECISIONS.md. Blocking merges on a number the stack cannot
-    # reach would train everyone to ignore a red check.
     continue-on-error: true
-
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/runner-identity
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          # ── Not on the self-hosted runner, and this is measured ────────────
-          #
-          # `cache: npm` archives `~/.npm` and uploads it to GitHub's cache
-          # service, so that the NEXT ephemeral machine does not download the
-          # registry again. A self-hosted runner is not ephemeral: `~/.npm` is
-          # still there next run, having never been lost.
-          #
-          # So the whole exchange is a round trip to replace something that did
-          # not go anywhere — and on the first run of this change it cost more
-          # than everything it was helping. Lint, typecheck, 589 unit tests, the
-          # RLS suite, a production build, budgets, the degraded-dependency
-          # pause: **5 minutes**. `Post Run actions/setup-node@v4`, uploading
-          # the cache: **15 and still going.**
-          #
-          # Written the long way round on purpose. `x && '' || 'npm'` looks
-          # right and returns `npm` in both branches, because an empty string is
-          # falsy in a GitHub expression and the `||` takes over.
-          cache: ${{ runner.environment == 'github-hosted' && 'npm' || '' }}
+          cache: npm
       - run: npm ci
-      # The marketing route is static, but `next build` still validates the
-      # Supabase environment — and `with-prod-server.sh` refuses to start
-      # without a local database. So this job needs the stack too, even though
-      # the page it measures never touches it.
-      - uses: supabase/setup-cli@v1
-        with:
-          version: 2.109.1
-      - uses: ./.github/actions/isolated-supabase
-      - run: supabase start
-      - name: Point the app at the local stack
-        run: |
-          set -euo pipefail
-          eval "$(supabase status -o env)"
-          {
-            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
-            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY"
-            echo "NEXT_PUBLIC_SITE_URL=http://localhost:3000"
-            echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
-            echo "REPORT_TOKEN_SECRET=ci-only-not-a-secret"
-          } > .env.local
       - run: npx playwright install --with-deps chromium
       - run: npm run lighthouse
-
-      # A hosted runner is deleted when the job ends. This Mac is not. Nine
-      # containers left behind after every run would fill a 6 GiB Colima VM in
-      # an afternoon and take the developer's own stack down with it — a CI job
-      # whose failure mode is somebody else's broken machine. `always()`, so a
-      # red suite still cleans up after itself.
-      # ── `--project-id`, and it is not belt-and-braces ─────────────────────
-      #
-      # `--no-backup` means "delete all data volumes after stopping". Without
-      # `--project-id` the target is resolved from `supabase/config.toml` in
-      # the workspace — so the blast radius of this line depends on a file
-      # having been edited correctly by an earlier step, and `always()` means
-      # it runs even when that step did not.
-      #
-      # Naming the project makes the destructive flag unable to reach anything
-      # but CI's own stack, whatever state the config is in. On 2026-08-31 the
-      # developer's `coditu` stack and its data volume disappeared during this
-      # work and could not be attributed with certainty; the logs show every
-      # teardown correctly scoped to `codituci`. That uncertainty is the whole
-      # argument — a destructive command should not be one file edit away from
-      # a different target.
-      - name: Tear the CI stack down
-        if: ${{ always() && runner.environment == 'self-hosted' }}
-        run: supabase stop --project-id codituci --no-backup || true

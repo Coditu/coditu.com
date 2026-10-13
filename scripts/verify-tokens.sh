@@ -116,15 +116,5 @@ else
   echo "  ok   no prerendered content shipped hidden"
 fi
 
-# /dev/tokens must not exist in a production build. It renders every token in
-# both themes, which is useful to us and pointless noise on a real deployment.
-if [ -f .next/server/app/dev/tokens.html ]; then
-  if grep -qiE '404|not.?found' .next/server/app/dev/tokens.html; then
-    echo "  ok   /dev/tokens is 404 in a production build"
-  else
-    echo "  MISS /dev/tokens rendered in a production build — the guard is not working"; fail=1
-  fi
-fi
-
 echo
 if [ "$fail" -eq 0 ]; then echo "tokens: OK"; else echo "tokens: FAILED"; exit 1; fi

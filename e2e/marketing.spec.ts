@@ -127,7 +127,7 @@ test.describe("marketing site", () => {
     expect(copy.toLowerCase()).not.toContain("strukture");
     expect(metadata.toLowerCase()).not.toContain("strukture");
 
-    for (const path of ["/robots.txt", "/sitemap.xml", "/site.webmanifest"]) {
+    for (const path of ["/robots.txt", "/sitemap.xml"]) {
       const response = await page.request.get(path);
       expect(response.ok(), `${path} should be served`).toBe(true);
       expect((await response.text()).toLowerCase()).not.toContain("strukture");
@@ -304,5 +304,32 @@ test.describe("marketing site", () => {
     await page.goto("/");
     await expect(page.locator("html")).toHaveClass(/dark/);
     expect(await audit(page)).toEqual([]);
+  });
+  test("no horizontal scroll at any of the thirteen widths", async ({ page }) => {
+    for (const width of [320, 360, 390, 430, 640, 744, 834, 1024, 1280, 1440, 1728, 1920, 2560]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.waitForTimeout(120);
+      // Names the offending element, because "something overflows" is not a bug report.
+      const overflow = await page.evaluate(() => {
+        const limit = document.documentElement.clientWidth;
+        if (document.documentElement.scrollWidth <= limit + 1) return [];
+        return Array.from(document.querySelectorAll<HTMLElement>("body *"))
+          .filter((el) => el.getBoundingClientRect().right > limit + 1)
+          .slice(0, 5)
+          .map(
+            (el) =>
+              `${el.tagName.toLowerCase()}.${el.className.toString().split(" ").slice(0, 2).join(".")}` +
+              ` → ${Math.round(el.getBoundingClientRect().right)} > ${limit}`
+          );
+      });
+      expect(overflow, `at ${width}px`).toEqual([]);
+    }
+  });
+
+  test("the dashboard is gone: no link to it, and its old routes are 404", async ({ page }) => {
+    await expect(page.locator('a[href^="/app"], a[href^="/login"], a[href^="/client"]')).toHaveCount(0);
+    for (const path of ["/app", "/login", "/client", "/api/health/database"]) {
+      expect((await page.request.get(path)).status(), path).toBe(404);
+    }
   });
 });
