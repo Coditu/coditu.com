@@ -1,0 +1,87 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+/test-results
+/playwright-report
+/blob-report
+/.playwright
+*.lighthouseci
+/.lighthouseci
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# Recovery material. The public age recipient lives in ops/; none of the
+# encrypted archives, private keys, or plaintext database dumps belong in git.
+/.backups
+/.db-gate
+*.agekey
+*.dump
+*.dump.age
+*.tar.gz.age
+
+# macOS — AppleDouble resource forks and Finder metadata.
+# These break `git status` with "non-monotonic index" when they land in .git/objects/pack.
+._*
+.DS_Store
+
+# misc
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# supabase local stack
+/supabase/.branches
+/supabase/.temp
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# local agent/tooling state — never committed
+/.claude-flow
+/.swarm
+/.hive-mind
+/.claude
+
+# local screenshot helper — verification only, never committed
+/scripts/.shot.local.mjs
+
+# Client-portal browser verification is IN git now. It was local-only until it
+# was explicitly asked for, which the 2026-08-27 audit did: these thirty-four
+# specs are the only automated proof that a client contact cannot reach /app,
+# another company's project, an internal comment, an unpublished component or a
+# figure — and coverage nobody but one laptop can run is not coverage.
+# `client-fixtures.ts` lost its `.local` suffix with them, because the name was
+# the claim.
+/scripts/.*.local.mjs
+
+# One-off browser diagnostics — verification only, never committed
+/e2e/*.local.spec.ts
+
+# Written by CI immediately before a production deploy; never committed.
+public/build-health.json

@@ -1,0 +1,2634 @@
+# 07 — Field notes
+
+**Things this repository has already learned the hard way.** Every entry below cost somebody real
+time, and none of them is derivable from the code by reading it.
+
+This file exists because that knowledge used to live in one laptop's private assistant memory, where
+a cloud session, a new developer, and the next agent could not reach it. It is checked in so all of
+them can.
+
+## How to use it
+
+- **Read it before debugging anything that smells environmental** — a test that fails differently on
+  each run, a build that cannot find the seeded users, a 502 from the auth API, a status code that is
+  200 when it should be 404.
+- **Append to it.** One `###` entry per fact: what is true, why it matters, and what to do about it.
+  Newest at the bottom of its section. Date anything time-sensitive.
+- **Correct it in place** when something stops being true, and say so — a stale note is worse than no
+  note, because it is trusted.
+- Keep entries short enough to read in a hurry and specific enough to act on. A fact with no
+  consequence attached is a comment, not a field note.
+
+---
+
+## Environment and verification
+
+### `npm run build` points at production
+`next build` sets `NODE_ENV=production`, and Next loads **`.env.production.local` ahead of
+`.env.local`**. This repo keeps the hosted project's credentials in `.env.production.local`, so a bare
+`npm run build` produces a bundle wired to **production** — and `NEXT_PUBLIC_*` is inlined at build
+time, so nothing set at `next start` can undo it.
+
+It presents as *"That email and password do not match."* Nothing errors; the app simply cannot find the
+seeded users. Injected `sb-127-auth-token` cookies are ignored outright (a production build expects
+`sb-hayfsvsepgfescojesbd-auth-token`), `getUser()` short-circuits with no network call, and `/app`
+redirects to `/login` in ~3ms — which looks exactly like a tripped circuit breaker.
+
+Build through `scripts/with-prod-server.sh`, or export first:
+
+```bash
+set -a; . ./.env.local; set +a; npm run build
+```
+
+Confirm which database a build is wired to before debugging anything else:
+
+```bash
+grep -rhao "127\.0\.0\.1:54421" .next/server | head -1   # local
+grep -rlao "hayfsvsepgfescojesbd" .next/server | head -1  # production
+```
+
+### Kong caches the database after a reset
+`supabase db reset` restarts the Postgres container and `supabase_kong_coditu` keeps routing to the old
+upstream. `/auth/v1/health` answers **502** and the whole e2e suite fails at sign-in — which reads as a
+broken auth service rather than a stale proxy.
+
+```bash
+curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:54421/auth/v1/health   # want 200
+docker restart supabase_kong_coditu && sleep 8                                 # the fix
+```
+
+### Degrade Supabase with `docker pause`, never `docker stop`
+`scripts/check-degraded-dependency.mjs` proves the circuit breaker by pausing Kong. A **paused**
+container keeps its listening socket, so the kernel completes the handshake and nothing ever answers —
+the failure that actually hurts. A **stopped** one refuses the connection in a millisecond and proves
+nothing. Always `docker unpause` defensively at the start as well as in `finally`.
+
+The obvious alternative fails *by passing*: starting the server with `NEXT_PUBLIC_SUPABASE_URL`
+overridden does nothing, because Next inlined the URL at build time.
+
+### The e2e suite shares one local database
+`e2e/fixtures.ts` connects every spec to the single local stack on ports 544xx. Specs coordinate with a
+pg advisory lock (`sprintTotals: "read" | "write"`), but that lock only covers specs in the same run.
+A second session — another worktree, another agent, a stray `next dev` — running its own suite against
+the same database produces failures that look exactly like regressions in your code.
+
+Before trusting an e2e failure: `ps aux | grep playwright`, then re-run the failing spec alone or at
+`--workers=1`. Contention shows up as *different* specs failing each run; a real regression fails the
+same one every time.
+
+**And a third case that looks like neither: the suite leaves the seed changed.** `item-detail.spec.ts`
+→ *"tapping the words opens the editor and does not tick the box"* reads
+`getByRole("checkbox").first()`. On the seeded database COD-231's three criteria are all unticked, so
+the first one is unticked and the assertion holds. A previous run that ticked two of them and did not
+put them back makes **done sink**, so `.first()` is now a *ticked* criterion and the test fails on all
+three engines, in isolation, repeatably — which is exactly what a real regression looks like. It cost
+a full diagnosis on 2026-08-25.
+
+So the check is three-way, in this order, and the last one is cheap:
+
+1. different specs each run → the machine
+2. same spec, passes alone → contention
+3. same spec, fails alone → **`npm run db:reset`, then run it again.** Only if it still fails is it
+   the code.
+
+Any spec that reads a seeded row by POSITION rather than by name has this failure mode latent in it.
+
+### `auditA11y` at a phone WIDTH is not an audit at a phone POINTER
+
+`criteria.spec.ts` → *"it works on a phone, and axe finds nothing while editing"*
+sets a 390px viewport in the **chromium** project and then runs `auditA11y`. It
+reports seven `target-size` violations on the editor toolbar:
+
+```
+target-size @ button[aria-label="Bold"]
+target-size @ button[aria-label="Italic"]
+…
+```
+
+**They are invented.** Those buttons reach 44px through
+`@media (pointer: coarse)` in `app/globals.css`, and chromium reports
+`pointer: fine` however narrow the viewport is — the note above about measuring
+touch targets, arriving through axe instead of through a hand-rolled measurement.
+`auditA11y` includes `wcag22aa`, which is where `target-size` lives, and it does
+not replay the coarse rules. `e2e/mobile.spec.ts` → *"every toolbar target clears
+44px on a coarse pointer"* asserts the real property in the `mobile-chrome` and
+`mobile-safari` projects, and passes.
+
+Confirmed pre-existing on 2026-08-25 by stashing a working tree and re-running
+against the parent commit: same seven, same buttons.
+
+**Two ways out, and the second is better.** Either replay the coarse rules into
+an injected `<style>` before auditing, or move the assertion into a project that
+actually has a coarse pointer — the second needs no harness at all and audits
+what a phone really renders.
+
+It hides in a full run: `criteria.spec.ts` is `serial`, so when anything earlier
+in the describe fails this one is reported as "did not run" rather than as a
+failure. Absence from a red summary is not evidence it passed.
+
+### A pgTAP file that counts rows in an append-only table must build its own fixture
+
+`document_revisions` accumulates, and the e2e suite writes documents. So the
+revision count of any SEEDED story is whatever the last browser run left it at,
+and an assertion like
+
+```sql
+select is((select count(*) from public.document_revisions
+            where entity_id = '…231'), 1, '…');
+```
+
+is asserting the history of the test suite. It is the "suite leaves the seed
+changed" trap in a nastier form than reading a row by position: it passes on a
+fresh database, passes again on the run right after a reset, and fails only on
+the runs that follow a browser run — so it reads as flakiness rather than as the
+deterministic thing it is.
+
+`supabase/tests/revisions.sql` creates its own work item and criterion inside the
+transaction, so numbering starts at 1 by construction and `rollback` removes it.
+Any future test that counts rows in an append-only table should do the same.
+
+The first draft of that file did use COD-231 and passed — purely because the
+suite happens to edit a different story's description. That is luck, not a
+design.
+
+### `supabase test db` reports `Failed: 0` for a file that errored
+
+A SQL error in a pgTAP file does not fail the run in the way you expect. This:
+
+```
+supabase/tests/rls.sql ... ok      <- it says ok
+Tests: 260 Failed: 0               <- and no failures
+Parse errors: Bad plan.  You planned 262 tests but ran 260.
+```
+
+was `select like(...)` — pgTAP's LIKE assertion is **`alike()`**; `like()` does
+not exist. The statement raised, psql aborted the rest of the transaction, and
+the error went to stderr where pg_prove does not read it. Every assertion that
+had already run still emitted its `ok` line, so the counts look healthy.
+
+**The plan count is the only thing that catches it.** `select plan(N)` at the top
+of each file is not bookkeeping — it is the assertion that the file ran to the
+end. Never adjust the number to match what ran; find out why the missing ones
+did not.
+
+The tell is `Bad plan` or `Non-zero exit status: 3` next to `Failed: 0`. When you
+see it, run the file straight through psql to get the real error:
+
+```bash
+docker exec -i supabase_db_coditu psql -U postgres -d postgres -f - < supabase/tests/rls.sql
+```
+
+(pgtap lives in `extensions` and each test file creates it, so running a snippet
+in a bare psql session gets `function plan(integer) does not exist` — that is the
+session, not the database.)
+
+### A working feature is not evidence that its policy is enforced
+
+Presence on the sprint header works. It works identically with
+`config: { private: false }`, which skips `realtime.messages` RLS altogether. So
+`e2e/presence.spec.ts` → *"two people on the same sprint can see each other"*
+would stay green if somebody removed the policies, removed the prefix, or set
+`private: false` — the feature is not the guarantee.
+
+The shape of the problem is general: **when a security control is a gate the
+happy path never touches, the happy path cannot test it.** Look for a test that
+fails when the control is removed. If there isn't one and there cannot be one,
+say so and pin the control's shape directly, as `supabase/tests/read-boundary.sql`
+does for the client RPC projections and `rls.sql` now does for these two
+policies.
+
+Concretely, for realtime: assert the policies exist, that they name
+`is_active_member()`, and that they are confined to the `coditu:` topic prefix —
+plus a browser assertion that the client really sends `"private":true`. Neither
+half is sufficient alone.
+
+### Adding a panel to a page changes every test that reads text from it
+
+W4c put a version history panel on the item page. It renders each revision's
+text as diff lines, so the story's writing is now on that page **twice** — once
+live, once as history. Four specs that had nothing to do with version history
+broke on strict mode:
+
+```
+getByText("WITHDRAWNSENTINEL") resolved to 3 elements:
+  1) <p …>WITHDRAWNSENTINEL</p>
+  2) <div …>+ added: WITHDRAWNSENTINEL</div>
+  3) <div …>+ added: WITHDRAWNSENTINEL</div>
+```
+
+They were not run in W4c — the specs run then were the new one plus a11y and
+navigation — so the breakage was found two phases later, along with a real leak
+underneath it (below). **After adding anything that renders existing content in
+a new place, run the specs for that PAGE, not just for the feature.** For the
+item page that is `item-detail`, `criteria`, `composer` and `editable`.
+
+The fix in each is `.first()` on the live copy, with a comment saying why there
+is more than one.
+
+### `document_revisions` cascades for stories and not for comments
+
+`entity_id` is a plain uuid addressing five different tables, so it can carry a
+foreign key to none of them. `work_item_id` and `sprint_id` DO have one, which is
+why purging a story already removed its whole history — and why nobody noticed
+that purging a **comment** did not.
+
+A withdrawn comment's words are supposed to reach no one, including its author.
+They stayed in `document_revisions` and the history panel went on rendering
+them, on a story any internal member could open, permanently, behind a
+confirmation that had just said "removes the comment permanently".
+
+Both sides are fixed and both are needed. `purge_deleted` deletes the comment's
+revisions explicitly, **before** the comment, so a half-failure leaves a comment
+in the bin rather than a vanished comment with readable words.
+`lib/data/revisions.ts` shows a comment's revisions only while that comment is
+present and standing — written as an ALLOWLIST, because the first attempt asked
+"which are withdrawn" and missed the case that actually leaked: a comment that no
+longer exists at all.
+
+Criteria are deliberately not treated this way: a removed criterion's history is
+a legitimate record of what the work asked for. Withdrawing a comment is
+specifically the act of taking words back.
+
+### A context provider above `useOptimistic` can strand the optimistic state
+
+W5b added `PresenceSurfaceProvider` around the whole item body so an editor
+anywhere inside could announce which surface it was on. It held the surface in
+`useState`, so opening the composer re-rendered everything under the provider —
+including the thread, which owns the `useOptimistic` comment.
+
+`e2e/optimistic.spec.ts` → *"a failed post gives the draft back rather than
+losing it"* then failed with the optimistic entry stuck on `sending…` for ever.
+The composer's rollback runs inside a transition, and a re-render arriving from
+a provider above it left the optimistic entry in place instead of reverting.
+
+**A provider that wraps a subtree containing optimistic state must not hold
+frequently-changing state.** `useSyncExternalStore` is the fix and is better
+anyway: claims live in a ref, and only the one component that reads the value
+re-renders. Nothing else in the tree is touched, so nothing else can be
+disturbed.
+
+The tell is an optimistic placeholder that never resolves while the write itself
+plainly finished — the error toast appeared, the draft came back, and only
+`sending…` was wrong. Confirmed as caused-by-this-change with `git stash`: the
+test passed on the parent, failed with the change, and passed again with a
+single `useAnnounceSurface` call neutralised.
+
+### Two `string` parameters is a type system that cannot help you
+
+`getSprint(projectId: string, number: number)` takes a project **ID**. The
+workspace home passed a **slug**. It typechecks perfectly, lints clean, and
+fails at the database with:
+
+```
+22P02  invalid input syntax for type uuid: "meinevim"
+```
+
+which the app renders as its error boundary — *"This screen did not load."* No
+unit test caught it, because the failure is a real query against a real
+database; nothing but opening the page would have.
+
+Two lessons, and the second is the general one:
+
+- **`getSprint` and friends take ids, not slugs.** `getProjectBySlug` is the one
+  that takes a slug, and its name says so. Check the parameter name, not the
+  type.
+- **The green gate does not open a page.** `lint`, `typecheck` and `test` all
+  passed on a page that threw on every single load. `06-PROGRESS.md` has said
+  "the green gate never opens a page" since W0; this is the clearest instance
+  of it yet, and it was found because somebody insisted on looking in a browser.
+
+Two more defects surfaced in the same look and neither is visible to a test that
+does not read the rendering: `StatusChipDot` already prints its label, so
+printing `STATUS_LABEL` beside it rendered *"in progress in progress 3"*; and
+`daysRemaining` clamps at zero, so a sprint that ended two days ago read
+*"0 days left"*.
+
+**Signing in to the browser without typing a password:** mint a token against the
+local auth API and set the cookie, exactly as `e2e/fixtures.ts` does.
+
+```bash
+curl -s -X POST "http://127.0.0.1:54421/auth/v1/token?grant_type=password" \
+  -H "apikey: $ANON" -H "Content-Type: application/json" \
+  -d '{"email":"mohamed@coditu.com","password":"coditu"}'
+```
+
+then `document.cookie = "sb-127-auth-token=base64-" + btoa(JSON.stringify({access_token, refresh_token, expires_at, expires_in: 3600, token_type: "bearer"}))`.
+The cookie name's `127` is the first label of the Supabase URL, not a typo.
+
+### A Tailwind variant that does not compile fails silently and looks fine
+
+`min-[1180px]:data-[collapsed]:w-[var(--rail-collapsed)]` and
+`min-[1180px]:group-data-[collapsed]/rail:opacity-0` produce **no CSS at all**
+here. Nothing warns. The class names are on the element, `lint` and `typecheck`
+pass, and because the *base* class still applies the component looks entirely
+correct in one of its two states — it just never reaches the other one.
+
+Finding it took setting the attribute by hand in a browser and measuring:
+
+```js
+const a = document.querySelector('aside[data-app-chrome]');
+a.setAttribute('data-collapsed', 'true');   // then, IN A SEPARATE CALL:
+getComputedStyle(a).width;
+```
+
+**Measure in a separate call from the mutation.** Reading `getComputedStyle` in
+the same expression that sets the attribute or clicks the button returns the
+value from before React flushed, which sent this diagnosis down two wrong paths.
+
+When a variant stack is doing something non-trivial, write the rule in
+`globals.css` and key it on a data attribute. It is one readable selector and it
+cannot silently vanish.
+
+### Turbopack serves a stale CSS chunk after an edit
+
+While diagnosing the above: the browser was served CSS containing a token added
+in one edit but *not* rules appended in a later edit — same chunk hash, so no
+reload fixes it. That made an already-subtle bug read as three different bugs in
+sequence.
+
+Check before believing any CSS diagnosis:
+
+```js
+const css = await (await fetch(document.querySelector('link[rel=stylesheet]').href)).text();
+css.includes('the-selector-you-just-wrote');
+```
+
+If it is absent, restart `next dev` — an HMR round trip and a hard reload are
+not enough.
+
+### A width transition makes a synchronous measurement lie
+
+The sidebar animates its width over 220ms, so `getComputedStyle(el).width`
+straight after `setViewportSize` returns an **interpolated** value — 268px on its
+way down to 64. Use `expect(locator).toHaveCSS("width", …)`, which polls. The
+first version of `rail.spec.ts` read directly and failed against a sidebar that
+was working perfectly.
+
+### A loaded machine fails the suite as timeouts
+The suite is ~6 minutes at 12 workers on an idle machine. Under load (a browser, a VM, another build)
+the same run takes 30+ and fails 20 tests, all of them `Test timeout of 30000ms exceeded` — including
+`page.waitForTimeout(120)`, which is the tell. Check `uptime`; above a load average of ~10, run
+`npx playwright test --workers=3` instead of diagnosing.
+
+Related: never edit source files while a suite is running. Every save invalidates the dev server's
+chunks, and the cascade looks like twenty unrelated failures.
+
+### The dev server must be warm before a parallel run
+Twelve workers hitting an uncompiled route at once exceeds the 30s navigation timeout and the failures
+cascade. `curl` the main routes first (`/`, `/login`, `/app`, `/app/my-work`, `/app/people`,
+`/app/import`, `/app/projects`) or run one cheap spec before the suite.
+
+---
+
+## The hosted project
+
+### Production migrations are pushed by hand
+`npm run db:migrate` is `supabase migration up` — **local only**. Nothing in the repo, CI, or the Vercel
+deploy pushes a migration to `hayfsvsepgfescojesbd`. Schema and code travel separately and arrive in
+whatever order they arrive; on 2026-08-21 that took production down (`sprints.notes_written_at` shipped
+ahead of its migration, `42703` on every sprint page), and by 2026-08-22 production was four migrations
+behind — including the fix for a sign-up handing itself `role: admin`.
+
+Applying them is the user's own terminal (the CLI on this machine is logged into a different account
+and gets `403`; a cloud session has no token at all, and the Supabase MCP server needs an interactive
+OAuth round trip it cannot run):
+
+```bash
+supabase link --project-ref hayfsvsepgfescojesbd && supabase db push
+```
+
+**Prefer `scripts/push-to-hosted.sh`** — the same push, with the before-and-after numbers taken
+automatically and sixteen assertions on the result. It exists because the list in `06-PROGRESS.md`
+has two steps whose failure is silent, and a checklist read at the end of a long day is the wrong
+shape for those. Rehearsed 2026-08-24 against a bare-Postgres copy stood up at production's exact
+migration state; all eight migrations, all three seeds, all sixteen checks.
+
+**Never `supabase db push --include-seed`.** It runs `supabase/seed.sql`, whose accounts are created
+with `crypt('coditu', …)` — see "The seed password reached production" below, which is what that flag
+did once already. The three files under `supabase/seeds/` are a different thing and are safe; the
+script runs them individually through `psql` for exactly this reason.
+
+### `supabase db push` swallows `raise notice`
+A migration that reports what it did through `raise notice` reports it to nobody: the CLI prints
+`Applying migration …` and its own JSON summary, and the server's notices are not in either. Measured
+directly — `20260825093000_stable_image_refs.sql` raises
+`stable image refs: % comments, % criteria rewritten`, and `grep -c 'stable image refs' push.log`
+returns **0**.
+
+This matters more than it sounds, because a well-written data migration is idempotent, so **the number
+is gone the moment it runs** — a second run correctly finds nothing left to do and reports zero. If a
+migration rewrites rows and you want to know how many, **count them yourself before you push**, with
+the same predicate the migration uses. `scripts/push-to-hosted.sh` does that and cross-checks the
+notice if it ever does appear.
+
+**Checking what production actually has**, read-only, with the service-role key:
+a column — `GET /rest/v1/<table>?select=<col>&limit=1`, `400` means missing; a bucket —
+`GET /storage/v1/bucket`. **A function: do not probe with `{}`.** PostgREST answers `PGRST202` both
+when the function is absent and when it exists with different arguments — the two responses are
+byte-identical. Call it with its real named arguments and no-op values instead.
+
+### The Supabase SQL editor discards open transactions
+It runs the editor contents as one request on a pooled connection, so a script that opens `begin;` and
+never commits is rolled back when the request ends — and it looks like it worked, because the `select`
+at the bottom runs *inside* the transaction and the grid shows exactly the state you wanted. Put
+`commit;` in the script, and verify with a separate execution afterwards.
+
+### Production accounts are the team's real Gmail addresses; local is deliberately not
+The hosted project's four profiles are on real addresses (`mohamedtamer200200@gmail.com`,
+`elkhateebabdelrahman10@gmail.com`, `ahmed.yehia4431@gmail.com`, `adamnafie@gmail.com`), all `admin`.
+**Local must stay on `@coditu.com` / `coditu`** — `e2e/fixtures.ts`, `scripts/check-budgets.mjs` and
+`scripts/check-degraded-dependency.mjs` all sign in that way. Never apply the repoint locally.
+
+Abdelrahman's address is `elkhateebabdelrahman10@gmail.com` — inviting the version without the `10`
+gives him a second profile and splits his hours.
+
+### The seed password reached production
+`supabase/seed.sql` creates its accounts with `crypt('coditu', …)` and the ledger records that the seed
+**was** run against the hosted project, so production carried four accounts whose password was
+`coditu`, one an admin. Repointing them to real addresses does not fix it — the password travels with
+the account. Rotation is a dashboard step (Auth → Users) and is **not** something to verify by signing
+in. If a hosted project is ever seeded again, substitute real passwords first.
+
+### Local and production item keys diverged
+The Notion export carries no item keys — Coditu assigns them — so the two databases numbered the same
+104 items differently: **local `COD-140…COD-243`** (Week 17 is COD-229…242), **production
+`COD-152…COD-255`** (Week 17 is COD-241…254). Same order, different offset.
+
+**Consequence:** any data fix keyed on `COD-nnn` attributes the wrong rows in production while looking
+perfect locally. Match on something stable — the title — instead. `supabase/seeds/item-components.sql`
+is built this way for exactly this reason.
+
+---
+
+## Database
+
+### Deleting a profile cascades its work
+Ten foreign keys reference `public.profiles`. A delete **removes** rows in `time_entries`, `comments`,
+`comment_mentions`, `notifications`, `attachments`, and blanks `activity.actor_id`,
+`work_items.assignee_id`, `work_items.reviewer_id`, `sprints.notes_author_id`,
+`allowed_emails.invited_by`.
+
+The People page only reports assigned items and logged hours, so an account showing `0 assigned / 0.0
+logged` can still own comments and activity — that happened on 2026-08-21. **Merge duplicates, never
+delete them**: repoint all ten columns, guard the delete with a count across every referencing table,
+and raise rather than proceed. `comment_mentions` and `notifications` carry per-(parent, profile)
+uniqueness, so move only what will not collide.
+
+### A column guard is an allowlist written as a denylist
+`guard_work_item_columns` and `guard_criteria_columns` both raise when an engineer changes a column
+*named in a list*. So **a new column is silently writable by an engineer until somebody adds it
+there.** `component_id` and `body_json` were each added for that reason and not because anybody asked.
+Check both guards whenever you add a column to `work_items` or `acceptance_criteria`.
+
+### An AFTER DELETE trigger that writes a row about its parent breaks the cascade
+
+`record_component_tag_activity` logs an untag into `activity`. Deleting a work
+item cascades to `work_item_components`, so the trigger fired with the parent
+already gone:
+
+```
+insert or update on table "activity" violates foreign key constraint
+DETAIL:  Key (work_item_id)=(d22501ae…) is not present in table "work_items".
+```
+
+The whole DELETE aborts, so for an hour **nothing could delete a work item** —
+not the Server Action, not psql, not the e2e cleanup. It surfaced as a spec
+failing in `afterEach`, which is to say as a spec about components failing for a
+reason that had nothing to do with components.
+
+The guard is one line — skip the write when the parent is gone:
+
+```sql
+if not exists (select 1 from public.work_items w where w.id = old.work_item_id) then
+  return null;
+end if;
+```
+
+**The shape is general: any AFTER DELETE trigger that INSERTs a row referencing
+the deleted row's parent has this bug**, and it is invisible until something
+deletes a parent. Note which triggers do NOT have it and why —
+`refresh_component_mirror` runs on the same table and the same event, and is fine
+only because it issues an UPDATE that matches zero rows, and an UPDATE matching
+nothing is not an error. That is luck, not design, so it is worth checking
+rather than assuming.
+
+### Renaming an enum value does not reach SQL functions
+`alter type … rename value` is metadata-only; column defaults, index predicates, view predicates and
+check constraints follow it. Two things do not: an old-style `language sql` function stores its body as
+text and re-parses it on every call (`work_item_status_rank` must be `create or replace`d in the same
+transaction), and `activity.from_value` / `to_value` are plain `text` that keep the retired spellings
+forever unless backfilled. A view's FILTER predicates follow the rename but its output **column
+aliases** do not — fix with `alter view … rename column`, which preserves grants and
+`security_invoker`.
+
+### `storage.objects` refuses a direct SQL delete
+A statement-level `BEFORE DELETE` trigger (`protect_objects_delete`) raises `42501` unless the session
+GUC `storage.allow_delete_query` is `'true'`. pgTAP must set it (`set local …`) to exercise the RLS
+policy underneath; e2e cleanup cannot delete rows at all and has to call
+`DELETE /storage/v1/object/<bucket>/<key>` with the service-role key.
+
+### Notifications come from a trigger
+Rows in `public.notifications` are written by `sync_comment_mentions`, a `security definer` trigger on
+`comments`. `lib/actions/notifications.ts` looks like the place and is not — it only marks rows read.
+Anything that must happen when a notification is created hooks into `postComment` *after* its insert
+returns (the trigger has already run in the same transaction), or is a second trigger. Also: the `kind`
+constraint allows `'assigned'` and `'review_requested'`, but only `'mention'` is ever inserted.
+
+---
+
+## App behaviour
+
+### `router.refresh()` cancels a pending `push()`
+`refresh()` re-fetches the CURRENT route. Issued right after `router.push(path)`, before the push has
+committed, it cancels the navigation — the action succeeds, the toast fires, and the reader is left
+where they started. After a Server Action that already calls `revalidatePath`, just `push`.
+
+### A Server Action can reject, and your rollback never runs
+`const result = await action(); if (!result.ok) rollback()` handles the failure the action *reports*
+and not the one it cannot: the call is a `fetch`, and a lost network or a restarted server makes the
+promise **reject**. Both the rollback and the message are skipped, `useOptimistic` reverts on its own,
+and the change appears and vanishes with nothing said. Wrap every call in `settle()`
+(`lib/action-result.ts`), which rethrows `redirect()`/`notFound()` first.
+
+Related: state set inside `startTransition` is deferred until the transition settles — only the
+`useOptimistic` dispatch belongs in there; urgent UI resets go before it.
+
+### Signing out revokes every session
+`supabase.auth.signOut()` defaults to `scope: "global"`. In a parallel suite sharing one account, one
+sign-out logs out eight other workers mid-assertion — and they report whatever they were looking for as
+missing, not as "signed out". Any spec that signs out creates its own throwaway account
+(`createThrowawayAccount()`).
+
+### `loading.tsx` changed the whole suite
+Four measured consequences of a `loading.tsx` in every `/app` segment:
+
+1. **The suite needs a hydration wait.** A streamed boundary hydrates *after* load, so `page.goto`
+   returns real markup with no handlers. `e2e/fixtures.ts` wraps every `goto` and waits for a
+   `__reactFiber$` key on `<main>`.
+2. **`notFound()` returns 200.** The shell is flushed before the page body runs. Assert the rendered
+   not-found content and the `next-error` meta marker, never the status.
+3. **A fallback rides in the flight payload of every page beneath it** — ~1KB per element in dev.
+   Skeletons paint rows with repeating gradients rather than one element per row.
+4. **A dev-only hydration mismatch**, ~10 in 60 loads under six workers against `next dev`, 0 in 60
+   against a production build.
+
+### Prefetch renders dynamic routes
+`<Link>` prefetches on viewport entry, and for a dynamic route each prefetch is a full server render
+that `staleTimes.dynamic: 0` throws away. Measured: one sprint page view was 28 RSC renders and 178
+database statements with prefetch on, 0 and 40 with `prefetch={false}` — and navigation timings were
+unchanged. Use `prefetch={false}` on links into authenticated dynamic routes.
+
+### Coditu opens light, not dark
+`next-themes` runs `defaultTheme="light"` with `enableSystem={false}`, reversing the 2026-08-20 ADR
+after the team used it. Never reach the alternate palette in a test by clicking a button labelled
+"Switch to light theme" — that label names the theme you are *leaving*, so it points the wrong way when
+the default changes. Set `localStorage.theme` before load and assert the class.
+
+### A fixed overlay inside the item dialog needs a portal
+The item dialog's panel is `overflow: hidden`, so a `position: fixed` scrim rendered inside it is
+clipped to whatever column it sits in — a "full screen" image viewer opens inside a 300px box.
+Portal to `document.body` (`CellPopover`, `CommentImage`). And Escape must be caught in the **capture**
+phase and stopped there, or one press closes the inner thing *and* the dialog behind it.
+
+### `data-autofocus` in a cell popover only works once positioned
+The popover renders at `visibility: hidden` until it has measured a position, and `focus()` on a hidden
+element is a no-op that reports nothing. Focus must wait for `position` — which means depending on it,
+which means a ref to claim focus once per opening (a scroll re-positions constantly).
+
+### A toolbar button steals ProseMirror's stored marks
+Pressing a toolbar button moves focus out of the editor, and that drops the stored marks — the "what I
+type next is bold" state an empty document has instead of a range. `focus()` in the command chain puts
+the caret back with the mark already gone, so the button appears dead until there are words to select.
+`onMouseDown={(e) => e.preventDefault()}` on every toolbar button.
+
+### `contenteditable` + `aria-label` is an axe violation while empty
+A `contenteditable` div is a *generic* element to axe, and `aria-label` on a generic element is
+prohibited — but the rule only fires when the element has no text content, which is why an editor
+audited after typing looks clean. Give the editing surface `role="textbox"` and `aria-multiline`.
+
+---
+
+## Domain
+
+### The status vocabulary — the rename DID land, and this note was wrong twice
+**Corrected 2026-08-25 (second correction).** The first correction said the rename was not in this
+repository. It is. `supabase/migrations/20260825100000_rename_work_item_statuses.sql` is on `main`,
+and on a freshly reset local database:
+
+```
+enum_range(null::work_item_status)
+→ {draft,ready,in_progress,in_peer_review,in_qa,changes_requested,done,blocked}
+```
+
+`parseStatusFilter`, which the first correction said "does not exist", is `lib/work-items.ts`, and it
+carries `RETIRED_STATUSES` mapping `todo → ready`, `dev_started → in_progress`,
+`ready_for_peer_review → in_peer_review`, `in_review → in_qa` forward, because an unrecognised
+`?status=` value would quietly widen the filter to the whole sprint rather than error, and those links
+are in bookmarks.
+
+**Why the first correction was reasonable and still wrong.** It read
+`20260820120000_enums.sql`, found the original eight values, and concluded. A later `alter type …
+rename value` is invisible to the file that declares the enum — you have to fold every migration in
+order, which is what `tests/status-order.test.ts` now does. **Verify a vocabulary against the live
+`enum_range`, never against the migration that created it.**
+
+`STATUS_ALIASES` in `lib/import/notion.ts` is a separate, still-correct thing: it maps *Notion's*
+spellings onto these values at import time.
+
+**Still outstanding: `blocked` is not a status, it is a flag over one.** A blocked item is also
+mid-build or waiting on a reviewer, and storing `blocked` in the status column destroys the state
+needed to unblock it. The fix is a nullable `blocked_reason` with "blocked" derived from it; deferred,
+and it needs a backfill decision for existing rows.
+
+### The component registry is a copy of the EVIM repo
+`public.components` for MEINEvim is generated from `../microsoft-web-parts-final`: one row per SPFx
+solution, named by its manifest's `preconfiguredEntries[0].title.default` and carrying that entry's
+`officeFabricIconFontName`, plus one per feature in the React app's own registry. 41 rows as of
+2026-08-24, 34 with icons.
+
+**Check it every so often** — a copy of another repo goes stale silently, and a picker offering
+yesterday's list is the exact failure it exists to remove:
+
+```bash
+npm run components:check   # exits 1 if stale, and prints what is new, renamed, re-iconed or gone
+npm run components:sync    # rewrites supabase/seeds/components.sql
+```
+
+The script only ever **adds**. A rename or a changed icon over there is reported as drift, not written,
+because renaming a component in Coditu moves an item's history and that is a decision for the app. The
+icon is stored verbatim and mapped to a Lucide glyph in `components/coditu/component-icon.tsx`; an
+unmapped name falls back to the kind's glyph rather than rendering nothing.
+
+The folder name is not the product name: `ButtonLinkPlus` ships as *EVIM Button Link*, `Tabs with
+Cards` as *EVIM Themen Kachel*, `Finder` as *EVIM Dokumentenbibliothek*.
+
+### Ten imported items have no component on purpose
+`supabase/seeds/item-components.sql` attributes the imported work by matching phrases against titles.
+93 of 103 land. The other ten matched **two different components at the same priority** — "CR:
+Instagram / LinkedIn Feed", "Responsiveness for Link Kachel, Tabs with Cards, Newspart", "Add optional
+titles to all webparts" — and a wrong attribution would poison the per-component history the column
+exists to provide. The file only ever fills a NULL, so a correction made in the app is permanent.
+
+---
+
+## Git
+
+### Both append-only docs conflict, and "theirs" deletes the reasoning
+`docs/05-DECISIONS.md` and `docs/06-PROGRESS.md` are append-only logs. Resolve a conflict by keeping
+**both** sides' entries, never by taking one — a "theirs" resolution silently deletes everything below
+it.
+
+### Two sessions can write the same migration number
+Git merges two differently-named files without a murmur; the collision only bites at
+`supabase db push`, which refuses a file sorting earlier than what the remote already holds. **Check
+migration filename ordering by hand after any merge involving two parallel sessions**, and renumber
+while it is still unpushed — that is the only cheap moment.
+
+### `git pull --rebase` drops merge commits
+It replays commits onto their own parent and walks straight back into conflicts a merge commit had
+already settled. `git rebase --abort` restores everything (a rebase runs on a detached HEAD, so the
+branch never moved). After any merge whose resolution matters, prefer `git pull --ff-only`.
+
+---
+
+## Verification without Docker
+
+### The whole database layer can be verified on a bare Postgres
+`npm run db:test` is `supabase test db`, which needs the Docker stack. On a machine or a container
+with no Docker daemon — a cloud session, a locked-down CI box — the database half of the gate is still
+reachable, and it is worth an hour to set up because it is most of the gate:
+
+```bash
+apt-get install -y postgresql-16-pgtap        # pgTAP is the only real dependency
+initdb -D "$PGDIR" -U postgres --auth=trust   # as an unprivileged user; initdb refuses root
+pg_ctl -D "$PGDIR" -o '-p 54422' -w start
+```
+
+Then a **bootstrap** creating the pieces the migrations actually reference — and it is a short list,
+which is the surprising part. `grep -rhoE '\b(auth|storage|realtime|extensions)\.[a-z_]+' supabase/migrations/`
+returns exactly six: `auth.uid`, `auth.users`, `auth.sign`, `storage.buckets`, `storage.objects`,
+`storage.foldername`. Plus the roles (`anon`, `authenticated`, `service_role`, `authenticator`), the
+`extensions` schema, and the `supabase_realtime` publication. With those in place **every migration
+applies in order, the seed loads, and `supabase/tests/*.sql` runs through `psql` with the same TAP
+output `supabase test db` prints.**
+
+What this does NOT give you: PostgREST, so no `PGRST204` and no e2e; GoTrue, so nothing can sign in;
+storage's HTTP API, so an upload cannot be exercised end to end. Those are the parts a browser needs,
+and a browser needs the stack.
+
+### `alter database postgres` in a bootstrap script configures the wrong database
+`supabase-shim.sql` set the search_path with `alter database postgres set search_path = …`, which is
+correct exactly once — when the database really is called `postgres`, as the walkthrough above happens
+to make it. Load the shim into any other database (a rehearsal copy stood up at production's migration
+state, a second cluster) and the statement succeeds while configuring a database you are not connected
+to. **Nothing fails until `supabase/seed.sql` reaches `gen_salt('bf')`**, which lives in `extensions`
+and is suddenly not on the path — 1,900 lines in, with the projects and work items already inserted
+and everything after them missing.
+
+`alter database` takes a name and not an expression, so the fix is a `do` block with
+`format('alter database %I …', current_database())`. Fixed 2026-08-24; the note stays because the
+shape is general — a bootstrap script that names a database is a bootstrap script that works once.
+
+### `supabase/seed.sql` needs the current migration set, not an older one
+It ends with `select public.rebalance_project_keys();`, which arrives in
+`20260825091000_project_keys_and_slugs.sql`. That is correct for `db reset` (migrations, then seed) and
+it means the seed **cannot** be loaded onto a database held at an older migration state. To rehearse
+against production's state, comment that one line out for the rehearsal copy — do not stub the
+function, or the migration under test will replace a fake and you will have proved nothing.
+
+### Finding out what is actually in a chunk
+
+`npm run budgets` names the six biggest chunks of a route that is over, but content-hashed filenames
+say nothing about what is inside them. Two greps answer it without a bundle analyzer, and both work on
+the production build that is already on disk:
+
+```bash
+# which library — package paths survive minification in import specifiers and error strings
+grep -oE "@supabase/[a-z-]+|@tiptap/[a-z-]+|dnd-kit|lowlight|prosemirror-[a-z]+" \
+  .next/static/chunks/<hash>.js | sort | uniq -c | sort -rn
+
+# which of OUR components — pick a string literal that only one file contains
+grep -c "Half an hour more" .next/static/chunks/<hash>.js   # log-time.client.tsx
+```
+
+The second is the useful one and it needs a *distinctive* literal — user-facing copy works, identifier
+names do not, because they are mangled. `grep -oE '"[A-Z][a-z][^"]{12,40}"' <file>` over the source
+finds candidates.
+
+This is how the sprint page was shown to be shipping `log-time.client.tsx`, which only the item
+detail renders: one chunk contained both the sprint table's strings and `"Half an hour more"`. A
+parallel route's `@modal` slot contributes its client references to the segment's chunk group even
+on a render where the slot returns `null`.
+
+### Two imports that look free and cost 60KB each
+
+Both were found by `npm run budgets` on the same afternoon, both in client
+components, and neither is visible at the call site. The app shell went 69KB →
+184KB, and getting back under 110 took untangling them one at a time.
+
+**`CommentBody` pulls in lowlight.** It highlights code blocks server-side with
+every common language, so importing it into a `"use client"` file ships the whole
+highlighter: **+114KB**. `criteria-list.client.tsx` had already met this and says
+so in its own header — *"the bodies are rendered ON THE SERVER and handed down"* —
+and the fix is always the same shape: render the body in a Server Component and
+pass it down as a `ReactNode` prop.
+
+**`lib/blocks/schema.ts` used to pull in zod.** A client component that only
+wanted `isEmptyDocument` got the validator too: **+63KB**. Split now —
+`lib/blocks/schema.ts` is the pure vocabulary with a hand-written shallow node
+parser, `lib/blocks/validate.ts` holds the zod `documentSchema` and is imported
+only by Server Actions. `lib/supabase/env.ts` made the same split years earlier
+and explains why in its header.
+
+**The general rule:** a module reachable from the browser must not import a
+validation library or a syntax highlighter, and neither dependency is visible in
+the import that drags it in. `import { isEmptyDocument }` says nothing about zod.
+The tell is a route's own KB jumping by ~60 in one commit; the technique for
+finding which chunk is the note above about grepping built chunks — zod is
+identifiable by `invalid_type` / `too_small`, lowlight by its language names.
+
+### `@supabase/supabase-js` does not export `RealtimeClient`
+
+It inlines it. `sideEffects` on the package is narrow enough that tree-shaking *should* work, but
+there is nothing to shake: `dist/index.mjs` exports `createClient`, `SupabaseClient` and the error
+classes, and nothing else. Realtime without auth-js means depending on `@supabase/realtime-js`
+directly — it is already in the tree as a transitive dependency, so promote it at the **same version
+range** as `supabase-js` and check `package-lock.json` afterwards for a single entry. Two copies of a
+websocket client in one bundle is worse than the 65 KB it was meant to save.
+
+### `supabase gen types` needs Docker even with `--db-url`
+It spins up `postgres-meta` in a container regardless, so `npm run db:types` fails with
+`failed to connect to the docker API` even when it is pointed straight at a running Postgres. On a
+Docker-less machine `lib/supabase/database.types.ts` has to be hand-edited, and the generator's own
+conventions matter if the next `db:types` is not going to produce a large spurious diff:
+
+- Keys are **alphabetical** within `Row`, `Insert` and `Update`, and tables are alphabetical too.
+- A column is optional in `Insert` when it is nullable **or has a default** — so a `not null` column
+  with no default becomes *required*, and every caller then has to supply it. That is why
+  `work_items.key` was given `default ''` rather than having its default dropped: a BEFORE INSERT
+  trigger fills it either way, but the generator cannot see the trigger.
+- Every foreign key produces a `Relationships` entry **per referenced relation**, including the views
+  — a `profile_id` reference generates one for `profiles` and one for `v_person_load`.
+
+### `next build` is a real check, and it runs anywhere
+It type-checks, resolves every route, and catches a server/client boundary error that `tsc` will not.
+It needs the public env vars to be *present*, not correct:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54421 \
+NEXT_PUBLIC_SUPABASE_ANON_KEY=any-string-over-twenty-chars \
+npm run build
+```
+
+Read the field note above about `.env.production.local` before doing this on a machine that has one.
+
+---
+
+## The editor and its images
+
+### A `blob:` URL must never reach `body_json`
+An in-flight upload is rendered from `URL.createObjectURL(file)`, which exists in one tab and dies with
+it. Store one and it is a permanently broken image for everybody including its author on their next
+reload — the same class of bug as the expiring signed URL, arrived at from the other direction.
+
+Three things stop it and all three are load-bearing: the placeholder node's `parseHTML` returns nothing
+so it can never come back off a clipboard, its `renderHTML` emits an empty div so a document serialised
+by mistake carries no URL, and both the composer and the criteria editor refuse to submit while
+`hasPendingUpload(doc)` is true. The draft restore strips them too, because a draft written mid-upload
+outlives the tab that made it.
+
+### `fetch` does not report upload progress, and never has
+Only `XMLHttpRequest` fires `upload.onprogress`. A Server Action call is a `fetch`, so any upload that
+goes through one can show a spinner and nothing better. That is the entire reason `/api/uploads` is a
+route handler; it is not a preference.
+
+Cap the reported percentage at **99** until the response lands. The last percent belongs to the server
+answering, and a bar sitting at 100 while nothing happens reads as a hang.
+
+### The 16px rule does not reach the editor, because it is not an input
+`app/globals.css`'s coarse-pointer block names `input, select, textarea`. The rich-text surface is a
+`contenteditable` **div**, so it matched nothing — and `.coditu-prose p` re-declared 14px. iOS Safari
+auto-zooms any focusable **editable element** under 16px, `contenteditable` included, and does not zoom
+back out: tapping into the composer on an iPhone left the reader at 1.4x with the sheet off the side of
+the screen. Which is exactly the failure that block exists to prevent, arriving through the one element
+it does not match.
+
+The fix names `.coditu-prose` explicitly, and it is safe to scope it that way because
+`comment-body.tsx` renders a stored comment with its own classes — how a thread READS on a phone is
+untouched, only what you type into is raised. Asserted as a computed style in `mobile.spec.ts`, because
+the whole class of bug is a rule that looks like it applies and does not.
+
+### Toolbar buttons need `onPointerDown` as well as `onMouseDown`
+The existing note about stored marks is right and incomplete: a synthetic mouse event is **not
+guaranteed** on a touch screen. Safari fires it after a delay and some Android keyboards not at all, so
+on a phone the stored mark was lost before `onMouseDown` ever ran. Prevent both, and set
+`touch-action: manipulation` so the double-tap-to-zoom delay does not make the toolbar feel dead.
+
+---
+
+### Hand-written demo data breaks specs you did not touch
+
+Setting up a screenshot by writing straight into the seeded database — attributing seven Week 17
+items to components, publishing three components — broke `components.spec.ts` twenty minutes later,
+in a run whose diff contained none of those files. The spec filters the sprint by
+`?component=evim-themen-kachel` and counts rows; the demo SQL had changed which items carry which
+component. `npm run db:reset` and it was 11/11 again.
+
+The shared-database note above is about two *runs* colliding. This is the same hazard from a
+different direction: a **person** setting up a demo is another writer on the one seeded database, and
+the damage surfaces somewhere unrelated, later, looking like a regression in whatever is being worked
+on at the time.
+
+Use a spec fixture that creates its own rows under a recognisable prefix and deletes them afterwards
+(`e2e/client-*.local.ts` uses `portal-e2e-%`), or `db:reset` immediately after looking. Do not leave
+hand-written rows in the seed.
+
+### Two spec files cannot share one fixture
+
+`test.describe.configure({ mode: "serial" })` orders tests **within a file**. Playwright still runs
+different files in different workers at the same time, and `beforeAll`/`afterAll` run once per
+worker — so two spec files calling the same `setupFixture()`/`teardownFixture()` delete each other's
+rows mid-assertion. It presents as an assertion failing on data that was definitely there, and it
+moves between runs.
+
+Serial mode does not fix it and cannot. Give each file its own rows —
+`client-boundary.spec.ts` uses `boundary@portal-e2e.test`, `client-portal.spec.ts` uses
+`cara@portal-e2e.test` — so the fix does not depend on scheduling.
+
+### The suite's failures move between runs, and three is not a regression
+
+Two consecutive full runs on the same commit failed **different** specs — first
+`criteria`/`mobile`, then `my-work-import`/`mobile`/`motion` — and every one of them passed when run
+alone. That is the loaded-machine and shared-database pattern already recorded above, not a fault in
+whatever changed.
+
+The check that distinguishes them is cheap and should always be made before believing a red suite:
+re-run the named specs **in isolation**. If they pass, the suite is telling you about the machine. If
+they fail, they are telling you about the code.
+
+## Regexes and character classes
+
+### A hyphen between two escapes is a RANGE, and it is silent
+`/[\s -\\%?#]/` looks like "whitespace, space, hyphen, backslash, percent, question mark, hash". It is
+whitespace **plus every character from space (0x20) to backslash (0x5C)** — which includes every digit,
+every uppercase letter, `/` and `-`. A path-traversal guard written that way rejects every valid input
+and looks like it is working, because rejecting things is what a guard does.
+
+Write the range out: `/[\s\u0000-\u001F\u007F\\%?#]/`. And keep the escapes as escapes — a literal
+control character in a source file makes `grep` call it a binary file, makes the diff unreadable, and
+makes review impossible.
+
+Both `lib/attachments.ts` and `components/app/rich-text-editor.client.tsx` had this, and the second one
+(`/[\s -]/` in `normaliseHref`) would have refused every hyphenated domain.
+
+
+---
+
+## Next 16, and the things that fail by doing nothing
+
+### `after()` cannot touch `cookies()` — and the failure is invisible
+`app/app/earnings/page.tsx` refreshed the exchange rate in `after()`, calling `refreshExchangeRate()`,
+which called `getAppSettings()` and `createClient()`. Both read `cookies()`. Next 16 refuses that:
+
+```
+Route /app/earnings used `cookies()` inside `after()`. This is not supported.
+```
+
+**The callback throws and the work never happens.** The page is a 200 either way, because it renders
+from the stored rate — which is the design — so the only symptom was that
+`app_settings.usd_egp_rate_micros` stayed `null` in production for as long as the feature had existed,
+and every EGP figure read "no exchange rate yet". No test caught it; nothing on screen was wrong. It
+was found in the deployment's own runtime logs, by looking.
+
+The fix is `createSnapshotClient()` in `lib/supabase/server.ts`: read the cookies **eagerly, on the
+request**, and hand the callback a client that carries a plain array instead of the store. Build it in
+the component body, use it in the callback. Same anon key, same RLS — only *when* the cookies are read
+changes. `refreshStoredRate` in `lib/exchange-rate.ts` takes the settings as an argument for the same
+reason, and lives outside `lib/actions/earnings.ts` because that file is `"use server"` and a Supabase
+client is not something a Server Action's arguments can carry.
+
+**The general rule:** anything inside `after()` must be handed its request state, not go looking for
+it. If a background callback appears to do nothing, check the runtime logs before checking the logic.
+
+### TipTap v3 does not re-render on a transaction
+`useEditor` defaults `shouldRerenderOnTransaction: false`, and its own types call the `true` case
+"legacy behavior that will be removed". So `editor.isActive("bold")` read in the render body is
+evaluated **once, at mount, and never again**: every button in the composer toolbar was frozen at
+"off" for the life of the editor, and `aria-pressed` told a screen reader the same lie.
+
+It looked fine, because pressing Bold still *worked* — the command ran, the text came out bold. Only
+the indicator was dead. Nothing caught it until a spec asserted `aria-pressed` on an **empty**
+composer, where the indicator is the only feedback there is.
+
+Use `useEditorState({ editor, selector })`, which re-renders only when a selected value changes.
+
+### WebKit cancels the click when you `preventDefault()` a `pointerdown`
+Measured on both engines, tapping a toolbar button:
+
+```
+mobile-chrome   pointerdown, touchstart, click
+mobile-safari   pointerdown, touchstart           ← no click, ever
+```
+
+`preventDefault()` on `pointerdown` looks like the thorough way to keep focus in the editor for both
+mice and fingers. On WebKit it cancels the activation outright, so the button does nothing at all on
+an iPhone — a worse bug than the one it was added for, and silent, because every desktop browser kept
+working. **Prevent `mousedown` instead**: it keeps focus, and `click` still fires everywhere.
+
+---
+
+## CSS that looks like it applies
+
+### A media query adds no specificity, so source order decides
+The coarse-pointer block raised the editor to 16px with
+`.coditu-prose p { font-size: max(16px, 1em) }`. It never took effect: `.coditu-prose p` is declared
+again **later in the same file** at 14px, at equal specificity, and `@media` contributes nothing to
+specificity. The later rule won, the fix shipped with the bug still in it, and the commit message said
+it was fixed.
+
+Only a computed-style assertion found it (`e2e/mobile.spec.ts`). The rule now lives at the **end** of
+`app/globals.css` with a comment saying it must stay there.
+
+**If a rule looks right and does nothing, check what is declared after it before checking anything
+else.**
+
+### A flex item's `min-width: auto` decides which sibling gives way
+
+The topbar's ⌘K box is `max-w-[420px] flex-1`, so its flex basis is 0 and it
+looks like the thing that shrinks. It is not. A flex item's **automatic minimum
+size** — `min-width: auto`, the default — clamps it up to its content, so it
+holds the whole placeholder and the sibling with a real basis absorbs every
+pixel of the shortfall. Beside it, the breadcrumb trail lost 20px at 1180 and
+clipped all four crumbs, `Coditu` at 34 of the 37 it needs.
+
+**Whoever states a minimum wins.** `min-w-[140px]` on the box reversed it
+completely: the placeholder ellipses first and the trail keeps its natural
+width. Nothing about the trail changed.
+
+So when two flex siblings compete and the wrong one is losing, look at
+`min-width` before touching `flex`, `basis`, or `shrink`. And when a control
+must not shrink below a usable size at all, the honest fix is often a
+breakpoint rather than a smaller minimum — the box is `xl:flex` now, from the
+bar's own arithmetic (trail 415 + cluster 303 + padding and gaps 79 + a 268px
+sidebar = 1205px) rather than from Tailwind's ladder.
+
+### A tree has no 64px representation, so it leaves rather than fades
+
+The sidebar's nav labels are `opacity: 0` when collapsed, deliberately: the icon
+survives and still needs a name in the accessibility tree. Copying that to the
+project-spaces tree would be wrong in a way that looks identical on screen —
+there is no icon there to keep a name for, so a faded tree is a dozen rows
+nobody sighted can see and nobody can reach. It is `display: none`, and
+`e2e/rail.spec.ts` asserts `toBeHidden()` rather than a computed opacity, so the
+assertion is about the accessibility tree and not about the paint.
+
+### A sticky header obscures whatever the browser scrolls into view
+Opening the criterion editor on an iPhone left **21px of a 74px** editing surface reachable; the rest
+was behind the `position: sticky` top bar. The browser had scrolled it "into view" correctly — it
+measures the viewport, not what is painted over it.
+
+`axe` names this precisely: `target-size … partially obscured`, which is the rare accessibility failure
+that is also a plain usability failure. The fix is `scroll-margin-top` on the editing surface plus
+`scrollIntoView({ block: "nearest" })` — "nearest" so it moves by exactly the height of the thing in
+the way, and not at all when it is already clear.
+
+---
+
+## Tests that could only ever be red, or only ever green
+
+Four of these turned up in one afternoon. Each one had been written, never run, and read as correct.
+
+- **`getByLabel` matches by case-insensitive substring.** `getByLabel("Title")` also matches a button
+  whose label is "Edit **the title**". The assertion that the editor had closed could never pass,
+  because the pencil comes back the moment the editor goes away. Use `{ exact: true }`.
+- **A live locator is re-resolved on every use.** Ticking a criterion sinks it to the bottom of the
+  list, so `boxes.first()` afterwards reads a *different*, still-unticked checkbox and reports that
+  the tick did nothing. Pin the row by its accessible name, not by position.
+- **An `<img>` on screen is not an upload that has finished.** While it is in flight the document
+  holds a placeholder that draws the picture dimmed under a progress bar — a real `<img>`. Saving in
+  that state is refused on purpose, so the test clicked Save, was told "an image is still uploading",
+  and asserted against a list that had never changed. Wait for `[data-uploading-image]` to reach zero.
+- **A page-wide `getByText` also matches the toast.** "Removed “E2E temporary”." contains the text the
+  test was asserting had gone, so the assertion could only pass if the undo toast never appeared —
+  that is, only if the feature were broken. Scope to the list.
+
+And one that was worse than red: **`?export=csv` is not a route.** Exports are produced by the
+`renderExport` Server Action, so that request returned the sprint *page*, 200, and the money-leak
+assertion ran against Next's own inline runtime — where `$` followed by a digit turns up in minified
+React sooner or later. It reported a leak in a CSV it had never looked at. The one assertion in the
+suite that must never cry wolf was crying wolf about the wrong document entirely.
+
+### A single-row settings table cannot be shared by parallel workers
+`app_settings` has `check (id = 1)`. Every earnings test has to point `payout_from_sprint_id` at a
+sprint to have anything to assert against, and has to put it back afterwards. Under `fullyParallel`
+those run in different workers against the same row, so one describe's teardown blanks the setting
+while another's tests are still reading it — and every one of them fails as "not tracked", which is
+the *correct* rendering of the state it was just put into. `e2e/earnings.spec.ts` is
+`test.describe.configure({ mode: "serial" })` for that reason: unlike the `composer.spec.ts` fixture
+race, there is no per-project row to hand out, because there is only ever one row.
+
+### A client-safe TABLE is not a client-safe QUERY
+
+`client_threads` and `client_messages` carry no internal-only columns, so reading them with an
+ordinary `.from()` select and letting RLS pick the rows is correct. The first version of
+`lib/data/client-threads.ts` did exactly that — and returned an **empty list** to a client who had a
+question waiting.
+
+The list also needs what a thread is *about*:
+
+```ts
+components!inner ( name, slug ),
+projects!inner   ( slug ),
+profiles!client_messages_author_id_fkey ( full_name, initials )
+```
+
+A client contact cannot read any of those three. That is the boundary working as designed —
+`is_active_member()` is false for her. But `!inner` on a join that returns nothing **drops the parent
+row**, so the query came back `[]`: no error, no permission message, no 403. The screen said "Nothing
+to answer right now" while the database was perfectly willing to say there was one.
+
+The pgTAP suite was green throughout, because the SQL was never wrong. Only the browser found it.
+
+**The rule:** the moment a query joins outward from a client-readable table it inherits the strictest
+policy it touches, and `!inner` makes that silent. Anything a client reads that needs a name from
+`components`, `projects` or `profiles` goes through a `security definer` RPC that selects those
+columns by name — `client_thread_list` and `client_thread_messages` exist for exactly this.
+
+The tell, if this happens again: a `.from()` select that returns `[]` for a client and the right rows
+for `postgres`, with RLS assertions passing on both.
+
+### Clipping is not overflow, and no overflow assertion will catch it
+
+`html` carries `overflow-x-clip`. A control pushed past the right edge therefore creates **no
+scrollbar** and does not change `scrollWidth` — `document.documentElement.scrollWidth >
+clientWidth` stays false while the control is unreadable and unhittable.
+
+The topbar shipped this in step 7 ("pushed off-screen and *clipped* — no scrollbar, just unreachable
+buttons"). The client portal header shipped it again at 320px in the client-portal brief, one fix
+after the label had been made to wrap instead. Two different screens, same invisible failure.
+
+Assert element geometry, not document width:
+
+```ts
+const rect = el.getBoundingClientRect();
+if (rect.right > viewportWidth || rect.left < 0) // escaped
+```
+
+`e2e/client-questions.spec.ts` does this for every header control at 320/360/390.
+
+### `server-only` is a bundler rule, so `typecheck` and `lint` both pass
+
+`components/app/client-visibility-panel.client.tsx` imported `THREAD_STATE_LABEL_INTERNAL` from
+`lib/data/client-threads.ts`, which begins `import "server-only"`. That is a build error:
+
+```
+Ecmascript file had an error
+> 1 | import "server-only";
+```
+
+`npm run typecheck` passed. `npm run lint` passed. The rule is enforced by the **bundler**, so
+nothing short of `next build` or actually loading the page sees it — and the page in question was a
+route neither the unit tests nor the pgTAP suite touch. The screenshot found it.
+
+**Types are fine either way** — they are erased, so `import type` across the boundary never trips it.
+It is a runtime value (a const, a function, an object) that drags the whole module across.
+
+The fix is to put shared vocabulary in a module with no `server-only` and let the server-only file
+re-export it: `lib/client-threads.ts` holds the labels and the view types, `lib/data/client-threads.ts`
+holds the loaders. When a client component needs one word from a server module, move the word.
+
+**The general lesson for this repo:** the green gate is `lint + typecheck + test + db:test`, and none
+of those four opens a page. A route that no spec visits is a route where a build error can sit
+undetected. Run it, or screenshot it.
+
+### …and opening the page is not enough either — run the specs that have an opinion about it
+
+The complement, found on 2026-08-25 while taking a baseline. C12 added the client-visibility panel to
+the component dossier page. Its verification was `lint && typecheck` plus looking at the rendered page
+at five widths, and the page looked correct — because it *was* correct.
+
+`e2e/components.spec.ts` had asserted, since before that panel existed:
+
+```ts
+await expect(page.getByRole("heading", { level: 2 })).toHaveCount(sprints.length);
+```
+
+A new panel with an `<h2>` of its own makes that 6 against 5. Nothing was wrong with the page; the
+assertion had quietly meant "every h2 on this page is a sprint" and nobody had said so. It sat on
+`main` from `3da9eb7` until the next full suite ran.
+
+Two things to take from it:
+
+- **A phase that changes a rendered route runs the specs for that route.** Not the whole suite
+  necessarily — `npx playwright test e2e/<that-one>.spec.ts` is twenty seconds.
+- **Count what you mean.** `getByRole("heading", { level: 2 })` is a claim about the entire document.
+  The fix is `h2[id^="sprint-"]`, scoped by the id the `<section aria-labelledby>` already carries —
+  which is also a small argument for labelling sections properly in the first place, since it gives a
+  spec something honest to point at.
+
+
+### `getByText("EVIM")` matches `MEINEvim components`
+
+Playwright's `getByText` with a **string** matches a case-insensitive
+*substring*. `export.spec.ts` asserted `getByText("EVIM")` was absent from the
+whole page, to prove one client's work cannot appear under another's URL. The
+day the sidebar grew a project-spaces tree, `MEINEvim components` matched it,
+and a passing security assertion went red for a reason that had nothing to do
+with scoping.
+
+Two things:
+
+- **Pass a regex when you mean a word.** `/\bEVIM\b/` would not have matched.
+- **Scope the claim to what makes it.** That test is about what the **page**
+  renders, so it reads `page.getByRole("main")` now. Chrome that lists every
+  project a reader may see is not a leak, and an assertion over `page` cannot
+  tell the difference.
+
+### A browser you have been clicking in is not the fresh context the suite uses
+
+The trail measured clean at 1180px in the browser and clipped at 1180px in
+Playwright, on the same commit. The browser had a `coditu.*` preference stored
+from earlier clicking; the spec's context had none, so the sidebar was a
+different width and the topbar had 20px less to give.
+
+Before trusting a measurement taken by hand, clear the app's own keys and
+reload:
+
+```js
+Object.keys(localStorage).filter((k) => k.startsWith("coditu.")).forEach((k) => localStorage.removeItem(k));
+location.reload();
+```
+
+The general form: **any measurement of a layout that a stored preference can
+move has to say which preference it was taken under.**
+
+
+### axe's `target-size` is scroll-dependent under a sticky header
+
+`password.spec.ts` → *"axe finds nothing on the sign-in page or the password
+screen"* went red with:
+
+```
+target-size … Target has insufficient size because it is partially obscured
+(smallest space is 160.8px by 14.4px)
+```
+
+against a `Temporary password` button belonging to **a different person** than
+the one the test had just acted on. The button is 161×36 — nowhere near
+undersized.
+
+Measured, and the measurement is the whole story: the same page reports the
+violation at `scrollY: 666` and reports **nothing** at `scrollY: 0`, and
+`document.elementFromPoint` at the button's centre returns the topbar. Clicking
+a control near the bottom of a long page scrolls it, and a `position: sticky`
+header genuinely overlaps whatever passes under it — for any control, on any
+scrolled page in this app. W6b is what exposed it: a 268px sidebar makes
+`/app/people` tall enough at 1280 that the click scrolls.
+
+**So a whole-page `auditA11y` taken after a click that scrolled is not
+reproducible.** Audit the surface the test is about
+(`auditA11y(page, "[data-team-member]:has([data-temporary-password])")`), and
+leave the unscrolled whole-page audit to `a11y.spec.ts`, which is where it
+belongs.
+
+**This is NOT the same as the criterion editor on a phone**, three sections up,
+where the browser scrolled a control into view and *left it* under the bar. That
+one is a real failure and `scroll-margin-top` fixes it. The difference is whether
+anybody was sent to the obscured control: a bystander scrolled under a sticky
+header is a scroll position, a target you were just navigated to is a bug.
+
+### A route that stops redirecting leaves assertions elsewhere asserting the redirect
+
+W6a turned `/app` from a redirect into the workspace home. Two specs in unrelated
+files were asserting the old behaviour and neither was run for three phases:
+
+- `pwa.spec.ts` → *"it takes a signed-in visitor straight into the app"*,
+  expecting `/app/projects/…/sprints/\d+$` from the marketing header's link.
+- `allowlist.spec.ts` → *"an admin invites, and then the same address can sign
+  up"*, expecting `/\/app\//` — with the trailing slash — after sign-up.
+
+Both were confirmed pre-existing by checking out the phase's parent commit and
+re-running there, which is the cheap version of this diagnosis and worth doing
+before assuming anything:
+
+```bash
+git stash push -m wip && git checkout -q <parent-sha>
+npx playwright test e2e/<suspect>.spec.ts --workers=1 --project=chromium
+git checkout -q <branch> && git stash pop
+```
+
+**Grep for the route, not for the file you changed.** A route's shape is asserted
+by whoever happened to need it, and `git grep "/app/projects/.\+/sprints"` finds
+them in seconds.
+
+
+### An assertion on the greeting is an assertion on the wall clock
+
+`greeting()` has **four** wordings, and the fourth is easy to miss because you
+have to be working at the wrong hour to see it:
+
+```ts
+if (hour < 5)  return `Still up, ${first}`;
+if (hour < 12) return `Good morning, ${first}`;
+if (hour < 18) return `Good afternoon, ${first}`;
+return                `Good evening, ${first}`;
+```
+
+A `pwa.spec.ts` assertion written as
+`toContainText(/Good (morning|afternoon|evening)/)` passed all evening and went
+red at 00:30 Cairo, in the middle of the run that was meant to close the phase.
+Nineteen hours a day it is a correct test.
+
+**Assert that Home rendered, not what Home says.** The clock-free signal is the
+rail: `aside a[aria-current="page"]` is `["Home"]` on `/app`, which is what
+`home.spec.ts` and `rail.spec.ts` already use. The greeting's own wording is
+pinned where it belongs, in `tests/today.test.ts`, against a fixed hour.
+
+The general form: **anything derived from `now` needs an injected clock in a
+unit test and a different signal entirely in a browser test.**
+
+### A hidden Browser-pane tab suspends layout, so every measurement is zero
+
+Diagnosing the sort headers, `getBoundingClientRect()` on a visible, `display: flex`,
+`visibility: visible` element in the document returned **0×0**, screenshots showed a frame from
+several seconds earlier, and a real pointer click on a button did nothing at all. It reads exactly
+like a broken component — and it cost a wrong diagnosis before the cause turned up:
+
+```js
+document.visibilityState   // "hidden"
+document.hasFocus()        // false
+```
+
+The pane's tab had gone to the background. A hidden tab throttles `requestAnimationFrame`, suspends
+layout, and serves a stale compositor frame to a screenshot.
+
+**Check `document.visibilityState` before believing any measurement or screenshot**, and call
+`tabs_select` on the tab first. Everything re-measured correctly the moment it was fronted, with no
+change to the code.
+
+### `router.replace` is a round trip, so two quick clicks compute from the same stale state
+
+The sprint table's sort headers write `?sort=` and read the stack back from the server's props.
+Clicking Deadline and then shift-clicking Status a moment later produced `?sort=status:asc` — the
+deadline key **silently dropped** — because the second click's `toggleSort` ran against the props
+from before the first navigation had landed. The faster somebody builds a sort, the more of it they
+lose.
+
+`window.location` is no help: on a dynamic route the URL updates when the navigation commits, which
+is after the server responds.
+
+The fix is to remember what the last click *asked for* and toggle from that, reconciling during
+render when the URL catches up. Note what it is deliberately not: the headers and the rows still both
+render from the server's value, so nothing on screen is optimistic and there is nothing to roll back.
+
+**Any control that computes its next state from a URL it just wrote has this bug.** Filters that
+toggle one value at a time do not (each click is independent); anything that *accumulates* does.
+
+### `position: fixed` inside a `<Reveal>` is not fixed — and `blur(0px)` is why
+
+The filter panel rendered with `role="dialog"`, an `aria-label`, a focus trap and a clean axe run,
+and on screen it was a **grey stripe across the toolbar**. Measured:
+
+```js
+document.querySelector('[data-scrim]').getBoundingClientRect()   // 1046 × 65, not the viewport
+```
+
+`position: fixed` resolves against the nearest ancestor with a `filter`, a `transform`,
+`backdrop-filter`, `contain`, or a `will-change` naming one of them. `<Reveal>` animates **both** a
+transform and a blur — and it settles on `filter: blur(0px)`, which is a filter *value*, not `none`.
+The containing block therefore survives the animation and never goes away.
+
+So **anything `position: fixed` mounted inside a revealed section is trapped**, permanently, and
+every static check passes. `DialogShell` portals to `document.body` now, guarded by `useMounted()`,
+which fixes it for every dialog rather than for the one that found it.
+
+To check whether an element is trapped:
+
+```js
+let el = node.parentElement;
+while (el) {
+  const cs = getComputedStyle(el);
+  if (cs.filter !== 'none' || cs.transform !== 'none' || cs.backdropFilter !== 'none') console.log(el, cs.filter, cs.transform);
+  el = el.parentElement;
+}
+```
+
+### `read_console_messages` is a buffer, not a snapshot
+
+Chasing the above, the console reported
+`TypeError: Cannot read properties of undefined (reading 'types') … in <FilterBar>` — a component
+that was, at that moment, rendering perfectly. The entry was from an earlier build in the same tab:
+the reader returns everything the tab has accumulated across navigations, including errors from code
+that no longer exists.
+
+**Open a fresh tab before believing a console error**, or check that the thing it names is actually
+broken on screen. A new tab on the same page reported nothing at all.
+
+### Playwright's `webServer.url` and `baseURL` have to agree
+
+`playwright.config.ts` honoured `E2E_BASE_URL` for `baseURL` and hard-coded `http://localhost:3000/login`
+for `webServer.url`. Point the tests at another port — which is necessary when a second session on
+this machine holds 3000 — and Playwright probes 3000, finds nothing, starts its own `npm run dev`,
+and that dies on:
+
+```
+Unable to acquire lock at .next/dev/lock, is another instance of next dev running?
+```
+
+Two dev servers cannot share one checkout. Both now read one `BASE_URL` constant.
+
+**And check who owns port 3000 before trusting an e2e run**, because the default points there:
+
+```bash
+lsof -nP -iTCP:3000 -sTCP:LISTEN -t | head -1 | xargs -I{} lsof -p {} -a -d cwd
+```
+
+A run against another worktree's server passes or fails for reasons that have nothing to do with your
+code.
+
+### The Browser pane's viewport emulation makes pointer clicks land elsewhere
+
+With an emulated viewport (`resize_window` to 1400×880 in an 800px pane), `computer` clicks at
+coordinates taken from the returned screenshot did nothing — twice, on two different buttons — while
+`element.click()` on the same node worked immediately and Playwright's own clicks were reliable
+throughout. The emulation also intermittently rendered the page at ~38% scale until it was cleared
+with `preset: "desktop"` and re-applied.
+
+**Use the pane to look, and Playwright or `element.click()` to drive.** A click that appears to do
+nothing there is not evidence of a broken handler.
+
+### A `lib/` module that imports zod ships zod to the browser
+
+`lib/saved-views.ts` held the URL helpers **and** the zod schema. `view-menu.client.tsx` imports
+`searchFromSpec` from it, so the whole module — zod included — went into the client bundle:
+
+```
+app shell (sprint table)   own   143.1 KB / 110 KB      (was 77.9)
+           75.9 KB  ad48a3bd42e6d99c.js
+```
+
+Nothing else noticed. `lint`, `typecheck`, `test`, `db:test` and every e2e spec were green; the
+feature worked perfectly. **`npm run budgets` is the only gate that can see this**, which is the
+argument for running it on any phase that adds a client component.
+
+The fix is a file split, not a smaller import: `lib/saved-views.ts` is pure and dependency-free,
+`lib/saved-views-schema.ts` holds the zod and is imported only by the server action and the server
+read model.
+
+The rule generalises: **anything under `lib/` that imports a heavy dependency is one client import
+away from being in the browser bundle.** `lib/data/*` is safe because `import "server-only"` fails the
+build; a plain `lib/*.ts` has nothing stopping it.
+
+To find what a chunk actually contains:
+
+```bash
+grep -l "ZodObject\|zodError" .next/static/chunks/*.js | head
+```
+
+### PostgREST's `on_conflict` takes column names, not expressions
+
+A unique index on `lower(btrim(name))` expresses "one name per person, whatever its case" correctly
+and cannot be used as an upsert target:
+
+```
+{"code":"42703","message":"column \"lower\" does not exist"}
+```
+
+In the UI that arrives as a generic "could not be saved" and reads like an RLS problem, because that
+is where you look first when a write fails. A **stored generated column** holding the same fold —
+`name_key text generated always as (lower(btrim(name))) stored` — is a name PostgREST can point at.
+
+Worth checking directly rather than guessing, which takes one curl:
+
+```bash
+curl -s -X POST "$SUPABASE_URL/rest/v1/<table>?on_conflict=<cols>" \
+  -H "apikey: $ANON" -H "Authorization: Bearer $TOKEN" \
+  -H "Prefer: resolution=merge-duplicates" -d '{…}'
+```
+
+### RLS is not a grant, and the error says so in the wrong direction
+
+A new table with perfect policies still answers `42501 permission denied for table saved_views`,
+because a policy says which ROWS a role may touch and a grant says whether the role may touch the
+table at all. The hint even tells you:
+
+```
+HINT:  Grant the required privileges to the current role with: GRANT INSERT ON public.saved_views TO authenticated;
+```
+
+Every `create table` in this schema needs its `grant … to authenticated` line. And the corollary is
+worth keeping: `anon` deliberately has **no** grant, so an anonymous read fails with `42501` rather
+than returning zero rows — which is the stronger result, and the reason `rls.sql` asserts anonymous
+denial with `throws_ok` rather than a count.
+
+### An e2e that asserts the ABSENCE of a row is coupled to every row anybody made
+
+`saved-views.spec.ts` opened a filtered sprint and asserted the control read `Custom view` — that is,
+that **no saved view matched that URL**. It passed until a view saved by hand while testing matched
+it, and then failed on an assertion that had nothing to do with the change.
+
+Assert absence against something only this test could have created — a filter value nobody would
+save — rather than against the state of the whole table. Same family as the note above about reading
+a seeded row by position: a test that depends on what is *not* there depends on everything.
+
+### The `@modal` slot no longer drags the item detail into the sprint's chunks
+
+The note above — *"a parallel route's `@modal` slot contributes its client
+references to the segment's chunk group even on a render where the slot returns
+`null`"* — was measured in W1 and is **no longer true on Next 16 / Turbopack**.
+
+Tested the only way that settles it: the modal slot's page was replaced with
+`export default function () { return null }`, so nothing in the segment imported
+`ItemDetailBody`, and the route was rebuilt and re-measured.
+
+```
+with the modal's item import   220.2 KB gz, 17 chunks
+with it stubbed out            220.3 KB gz, 17 chunks
+```
+
+**No change.** The chunk that holds both the sprint table's strings and
+`"Half an hour more"` is still fetched, because Turbopack co-locates modules
+from sibling routes and the sprint page needs its half. Route structure is not
+the lever.
+
+**The lever that does work is a static import of something only rendered on
+click.** The topbar imported the export and new-item dialogs at the top of the
+file and rendered them `{open ? … : null}` — so the code shipped on every page
+and the markup on none. `next/dynamic` on the two of them:
+
+```
+before   own 80.2 KB, total 220.2 KB
+after    own 75.7 KB, total 215.7 KB
+```
+
+The command palette is deliberately not one of them: ⌘K has to open it, not
+start a download.
+
+**So the general rule, and it is cheap to check:** grep a client component for
+`{someState ? <Heavy /> : null}` and see whether `Heavy` is a static import at
+the top. If it is, it is in the bundle of every page that renders the parent.
+
+### Measuring what a route actually downloads
+
+`scripts/check-budgets.mjs` only prints the six biggest chunks when a route is
+**over**, which is exactly when you no longer need the list. To get it for a
+route that passes, copy its `measure()` — a Playwright page with a
+`response` listener over `/_next/static/**.js`, `waitUntil: "load"` then
+`networkidle` then a 2.5s settle — and cross-reference each chunk against the
+built files with the string markers above. That is how the two numbers in the
+note above were taken. Keep the script out of git: `/scripts/.*.local.mjs` is
+already ignored.
+
+
+### `authenticated` may `truncate` every table, and `truncate` ignores RLS
+
+Reading the grants on a new table, expecting to see only what its migration
+added:
+
+```sql
+select table_name, string_agg(privilege_type, ',' order by privilege_type)
+  from information_schema.role_table_grants
+ where grantee = 'authenticated'
+ group by 1;
+```
+
+```
+access_events   REFERENCES,SELECT,TRIGGER,TRUNCATE
+activity        REFERENCES,SELECT,TRIGGER,TRUNCATE
+saved_views     DELETE,INSERT,REFERENCES,SELECT,TRIGGER,TRUNCATE,UPDATE
+```
+
+`TRUNCATE` is there on **every** table, from this project's default privileges,
+and it is the one write that **row-level security cannot touch** — policies are
+row filters, and a truncate does not visit rows. A table whose migration says
+"no write grant" still has that one.
+
+Not reachable through PostgREST, which has no way to issue a truncate, so this
+is not an open door today. It matters for anything whose value is that it cannot
+be emptied: `access_events` revokes it explicitly, and any future audit or
+append-only table should too.
+
+**The general form: a `grant` line in a migration says what was ADDED, never
+what the role holds.** Read `information_schema.role_table_grants` when the
+answer matters, and assert it in a test — `e2e/access.spec.ts` checks the four
+write privileges are absent rather than checking the whole set equals `SELECT`,
+because `REFERENCES` and `TRIGGER` are there too and neither writes a row.
+
+### A trigger sees `auth.uid()` through PostgREST, and null everywhere else
+
+`access_events` is written by `security definer` triggers that record
+`(select auth.uid())` as the actor. Both halves of that are worth knowing:
+
+- Through the app it is the signed-in person. Verified end to end rather than
+  assumed — an invite added through the ordinary form on `/app/people` produced
+  *"Mohamed Tamer invited …"*, which is the assertion `e2e/access.spec.ts`
+  makes, because a trigger that could not see the session would write `system`
+  and still look like it worked.
+- From `psql`, a migration, or the service-role client it is **null**, and the
+  row reads `system`. That is not a gap to paper over: those are exactly the
+  writes an audit trail is asked about afterwards, and giving them an invented
+  author would be the one lie the table must not tell.
+
+*And a consequence:* `db:seed` inserts allowlist rows, so a freshly reset local
+database opens with `system` entries already in the history. A test that asserts
+an empty log will pass once and fail after the next `db:reset`; count the
+difference an action makes instead.
+
+
+### A hydration failure that only a recompiling dev server produces
+
+Reported as *"opening a story from the sprint table fails React hydration on
+every click"*, blamed on `ProgressRing`'s `useId` gradient because that is what
+the console diff named. Measured before changing anything:
+
+```
+production build, 4 loads + click                          0 hydration failures
+warm dev server, 5 loads                                   0
+warm dev server, 3 loads + click                           0
+dev server, loaded straight after touching a source file  2 of 11
+```
+
+None of the three things in the report were true: not every click, not
+`ProgressRing`, and not present in what ships.
+
+**It is the streamed-HTML twin of the stale-CSS note above.** The browser
+hydrates HTML produced by one compilation against a client bundle from another,
+so the trees genuinely differ — and React reports **the first attribute it finds
+that disagrees**, which is not the cause. Two captures of the same failure named
+two different components: `ProgressRing`'s `<linearGradient id>` once, the app
+shell's `<aside>` the next time. A `useId` value shifts whenever anything above
+it in the tree changes, which makes it a very convincing false lead.
+
+**So: before believing a hydration diff, load the same page four times on a warm
+dev server, then once against `npm run e2e:prod`.** If it survives neither, the
+compilation is what changed, not the component the diff points at.
+
+*And the fix that was suggested and would have been wrong:* deriving the gradient
+id from the work item's id instead of `useId`. That reintroduces the exact bug
+`ProgressRing` was written to prevent — the same item's ring can be on screen
+twice, once in the sprint row and once in the open modal, and two elements would
+share an id again. `useId` is right; `e2e/sprint-table.spec.ts` asserts it.
+
+### `<Reveal>` forwards nothing it has not declared, and a `data-*` attribute vanishes silently
+
+`<Reveal as="header" data-identity>` compiles, type-checks, lints, and **reaches
+no element at all**. `RevealProps` is an explicit prop list — `tier`, `as`,
+`delay`, `className`, `aria-labelledby`, `aria-label` — with no rest parameter,
+and TypeScript does not check a JSX attribute whose name is not a valid
+identifier. So `data-anything` is accepted by the compiler and dropped by the
+component.
+
+The comment on `RevealProps` already says this about `aria-*`, which is why
+those two are declared. It is worth reading before adding a test hook: a spec
+scoped to `[data-identity]` will time out on an element that was never rendered,
+and nothing upstream of that says why.
+
+**Put the attribute on a real element and let `Reveal` sit inside it**, unless
+the prop is general enough to belong in `RevealProps`.
+
+### A route guard behind a `loading.tsx` is invisible to `curl`
+
+`/app/settings` redirects a non-admin to `/app/profile`. Checked with `curl`,
+every role got **`200` and `<title>Workspace settings</title>`**, which reads as
+a guard that does not work. It works.
+
+The segment has a `loading.tsx`, so the document response is the shell plus the
+skeleton, flushed immediately; the page component runs inside the Suspense
+boundary and its `redirect()` arrives later **in the streamed payload**. `curl`
+sees the first flush and stops. This file already records the same shape turning
+`notFound()` into a 200 — it is one behaviour with two faces.
+
+So a redirect or a `notFound()` on a segment that streams has to be verified in
+a browser, or by a request that reads the whole body and looks for the skeleton
+label rather than the title. A guard in a **layout** is different: layouts run
+above the boundary, so `password.spec.ts` can still assert the
+`must_set_password` gate wins over a page-level redirect underneath it.
+
+### Playwright's accessible-name match is a substring, and a second control can capture it
+
+`getByRole("button", { name: "Sign out" })` went from one match to two the moment
+Security grew a **"Sign out everywhere else"** button — strict mode fails with
+"resolved to 2 elements", not with "not found", and the error reads like the
+element moved rather than like the query widened.
+
+Same family as `getByText("EVIM")` matching `MEINEvim components`, four sections
+up, and it has the same fix: `{ name: "Sign out", exact: true }`. Worth checking
+whenever a screen gains a control whose label *starts with* an existing one.
+
+### An absolute count in `db:test` is coupled to every row the browser made
+
+`npm run db:test` failed `seed.sql` 16-17 — *"95 of them were already ticked in
+Notion"* and *"104 attachments"* — after a full `e2e` run and a session of
+clicking. Nothing in the schema was wrong. A spec ticked a criterion and did not
+put it back, and those two assertions count seeded rows.
+
+`e2e/item-detail.spec.ts` → *tapping the words does not tick the box* fails the
+same way and reads much worse: it expects `aria-checked="false"` and gets
+`"true"`, which looks exactly like a real regression in the tap targets. On a
+freshly reset database the file passes 24/24.
+
+**So `db:reset` before `db:test`, and before believing any absolute count or
+seeded boolean.** The rule this repo already had — never two suites at once —
+is not enough on its own: one suite is sufficient to leave residue for the next
+thing that reads it.
+
+### A spec that invites a fixed address is coupled to its own previous run
+
+`access.spec.ts` → *an ordinary change through the ordinary screen turns up in
+it* failed **in isolation**, which by the triage two sections up means the code.
+It was not the code. Run alone again a minute later, it passed.
+
+It invites a fixed `probe` address and asserts the history grew by exactly two
+rows. When the immediately preceding run has left that address in
+`allowed_emails`, the Invite click is a no-op, no rows are written, and
+`toHaveCount(before + 2)` never arrives. The spec cleans up after itself — so it
+poisons only the *next* run, and only until that run's own cleanup lands.
+
+**So "passes alone" has to mean alone on a settled database**, not alone
+immediately after something else. When an isolated re-run contradicts a previous
+isolated re-run of the same spec, `db:reset` and try once more before believing
+either.
+
+The general shape: a fixture keyed to a constant is a fixture shared with every
+past and future run of the same file. `composer.spec.ts` hands out a per-project
+row for exactly this reason, and `e2e/earnings.spec.ts` is `mode: "serial"`
+because `app_settings` has only one row to hand out.
+
+### A DOM count on a streamed page counts React's hidden buffer too
+
+`document.querySelectorAll('[data-history-entry]').length` returned **6** on a
+page whose database held **3**, in dev *and* in a production build. The server
+HTML was correct — one list, three rows — so it read like hydration duplicating
+the tree, which is a real thing this file already describes.
+
+It was not. React streams late content into a `<div hidden>` appended to
+`<body>` and moves it into place as each boundary resolves; on a page with a
+`loading.tsx` there is a second, also-hidden container holding the resolved
+copy. `querySelectorAll` walks the whole document and finds both — so **every
+element on a streamed page appears twice** until those containers are consumed,
+and the duplicate is invisible to a person and identical to the real one in the
+markup.
+
+The tell is whitespace: `innerText` on the buffered copy collapses differently,
+so two "identical" rows read as `COD-231 Highlight · v1` and
+`COD-231Highlight · v1`. That is one tree rendered twice, not two trees.
+
+**Scope every DOM count on an app route:**
+
+```js
+[...document.querySelectorAll(SELECTOR)].filter((n) => !n.closest('[hidden]')).length
+```
+
+**Playwright is only partly protected, and the first version of this note said
+otherwise.** Actionability checks and `toBeVisible` do ignore hidden subtrees;
+`toHaveCount` does not filter by visibility at all. So a count assertion can see
+the buffered copy even though a click never would. Corrected here rather than
+left, because a field note that is wrong is worse than none.
+
+Related: the same buffering is why `get_page_text` and `querySelector`
+immediately after a navigation can return an *empty* main — the resolved copy
+has not been moved in yet. Measure after the page settles, in a call of its own.
+
+
+### `getByText` counts the wrapper as well as the words
+
+`expect(page.getByText("The retry must not say this twice.")).toHaveCount(1)`
+failed with **2**, on a thread holding exactly **one** comment and a table
+holding exactly **one** row.
+
+Neither the database nor the screen was wrong. `getByText` matches *every*
+element whose text is that string, and when the comment body renders as
+`<div class="flex"><p>…</p></div>` both the wrapper and the paragraph qualify.
+The same spec passed on runs where the body rendered one level shallower, which
+is what made it look like an intermittent duplicate-comment bug — the worst
+possible thing for it to look like, in a file about idempotency.
+
+The probe that settled it filtered to **leaf** elements and found one, then the
+same probe without the leaf filter found one *container*: two Playwright
+matches, one comment.
+
+**Count the thing, not its text.** `page.locator("article").filter({ hasText })`
+is stable against any amount of wrapping; a bare `getByText().toHaveCount(n)` is
+an assertion about markup depth wearing the costume of an assertion about
+content. Related, one section up: `toHaveCount` also counts elements inside
+React's hidden streaming buffer.
+
+## `revoke … from public` does nothing on the hosted project
+
+**Found 2026-08-27, after the consolidated migration was pushed and verified.**
+
+`20260826211339` took `rebalance_project_keys` off the public API:
+
+```sql
+revoke execute on function public.rebalance_project_keys() from public;
+```
+
+Locally that is correct and it was verified two ways: the ACL came back as
+`postgres=X/postgres` and nothing else, and `anon` calling it over PostgREST got
+`permission denied for function`.
+
+`supabase db dump --linked` after the push, on the same function:
+
+```
+REVOKE ALL ON FUNCTION "public"."rebalance_project_keys"() FROM PUBLIC;
+GRANT  ALL ON FUNCTION "public"."rebalance_project_keys"() TO "anon";
+GRANT  ALL ON FUNCTION "public"."rebalance_project_keys"() TO "authenticated";
+GRANT  ALL ON FUNCTION "public"."rebalance_project_keys"() TO "service_role";
+```
+
+The revoke applied. It also achieved nothing, because on that project `anon`
+does not reach the function through `PUBLIC` — it has a grant of its own, and
+taking a privilege away from `PUBLIC` does not touch one granted to a role
+directly.
+
+**The two databases have different grant postures.** Counted from the two dumps:
+
+| | hosted | this checkout |
+|---|---|---|
+| functions in `public` granted to `anon` by name | **44** | 0 |
+| functions in `public` granted to `authenticated` by name | **59** | 20 |
+| tables in `public` granted to `anon` | 0 | 0 |
+
+Something has run the equivalent of `grant all on all functions in schema public
+to anon, authenticated, service_role` against the hosted project. `db reset`
+does not reproduce it, so a local checkout will always look tidier than
+production on function privileges.
+
+### What to do instead
+
+- **Revoke from the roles by name** — `from anon, authenticated` — never from
+  `public`, if the point is to close something.
+- **Put the decision in the body as well.** A grant can be handed back from the
+  dashboard; a `raise exception` cannot. Five of the six volatile
+  `security definer` functions `anon` can reach on the hosted project already do
+  this, and all five refuse correctly there *despite* being granted.
+- **`supabase db diff` will not tell you.** Verified: re-granting the function
+  locally and re-running `db diff --local` reports **no changes**. It compares
+  schema, not privileges. `supabase db dump` is what shows grants.
+
+### And the guard's discriminator is not `auth.uid()`
+
+The first version of the fix used the idiom from
+`guard_profile_privilege_columns` — *no `auth.uid()` means the owner, allow it* —
+so that `seed.sql` could still call the function. An **anonymous PostgREST
+request has no `auth.uid()` either**, so `anon` went straight through the moment
+the grant was restored. Measured with a temporary echo function, called both
+ways against the local stack:
+
+```
+anon, over PostgREST : session_user=authenticator  current_user=anon
+                       auth.uid()=null  claims={"role":"anon",…}
+owner, over psql     : session_user=postgres       current_user=postgres
+                       auth.uid()=null  claims=null
+```
+
+The question is *did this arrive as a request*, and the answer is the JWT claims,
+which PostgREST sets on every call and psql, a migration and the seed never do.
+That idiom is safe on a trigger guarding a table `anon` cannot write. It is not
+safe on a function `anon` can call.
+
+---
+
+## A helper in the wrong file shipped 329 KB to every reader
+
+**Found 2026-08-27, by the reopened audit.** `06-PROGRESS.md` had recorded the
+measurement — *"one chunk of 329,083 bytes containing `prosemirror-model` and
+`prosemirror-view` is fetched"* by a reader of a story page who never opens a
+composer — and named a hypothesis: a module-scope `dynamic()` preloaded on
+hydration under Turbopack.
+
+**The hypothesis was wrong.** All six editor call sites are and always were
+behind `next/dynamic`. The leak was two lines:
+
+```ts
+// comment-composer.client.tsx, criteria-list.client.tsx
+import { hasPendingUpload } from "@/components/app/uploading-image.client";
+```
+
+`hasPendingUpload` is a fifteen-line pure function. The module it lived in
+defines a TipTap **node view**, so it imports `@tiptap/core` and `@tiptap/react`.
+Both composers are ordinary client components on the story page, imported
+statically — so the story page's client graph statically contained TipTap.
+
+### How to find this class of bug
+
+Not by reading the source: source-level splitting looked correct, which is why
+the wrong hypothesis survived. Read the **built manifest** and ask which client
+modules declare the chunk among their own:
+
+```bash
+# 1. which chunk holds the dependency
+for f in .next/static/chunks/*.js; do
+  grep -lq "prosemirror-view" "$f" && echo "$(wc -c < "$f") $f"
+done | sort -rn | head
+
+# 2. who declares it — this is the answer
+python3 - <<'PY'
+import json, pathlib
+p = pathlib.Path(".next/server/app/<route>/page_client-reference-manifest.js")
+s = p.read_text(); data = json.loads(s[s.index('] = ') + 4:].rstrip().rstrip(';'))
+for k, v in data["clientModules"].items():
+    if any("<chunk-hash>" in c for c in v.get("chunks", [])): print(k)
+PY
+```
+
+It listed **28** modules, `next/dist/client/app-dir/link.js` and
+`favourite-star.client.tsx` among them. A chunk that `next/link` depends on is
+not lazily loaded by anything.
+
+### The rule
+
+**A module is only as light as its heaviest import**, and a helper that lives
+beside a heavy dependency drags that dependency wherever it goes.
+`lib/saved-views-schema.ts` states this for zod at the `lib/` level; this is the
+same shape one layer down, inside `components/`. The only thing that will tell
+you is a **production** build — the dev server eagerly loads dynamic chunks so
+HMR can patch them, so measuring this against `next dev` reports a failure that
+does not exist and hides one that does.
+
+`lib/blocks/uploading.ts` now holds the constant and the predicate, imports
+nothing, and says at the top that it may never import TipTap.
+
+---
+
+## Turbopack serves a stale `globals.css` after an edit to it
+
+**Found 2026-08-27.** A rule added inside an existing `@media (pointer: coarse)`
+block in `app/globals.css` did not appear in the served stylesheet. The rule was
+syntactically fine and `tsc`, `lint` and the page all behaved as though it had
+never been written — and the *earlier* rules in the same block were being served,
+which is what made it look like a specificity problem rather than a cache one.
+
+It is a cache one. `touch app/globals.css` did not clear it either; the served
+URL keeps its hash, so a browser reload fetches the same stale body.
+
+**The check**, which takes one command and is unambiguous:
+
+```bash
+CSS=$(curl -s http://localhost:3000/login | grep -o 'href="[^"]*\.css[^"]*"' | head -1 | sed 's/href="//;s/"//')
+curl -s "http://localhost:3000$CSS" | grep -c "the-declaration-you-just-added"
+```
+
+**The fix**: stop the dev server, `rm -rf .next`, start it again. Ten seconds,
+against however long it takes to convince yourself a correct CSS selector is
+wrong.
+
+---
+
+## A binned row is not readable, so a test helper that looks it up returns null
+
+**Found 2026-08-27, writing `supabase/tests/pages.sql`.** A pgTAP helper of the
+shape
+
+```sql
+create or replace function pg_temp.page_id() returns uuid language sql stable as
+  $$ select id from public.pages where slug = 'the-fixture' $$;
+```
+
+is correct right up until the fixture is soft-deleted. `pages`' read policy is
+`deleted_at is null`, so the helper returns **NULL** from that point on, every
+later assertion silently asks about nothing, and the failure surfaces several
+assertions further down as *"No such page"* from an unrelated function.
+
+Fixtures that will be deleted during a test get a **fixed uuid**, the way
+`supabase/tests/revisions.sql` gives its story one. Anything that reads its own
+fixture back through RLS is asserting the policy as well as the behaviour, and
+only one of those is what the test is about.
+
+---
+
+## The auth container caches the database it was just handed
+
+**Found 2026-08-27.** `kong-caches-db-after-reset` above records a 502 from the
+auth API after `db:reset`. GoTrue has its own version of it, and it is not a 502:
+
+```
+sign-in failed: 500 {"code":500,"error_code":"unexpected_failure",
+                     "msg":"Database error querying schema"}
+```
+
+Every spec then dies in `signIn()` in `e2e/fixtures.ts`, which reads as the
+application being broken. It is the container holding connections to the
+database `db reset` dropped out from under it.
+
+**Before any suite run that follows a reset:**
+
+```bash
+npx supabase db reset
+docker restart supabase_auth_coditu supabase_rest_coditu
+# then poll until it answers 200 — usually one try
+```
+
+`npm run gate` runs `db:test` and does **not** do this, so a gate run straight
+after a reset can fail this way and look like a regression.
+
+---
+
+## A parallel e2e failure count measures the harness, not the code
+
+**Measured 2026-08-27, so nobody has to argue about it again.**
+
+Two runs of the **same 29 spec files**, the same 2 workers, the same freshly
+reset stack:
+
+| | failures |
+|---|---|
+| run A | **54** |
+| run B | **4** |
+| in both | **1** |
+
+Fifty-three of A's fifty-four did not reproduce. Full-suite runs the same day
+gave **87**, then **10**, then **54** from identical code.
+
+**So: never report a parallel failure count, and never chase an individual
+failure out of one.** The only numbers worth writing down come from
+`--workers=1` or a per-file re-run. What survives isolation is real; what does
+not is the harness.
+
+### What the cross-worker failures actually are
+
+The one test that failed in both runs — `access.spec.ts:113` — still passed
+**3/3 alone**. Seven spec files write `allowed_emails` and read the same
+`access_events` table, and several clear their probe address with a **direct SQL
+delete from the harness**. That delete carries no session, so
+`record_allowlist_access_event()`'s `auth.uid()` is null and it writes a
+`system …` row straight to the top of the history another worker is
+mid-assertion on.
+
+That is the shape of nearly every cross-worker failure in this suite: one spec's
+cleanup writing an audit row into another spec's screen.
+
+---
+
+## The Notion importer drifts from the schema, silently, in private
+
+**Found 2026-08-27, re-importing Week 17.**
+
+`supabase/seed.sql` says at the top: *do not edit this file by hand: re-run the script against the
+export instead.* That is good advice with a failure mode nobody had hit yet.
+
+`20260825100000_rename_work_item_statuses.sql` renamed four enum values — `todo → ready`,
+`dev_started → in_progress`, `ready_for_peer_review → in_peer_review`, `in_review → in_qa` — and the
+committed seed was updated with it. **`scripts/import-notion-export.mjs` was not.** Running it against
+the *unchanged* export rewrote 23 rows back to names the enum no longer has. Nothing was wrong until
+somebody ran the script, and then the diff looked like a data change rather than a stale map.
+
+`supabase/notion-import.json` had the same 23 rows, which is worse: it is what
+`scripts/push-notion-import.mjs` sends to the hosted project through PostgREST, so a production push
+would have inserted `dev_started` into an enum that had not held that value since 25 August.
+
+**The check that finds it, in one line.** Run the importer against the export the seed was built from
+and diff:
+
+```bash
+node scripts/import-notion-export.mjs <pristine-export> && git diff --stat supabase/
+```
+
+Clean means the generator and the committed artefact agree. Anything else is drift, and it is worth
+running *before* you change the export, so a real diff is not mixed in with an old one.
+
+## `db reset` is shared, and another agent's run looks like your work being undone
+
+**Found 2026-08-27.** Twice in one session, a verified database went back to the previous seed between
+one query and the next: 107 items and 70 comments, then 104 items and 0 comments, with nothing in this
+worktree having changed.
+
+Every worktree points at the **same** local Supabase — `supabase/config.toml` names one project id —
+so `npm run db:reset` and `npm run e2e` from any of them replace the database for all of them. The
+suite's global setup resets, so a parallel agent running Playwright is a reset every few minutes.
+
+Before blaming your seed, look:
+
+```bash
+ps aux | grep -E "[p]laywright test|[s]upabase db reset"
+git worktree list
+```
+
+Then re-reset and verify **in the same command** rather than in the next one, so a race cannot open
+between them. Related: [[e2e-shares-one-local-database]] in the per-agent memory says the same thing
+about specs failing.
+
+## Storage answers `DatabaseSchemaMismatch` after a reset, and it is the container, not your SQL
+
+**Found 2026-08-27, uploading imported attachments.**
+
+Every upload after `npm run db:reset` failed with
+
+```
+400 {"statusCode":"503","error":"DatabaseSchemaMismatch",
+     "message":"The database schema is out of sync. Please run migrations or contact support."}
+```
+
+The migrations were applied and the schema was fine. `supabase_storage_coditu` holds its own
+connection and its own idea of the storage schema, and `db reset` recreates the database underneath
+it. The message names migrations because that is the usual cause; here nothing is out of sync except
+the container's memory of it.
+
+Same family as the Kong note above, and the same fix:
+
+```bash
+docker restart supabase_storage_coditu supabase_kong_coditu && sleep 12
+```
+
+## `push-notion-import.mjs` replaces; it does not update
+
+**Found 2026-08-27, asked to push Week 17 to production.**
+
+The script's own header says it "imports only delivery data", which reads as safe. What it does is
+
+```js
+for (const table of ["work_items", "sprints", "projects", "clients"]) {
+  await rest(`${table}?id=not.is.null`, { method: "DELETE" })
+}
+```
+
+— and everything below a work item cascades. That was correct exactly once, against an empty hosted
+project. Run against production five days later it would have taken a comment written that morning
+and its screenshot, **216 rows of activity**, a Week 18 sprint somebody created in the app, and every
+in-app status edit. It also renumbers every key, because PostgREST cannot move a sequence, so the
+column default assigns them afresh.
+
+**Look before pushing.** These four counts say whether the hosted project is still only the import:
+
+```bash
+for t in comments activity document_revisions saved_views; do …count(t)… ; done
+```
+
+Anything non-zero in `activity` beyond the import's own inserts means people have used it.
+
+`scripts/push-sprint-update.mjs` is the in-place alternative: it matches by normalised title, refuses
+when `description_json`/`highlight_json` is set or a time entry was logged in the app, and stops on
+any row it cannot account for on either side.
+
+## Production's profiles carry the seed's UUIDs
+
+`a0000000-0000-4000-8000-00000000000{1,2,3,4}` are Mohamed, Adam, Abdelrahman and Ahmed **on
+production**, not only locally — the seed's accounts were pushed there once and the ids stayed.
+
+Two consequences, one convenient and one not:
+
+- A `comment-images` key is `<profile uuid>/<object uuid>.<ext>`, so a storage key built locally is
+  valid on production unchanged, and so is the `/api/attachments/…` src inside a comment document.
+- Anything that treats those ids as local-only is wrong. They are real people's ids there.
+
+Keys are still not shared: the same item is COD-229 locally and COD-241 on production. See
+[[local-and-production-item-keys-diverged]].
+
+---
+
+## `supabase stop` leaves its volumes behind
+
+Tearing down an isolated project with `supabase stop` removes the containers and keeps
+`supabase_db_<project>`, `supabase_storage_<project>` and `supabase_edge_runtime_<project>`.
+Three of them survived a teardown that reported itself clean, and the next `supabase start`
+adopted them — so a "fresh" stack came up holding the previous pass's rows.
+
+The flag is `--no-backup`, and the check is not the flag:
+
+```bash
+supabase stop --no-backup
+docker volume rm supabase_db_<p> supabase_edge_runtime_<p> supabase_storage_<p> 2>/dev/null
+docker ps -a --format '{{.Names}}' | grep -c '<p>'      # want 0
+docker volume ls --format '{{.Name}}' | grep -c '<p>'   # want 0
+```
+
+Count both. A teardown that only counts containers reports success while the state that matters
+is still on disk.
+
+## Turbopack refuses a symlinked `node_modules`
+
+Standing up a second worktree to run the same suite at another commit, the obvious economy is to
+symlink `node_modules` at the new worktree rather than reinstall 803 MB. `next dev` will not start:
+
+```
+Error [TurbopackInternalError]: Symlink node_modules is invalid, it points out of the filesystem root
+```
+
+It is not a permissions or a resolution problem and no flag turns it off — Turbopack's filesystem
+root is the project directory and the symlink leaves it. On APFS the answer is a clone, which is
+copy-on-write and costs no real disk:
+
+```bash
+cp -Rc /path/to/main/node_modules "$WT/node_modules"   # 803 MB in 9.7s
+```
+
+`npm ci` also works and takes minutes. See [[worktree-must-live-outside-the-checkout]] for the
+other half of this — a worktree nested inside the checkout cannot run its own dev server at all.
+
+---
+
+## `locator.click()` scrolls the page, and `scroll-behavior: smooth` makes it look like your bug
+
+PF-9 carried "the peek scrolls the page ~490px UP on 4 of 5 opens" for two passes. It reproduced
+every run, the numbers were stable to the pixel, and it was the **instrument**.
+
+Playwright scrolls an element into view before clicking it. It does that through CDP, *below*
+JavaScript, so it is invisible to every hook you can write — patching `window.scrollTo`,
+`window.scroll`, `window.scrollBy`, `Element.prototype.scrollTop` and
+`Element.prototype.scrollIntoView` catches **nothing**. And because this app sets
+`html { scroll-behavior: smooth }`, that scroll *animates* over ~370 ms, which reads exactly like an
+application easing the page somewhere on purpose.
+
+The one-line test:
+
+```ts
+await link.click();                  // moved: [0, -566, 0, -472, -566]
+await link.dispatchEvent("click");   // moved: [0,    0,  0,    0,    0]
+```
+
+`dispatchEvent` does not scroll into view. Same build, same page, same five opens.
+
+Two things follow. **Any measurement of scroll position around a `locator.click()` is measuring
+Playwright** unless the target is already in the viewport — and it is always *upward* when the page
+is scrolled down and the target is above the fold, which is what made it look like "the app jumps to
+the top". **And a stack trace proving nothing called a scroll API is not evidence the scroll was not
+scripted** — it is evidence it did not go through JavaScript at all.
+
+What did survive the elimination: the document height never changed (1466 px throughout, sampled
+every frame), so it was never a clamp; focus never left the clicked link; and the dialog's own scroll
+lock, its `panelRef.focus()`, and every `Reveal` animation were each disabled in turn with the result
+bit-for-bit identical.
+
+---
+
+## `scroll-behavior: smooth` will be blamed for two different bugs before you find it
+
+One line in `app/globals.css` produced both of PF-9's and PF-6's most stubborn symptoms, and in
+neither case did it look like CSS.
+
+**It made a router scroll look like an application bug.** Opening a story moved the document to its
+maximum scroll — 68 px at 1280×720, **1970 px on a phone** — on the first open only and never on
+WebKit. Because smooth animates it over ~165 ms, it reads exactly like something easing the page
+somewhere on purpose. The actual caller is Next's own `ScrollAndFocusHandler.handlePotentialScroll`,
+bringing the newly-rendered `@modal` segment into view; `scroll={false}` on the link turns it off.
+Two plausible hypotheses were measured and thrown away first — Chrome's scroll anchoring
+(`overflow-anchor: none` changed nothing) and the dialog's `focus()` (forcing `preventScroll: true`
+changed nothing) — and the answer came from hooking every scroll API and reading the stack.
+
+**It made the editor lose the caret.** A browser scrolls the caret back into view on every keystroke.
+With smooth on the scrolling element it has to *animate* that, so at typing speed each keystroke
+restarts an animation that never arrives: thirty to-do items typed into the sprint notes left the
+caret **856 px below the fold**, coming back about 0.7 s after typing stopped. Chrome only. It reads
+as "the editor is slow" when the keystroke itself is 12.3 ms.
+
+```css
+html:has(.ProseMirror:focus) { scroll-behavior: auto; }
+```
+
+**What to remember.** If a scroll moves over more than one frame, the property is involved. And it is
+per-*scrolling-element*, so `:has()` on `html` is enough to switch it off for a state without
+touching anything else.
+
+---
+
+## A spec's teardown must delete only the rows it created
+
+Four files have now been fixed for one bug with one shape, and it costs a day every time because the
+failure surfaces somewhere else entirely.
+
+| spec | what it deleted that it did not create |
+|---|---|
+| `inline-edit.spec.ts` | every time entry on its item — **12.0 h** off the sprint |
+| `reliable-writes.spec.ts` | every comment and time entry on `COD-239` — **60 min**, one picture |
+| `composer.spec.ts` | `COD-240`'s imported picture |
+| `history.spec.ts` | all **seven** of `COD-235`'s imported revisions, never restored |
+
+Each is destructive for **the rest of the run**, and the spec that fails is a later one asserting a
+seeded total. `sprint-table.spec.ts:17` and `:92` are the two assertions in the suite that read the
+`SEED.totals` literal, and they were the two that failed in company and passed alone for weeks.
+
+```ts
+let seeded: string[] = [];
+test.beforeAll(async () => { seeded = (await query(`select id::text as id …`)).map(r => r.id); });
+// then, in the teardown:
+`delete from … where <the spec's scope> and not (id::text = any($1::text[]))`
+```
+
+**Move the counts with the delete.** If the spec asserts "one comment", count the same bounded set —
+relaxing the assertion to `2` to accommodate the seed is the easy fix and a weaker test.
+
+**Prove it by ordering, not by reading.** `A` alone, then `A` then `B`, then `B` alone. That is what
+identified `inline-edit` and it is faster than any amount of staring.
+
+---
+
+## The suite's failure count tracks the machine
+
+Five serial runs of the full suite from five fresh resets, same tree, same stack, gave **16, 15, 19,
+22 and 15** failures. The count rose with memory pressure — swap went from comfortable to 25.5 GB of
+26.6 across the sweep, runs 3 and 4 took 32 and 34 minutes against run 1's 24 — and run 4 contains
+`page.goto: Could not connect to the server`.
+
+Before diagnosing a flaky spec, check `sysctl vm.swapusage` and the wall time of the run it failed
+in. Twelve of the fifteen flips were five-second `expect` waits that a swapping machine could not
+meet; the default is 10 s now. Only three were real, and all three were found by *reading* the
+failure rather than by running it again:
+
+- an unscoped `getByText` matching the streaming tree's copy (strict-mode violation);
+- an interaction on a control behind `next/dynamic`, done once, before it was live;
+- `waitForTimeout` then a single read of an asynchronous scroll restoration.
+
+Two of those three are "read once at a fixed moment". If a spec sleeps and then reads, it is not
+asserting — it is guessing.
+
+---
+
+## A Supabase dump and restore have two asymmetric privilege traps
+
+**Backup:** `supabase db dump --db-url <coditu_backup>` still generates
+`--role "postgres"`. The login succeeds and then `pg_dump` fails at `SET ROLE postgres`; the
+CLI does not derive that flag from the connection user. Do not grant `postgres` membership to
+the backup role. Generate the CLI pipeline with a placeholder URL, assert the one forced-role
+line, remove only it, and run the platform-aware remainder as `coditu_backup`. That preserves
+the CLI's schema exclusions without turning a scheduled reader into the database owner.
+
+**Restore:** the normal local `postgres` login is not privileged enough to write every
+platform-owned Storage table (`storage.buckets_vectors` was the first refusal). A full restore
+is the opposite trust boundary: use the throwaway project's `supabase_admin` restore owner.
+The backup must be least-privilege; the rebuild necessarily owns the empty target.
+
+**Storage bytes after metadata:** once `data.sql` restores `storage.objects`, `aws s3 sync`
+lists those rows, believes objects of the same size already exist, skips every PUT, and exits
+green. GET then returns Storage `InternalError` because the bytes are absent. Force a recursive
+`aws s3 cp` from the archive, download again, and compare bytes. A restored metadata row is not
+a restored object.
+
+
+### `p p` is a selector that can only ever return nothing
+
+A `paragraph` inside a `paragraph` in `sprints.notes_json` made the renderer emit
+`<p><p>`, and the sprint page threw a hydration mismatch on every load. The
+obvious way to look for it does not work:
+
+```js
+document.querySelectorAll("p p").length   // 0 — before the fix and after it
+```
+
+**`<p><p>` is not nesting to a browser.** The HTML parser closes the first `<p>`
+when it meets the second, so the DOM holds two siblings and nineteen stray
+`</p>` are discarded. That disagreement *is* the bug — React's tree says nested,
+the parsed DOM says siblings — and then React repairs the DOM with
+`appendChild`, which does not obey the parser's rules, so after hydration
+`innerHTML` shows the nesting that `querySelectorAll` still cannot match.
+
+So the DOM is a witness to nothing here, in either direction. Look at the bytes
+the server sent:
+
+```bash
+curl -s -H "Cookie: sb-127-auth-token=$TOKEN" "$URL" | grep -c '<p class="whitespace-pre'
+```
+
+In a spec, `(await page.goto(url))?.text()` is the same bytes and is not
+timing-dependent. `e2e/sprint-notes.spec.ts` asserts on that rather than on the
+page, and `tests/comment-nesting.test.tsx` on `renderToStaticMarkup` for the
+same reason — a test that parses the markup first applies the very repair it is
+looking for and passes on a broken renderer.
+
+The general form: **for any "invalid HTML" claim, assert on the string, never on
+the tree.** The tree is the browser's opinion of what you meant.
+
+### React's nesting warning is not the hydration flake, and must not be filtered with it
+
+`comments.spec.ts` and `components.spec.ts` both filter
+`/^Hydration failed|hydrated but some attributes|did not match/i`, and the
+measurement behind that is real — 10 in 60 dev-server loads, 0 in 60 against a
+production build.
+
+`In HTML, <p> cannot be a descendant of <p>` is a **different** message and a
+different kind of fact: it comes from `validateDOMNesting`, it is a property of
+the markup, and it fires on every load or on none. It is safe to assert on and
+it is worth asserting on — it is the only signal the browser gives for a whole
+class of invalid output. Filter the race; never filter this.
+
+It is development-only, though, so a spec that relies on it alone proves nothing
+against a production build. Assert the response bytes as well.
+
+## Docker here is Colima, and it is a 6 GiB VM — that is why the suite numbers moved
+
+**Symptom.** `docker ps` answers instantly and `docker rm -f` never returns. `docker restart`,
+`docker logs` and `docker container prune` hang the same way, and the hung clients pile up — six of
+them at once on 2026-08-30, one of which had been stuck for three hours. The Mac reports high swap
+(14.6 of 15.3 GB) and everything is slow, so the machine looks like the problem.
+
+**It is not Docker Desktop.** There is no `Docker.app` on this Mac and `open -a Docker` fails.
+`docker context ls` says the endpoint is `unix:///Users/motamer/.colima/default/docker.sock` —
+this is **Colima** on a Lima VM. Quitting Docker Desktop is a no-op because there is nothing to quit,
+and `pgrep` for `com.docker` finds nothing while the daemon keeps answering.
+
+```bash
+docker context ls                 # the line that settles it
+colima list                       # PROFILE STATUS ARCH CPUS MEMORY DISK
+colima restart                    # this is "restart the Docker VM"
+```
+
+**The number that explains the rest: the VM has 4 CPUs and 6 GiB**, and it was being asked to hold
+three full Supabase stacks — `coditu`, `Baseeta`, and a leftover `coditurestore` from a restore
+drill. Eleven Postgres/Kong/GoTrue containers in 6 GiB. The host having 16 GB is irrelevant; the
+guest limit is the one that binds, and raising it would only move the thrashing to the host.
+
+**`colima restart` fixes it and loses nothing.** The VM disk is persistent, so named volumes and
+their data survive; containers come back up. Immediately afterwards, `docker rm -f` on the two
+containers that had been wedged for hours completed in **under a second**, and host swap fell from
+14.6 GB to 10.2 GB.
+
+**Why this matters beyond the annoyance.** The determinism work has produced 87, 10, 54, 16, 18 and
+631/0 failures from the same tree, and the ledger already suspected "the machine". This is the
+mechanism. Before trusting any suite count, check what else is inside the VM:
+
+```bash
+docker ps --format '{{.Names}}' | sed 's/.*_//' | sort -u   # which projects are running
+docker stop $(docker ps -q --filter "name=Baseeta")         # reversible; volumes stay
+```
+
+A run taken with one stack in the VM and a run taken with three are not comparable, and nothing in
+the Playwright output says which one you got.
+
+---
+
+## A second control can hide whether the first one still works
+
+**Symptom.** Nothing. That is the point. Everything is greener than it was, and one of your
+assertions has quietly become untestable.
+
+**What happened.** The deploy preflight refuses an unencrypted database connection. The way that
+refusal was known to still work was an experiment: force `ssl: false` in `check-hosted-schema.mjs`,
+point it at the real project, watch it print `database connection is not encrypted`. On 2026-08-31
+"Enforce SSL on incoming connections" was turned on at Supabase — correct, owed, and an unambiguous
+improvement. The experiment now dies one hop earlier:
+
+```
+XX000  (ESSLREQUIRED) SSL connection is required for user: coditu_backup
+```
+
+The provider refuses before the assertion is reached. The guard was never exercised again, and
+nothing anywhere would have said so.
+
+**The shape, stated so it is recognisable elsewhere.** Two controls in series, the outer one
+stronger. The inner one still runs, still passes, and no longer has any input that can make it fail.
+It has stopped being a control and become a comment — and unlike a deleted assertion, it leaves a
+green tick behind. This is the same family as *a deliberate red is a place a real red can hide*
+(2026-08-31): both are cases where a control's signal stops carrying information while still
+appearing to.
+
+**The question that finds it:** not *"does this control pass?"* but **"what input, that I can still
+produce, makes it fail?"** If the answer is "none, since we hardened the layer in front", the control
+needs a test that reaches it directly. `transportFailures` moved to `scripts/lib/transport-guard.mjs`
+and took `tests/transport-guard.test.ts` with it for exactly that reason.
+
+**And the omission that came with it.** The same check printed seven lines on success, none of them
+about the transport it had just verified. A passing run and a run with the assertion deleted were
+byte-identical. **A control that proves something should say what it proved** — otherwise its success
+and its absence look the same, which is the fail-open shape with no `exit 0` in sight. It now prints
+`tls=encrypted`, the protocol, the cipher and the issuer.
+
+---
+
+## A runbook step nobody has executed is a guess with formatting
+
+**Symptom.** The recovery runbook reads correctly, every sentence is true, and step 5a stops one
+statement in.
+
+```
+Applying migration 20260820120000_enums.sql...
+LegacyMigrationApplyError … At statement: 0
+  create type app_role as enum ('admin','lead','engineer')
+```
+
+**Why.** §5a said *"re-apply the migrations over the restored database — `supabase db push`"*. The
+archive carries **no `supabase_migrations` schema at all**: `supabase db dump` writes `public`, and
+the migration history is not part of it. So a restored database has a full schema and an **empty
+history**, the CLI replays all forty migrations from the beginning, and the first `create type` is
+already there.
+
+**What it was actually for.** Two triggers on `auth.users` — `on_auth_user_created` and
+`enforce_email_allowlist` — because no dump of this project carries a trigger on a managed schema.
+Everything else those migrations would create is in `schema.sql` and is already restored. The step
+needed to do a hundredth of what it said.
+
+**The general lesson, which cost seven runs to learn.** Automating the drill did not *reveal* a
+defect in the drill; it revealed defects in every step of the procedure that had only ever been
+read:
+
+| the step said | it actually did |
+|---|---|
+| restore into a local stack | died on `role "coditu_backup" already exists`, because `supabase start` had applied this application's migrations first — the target has to be **bare** |
+| the target is new enough | four `storage` columns hosted has and the CLI's pinned image does not |
+| re-apply the migrations | stopped at statement zero, above |
+
+Each of those had been performed by hand once, by somebody who worked around it in the moment and
+wrote down the intent rather than the workaround. **A procedure is only as true as its last
+unattended run.**
+
+**And the smaller trap inside it:** `ls -t` picked the *oldest* archive of eight that had been
+downloaded within the same second. Sort recovery sets by **name** — the names are ISO-8601 — never
+by mtime.
+
+## A cancelled run can wedge the self-hosted listener, and it still reports itself online
+
+Measured 2026-08-31, four times in one afternoon, on `coditu-mac`.
+
+Cancel a workflow run while the runner is executing one of its jobs and the job ends correctly —
+`Job … completed with result: Canceled` in `~/Library/Logs/actions.runner.*/stdout.log`. What does
+not always follow is the next line, `Listening for Jobs`. Without it the runner takes nothing, and
+the queued work sits there.
+
+**The reason it costs time is that nothing looks wrong.** The API says:
+
+```
+gh api repos/MooTamer/coditu/actions/runners --jq '.runners[]|"\(.status) busy=\(.busy)"'
+online busy=false
+```
+
+Online. Not busy. And not working. Meanwhile the run says `queued`, which is the same word it uses
+when a runner is simply occupied — so the obvious reading is "something else is ahead of me", and
+the obvious response is to wait, which never resolves.
+
+**The tell is in the runner's own log, not in GitHub:** the last line is a job completing, and there
+is no `Listening for Jobs` after it. Two minutes of that is enough to be sure.
+
+```bash
+tail -2 ~/Library/Logs/actions.runner.MooTamer-coditu.coditu-mac/stdout.log
+cd ~/actions-runner-coditu && ./svc.sh stop && ./svc.sh start
+```
+
+It picked the queued job up **three seconds** after the restart.
+
+Two things follow. **Cancel sparingly** — with a single runner the temptation is to cancel
+report-only jobs to free it, and each cancellation risks this. And when a job is queued against an
+idle runner, **read the runner's log before believing GitHub's status**: `online` is the runner's
+connection, not its willingness.
+
+### And do NOT restart the service to interrupt a job it is running
+
+That was tried, on the same afternoon, to get a production deploy out from behind an 85-minute
+report. It is worse than cancelling:
+
+```
+√ Connected to GitHub
+
+A session for this runner already exists.
+```
+
+GitHub still holds the session of the listener that was killed, and refuses the new one. The
+listener retries in a loop; the job it was running stays `in_progress` on a runner that no longer
+exists; and **nothing** — not the queued deploy, not anything else — is picked up until GitHub
+times the old session out on its own schedule. Restarting is the right move for a **wedged idle**
+listener and the wrong one for a **busy** listener.
+
+The way to keep a release from queueing behind a report is not to intervene at all, it is to make
+the graph say so: `browser` and `lighthouse` now `needs: [scope, check, deploy]`.
+
+## A pull request with a merge conflict schedules no CI at all
+
+Measured 2026-08-31, and it froze `main` for twenty minutes.
+
+A push to a pull-request branch produced **no workflow run**: nothing queued, nothing failed, and no
+`github-actions` entry in the commit's check suites —
+
+```bash
+gh api repos/MooTamer/coditu/commits/<sha>/check-suites --jq '.check_suites[].app.slug'
+vercel
+claude
+supabase
+```
+
+— while Vercel built the same push, so the event plainly reached webhooks. Closing and reopening the
+pull request did not help. Force-pushing a fresh sha did not help.
+
+**The cause: the pull request had gone `DIRTY` — a merge conflict with `main`.** GitHub runs
+`pull_request` workflows against `refs/pull/N/merge`, and a conflicting branch has no merge ref to
+build, so nothing is scheduled. Merging `main` in and resolving produced a run within seconds.
+
+**Nothing tells you.** The checks list is simply empty, which is exactly what it looks like in the
+first ten seconds after a push. The distinguishing question is not *"why has CI not started?"* but:
+
+```bash
+gh pr view <n> --json mergeStateStatus --jq .mergeStateStatus
+```
+
+`DIRTY` means it will never start. `BLOCKED` and `UNSTABLE` mean it did.
+
+`workflow_dispatch` is on `ci.yml` now, as the way back in when the event path produces nothing.
+
+## `supabase stop --no-backup` deletes data volumes, and picks its target from a file
+
+`--no-backup` is not "skip a backup step". The CLI's own help says: **"Deletes all data volumes
+after stopping."** It is the destructive flag.
+
+And without `--project-id` the *target* is whatever `supabase/config.toml` in the working directory
+says. So the blast radius of that one line depends on a file having been edited correctly by an
+earlier step — and in CI the teardown carries `if: always()`, which means it runs even on the runs
+where the earlier step did not.
+
+That was the shape on 2026-08-31 while CI moved onto the Mac. **The developer's `coditu` stack and
+its `supabase_db_coditu` volume disappeared during that afternoon and could not be attributed with
+certainty**: every teardown in the logs is correctly scoped (`project_id = "codituci"`,
+`Stopped services: [supabase_..._codituci]`), Colima was stopped and restarted once, and several
+runs were cancelled mid-job. No single line can be pointed at.
+
+**The uncertainty is the argument.** A destructive command should not be one file edit away from a
+different target, and "we could not work out what did it" is the outcome that proves it. Every
+teardown now says `supabase stop --project-id codituci --no-backup`, which cannot reach another
+project whatever state the config is in, and `tests/ci-runner.test.ts` asserts the flag.
+
+The cost this time was small and that is luck rather than design: the local database is seeded, not
+real, so it comes back with
+
+```bash
+supabase start && supabase db reset
+```
+
+Local is deliberately not production data — which is exactly why it is the one place a mistake like
+this could be survived quietly, and why it is worth writing down rather than shrugging at.
+
+## Cancelling a run does not always stop it, and its queued jobs can still start
+
+Measured 2026-08-31, and it is the reason the afternoon's last merge took an extra half hour.
+
+`gh run cancel` returned `✓ Request to cancel workflow … submitted` and the run stayed
+`in_progress`. Seven minutes later the runner finished the job it was on and then **picked up the
+next queued job from that same cancelled run** — the 85-minute browser baseline — with a newer run
+for the same branch waiting behind it.
+
+Three things to take from it:
+
+- **A cancel is a request, not a state.** Read `.status` back; do not trust the tick.
+- **Cancellation lands at STEP boundaries.** A job inside a long step (`supabase start`, `npm ci`
+  on a slow link) keeps going until that step ends, and the queued jobs behind it are still live
+  until the run actually reaches `completed`.
+- With **one runner**, a cancel that does not take does not merely waste minutes — it hands the
+  runner to a job you tried to stop, ahead of the one you are waiting for.
+
+The way out is not more cancelling. It is the ordering already in `ci.yml`: `browser` and
+`lighthouse` `needs: [scope, check, deploy]`, so the jobs worth waiting for are never behind the
+jobs that gate nothing.
+
+## A Mac runner hides macOS-only shell until the day CI leaves it
+
+Measured 2026-10-12. CI had run only on `coditu-mac` since 2026-08-31. The first run on
+`ubuntu-latest` after the repository went public failed one unit test, and the cause was a
+command, not a change:
+
+```
+expected 'offsite_disk_days_since=0'
+received 'offsite_disk_days_since=20738'      # days since 1970-01-01
+```
+
+`date -j -f fmt stamp +%s` is BSD date. GNU date has no `-j`, so the call failed into its
+`|| echo 0` and the age became the whole epoch. Three shapes to recognise:
+
+- **`date -j -f` without `-u` reads a `…Z` stamp as local time.** The Z is only a literal in the
+  format. On this Mac that made every age three hours too old. Add `-u`; on GNU, use `date -u -d`
+  with the time's colons put back.
+- **GNU `stat -f` is a flag, not a format.** On Linux, `stat -f '%m' file` prints the
+  *filesystem* of `file`, fails on a file named `%m`, and a `|| stat -c …` fallback then appends to
+  that output. Ask GNU's `-c` first: BSD rejects it with nothing on stdout. It remains in the
+  Mac-only local mode of `check-backup-freshness.sh`, which ships to the recovery repository —
+  edit it only together with `scripts/sync-recovery-repo.sh`, or `recovery:check` fails on the
+  drift.
+- **`sed -i ''` is BSD-only**; GNU reads the `''` as a file name. It remains only in
+  `local-nightly.sh`, which is macOS by design.
+
+Before trusting a script on both platforms, grep it for `date -j`, `stat -f` and `sed -i ''`, and
+run it on the other one. The `coditu-mac` notes above are history from 2026-10-12, when the runner
+was retired because the repository went public.

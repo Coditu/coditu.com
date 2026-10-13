@@ -1,0 +1,1485 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ==========================================================================
+   Coditu design tokens
+   Source: design/project/*.dc.html — see docs/01-DESIGN-SYSTEM.md.
+   Every number here is the spec. No component hardcodes a hex.
+
+   The prototype's `brightness` prop is a design-tool control and does not
+   ship; brightness 0 is the canonical token set.
+   ========================================================================== */
+
+/* `.light` mirrors `:root` so a subtree can be forced light even when `.dark`
+   sits on <html>. Custom properties inherit, so without this a nested light
+   panel silently keeps whatever the document root declared. */
+:root,
+.light {
+  /* --- surfaces: light ------------------------------------------------- */
+  --canvas: #ebeff6;
+  --raised: #f8fafc;
+  --overlay: #ffffff;
+  --hairline: rgba(11, 14, 20, 0.1);
+  --hairline-strong: rgba(11, 14, 20, 0.18);
+
+  /* The unfilled part of a progress ring, and the reason it is not a hairline.
+     A ring's track is a non-text graphical object, so WCAG 1.4.11 asks 3:1
+     against whatever it sits on. Measured, not assumed — `--hairline-strong`
+     gives 1.47:1 on a grouping-tinted row, which is a track nobody can see and
+     a ring that reads as a floating arc. 48% ink measures 3.26:1 at the worst
+     of the four tint layers, on the lightest surface. */
+  --ring-track: rgba(11, 14, 20, 0.48);
+
+  /* --- ink: light ------------------------------------------------------ */
+  --ink: #0b0e14;
+  --ink-muted: #52607a;
+  --ink-faint: #5f6b80;
+
+  /* --- action + scrim: light ------------------------------------------- */
+  --accent: #1e4ae0;
+  --scrim: rgba(11, 14, 20, 0.45);
+
+  /* --- brand: identical in both themes --------------------------------- */
+  --signal-from: #2b57ff;
+  --signal-to: #21e2c6;
+  --signal: linear-gradient(135deg, #2b57ff, #21e2c6);
+
+  /* --- functional: identical in both themes ---------------------------- */
+  --amber: #ffb020;
+  --rose: #ff5f6d;
+  --jade: #23c97f;
+  --slate: #6b7a90;
+
+  /* --- standalone amber text (over-estimate, near deadline, days left) -- */
+  --amber-text: #7a4f00;
+
+  /* --- status chips: light. Each is a themed pair — a value tuned for
+         paper drops to ~2.4:1 on the dark canvas. ---------------------- */
+  --chip-draft-fg: #52607a;
+  --chip-draft-bg: rgba(107, 122, 144, 0.14);
+  --chip-ready-fg: #3f4c63;
+  --chip-ready-bg: rgba(107, 122, 144, 0.16);
+  --chip-in-progress-fg: #183fbf;
+  --chip-in-progress-bg: rgba(43, 87, 255, 0.12);
+  --chip-in-peer-review-fg: #7a4f00;
+  --chip-in-peer-review-bg: rgba(255, 176, 32, 0.18);
+  --chip-in-qa-fg: #0b6b5c;
+  --chip-in-qa-bg: rgba(33, 226, 198, 0.18);
+  --chip-changes-requested-fg: #a81f2c;
+  --chip-changes-requested-bg: rgba(255, 95, 109, 0.14);
+  --chip-done-fg: #0e6b4b;
+  --chip-done-bg: rgba(35, 201, 127, 0.18);
+  --chip-blocked-fg: #a81f2c;
+  --chip-blocked-bg: rgba(255, 95, 109, 0.2);
+
+  /* --- tones: light ---------------------------------------------------- */
+  --tone-amber-fg: #7a4f00;
+  --tone-amber-bg: rgba(255, 176, 32, 0.18);
+  --tone-jade-fg: #0e6b4b;
+  --tone-jade-bg: rgba(35, 201, 127, 0.18);
+  --tone-slate-fg: #3f4c63;
+  --tone-slate-bg: rgba(107, 122, 144, 0.14);
+  /* rose and cobalt come from the returned handoff's own TONE map. Three tone
+     pairs were enough while the only tones on screen were amber, jade and
+     slate; the save-confidence chip needs a failure that is not a warning
+     (`Failed — draft kept`) and a neutral notice that is not a success
+     (`Recovered draft`), and inventing either would have been a colour nobody
+     designed. #a81f2c on its own 14%% wash clears 4.5:1 on `--paper`. */
+  --tone-rose-fg: #a81f2c;
+  --tone-rose-bg: rgba(255, 95, 109, 0.14);
+  --tone-cobalt-fg: #183fbf;
+  --tone-cobalt-bg: rgba(43, 87, 255, 0.12);
+
+  /* --- grouping: deterministic hue per integer.
+         The hue lives on the 3px left border and the <=6% row tint only —
+         an 11px label in the hue never clears 4.5:1, so the number is ink.
+         Sticky-cell backgrounds are OPAQUE and pre-mixed per group, or the
+         sticky column goes see-through as it scrolls over a tinted row. --- */
+  --group-1: #5b8cff;
+  --group-2: #12a594;
+  --group-1-tint: rgba(91, 140, 255, 0.05);
+  --group-2-tint: rgba(18, 165, 148, 0.05);
+  --group-1-sticky: #f4f7fe;
+  --group-2-sticky: #f2f9f8;
+  --group-chip-bg: rgba(11, 14, 20, 0.04);
+
+  /* --- the hover wash --------------------------------------------------
+     `--tint` in `Coditu Workspace.dc.html`, and every hover in that prototype
+     is `background: var(--tint)`. The build had no such token and reached for
+     `--canvas` instead: on a `--raised` card that reads as a *darker* panel
+     rather than a wash, and on the canvas itself it reads as nothing at all.
+     It is ink at 3.5% and white at 5%, which is what the design uses. --- */
+  --tint: rgba(11, 14, 20, 0.035);
+
+  /* --- elevation ------------------------------------------------------- */
+  --shadow-overlay: 0 24px 64px -24px rgba(0, 0, 0, 0.35);
+
+  /* --- geometry -------------------------------------------------------- */
+  --radius-chip: 6px;
+  --radius-control: 10px;
+  --radius-inner: 12px;
+  --radius-card: 14px;
+  --radius-list: 16px;
+  --radius-section: 20px;
+  --radius-pill: 999px;
+
+  /* The design's own two widths. 64px fits a 22px icon in a 44px target with
+     10px either side; 268px fits the longest label — "People & Access" — plus
+     the icon and the gutters without truncating. */
+  --rail-collapsed: 64px;
+  --rail-expanded: 268px;
+  /* Where the sidebar earns its labels. Below this it is icons only, and below
+     768 it is not there at all — the bottom bar takes over. */
+  --rail-wide: 1180px;
+  /* A minimum, not a fixed height — the design's topbar is
+     `min-height: 56px` and grows when the breadcrumb trail wraps. */
+  --topbar-h: 56px;
+  /* The phone's bottom navigation. The safe-area inset is added on top of it
+     wherever it is used, rather than baked in here — `env()` is 0 on a desk. */
+  --tabbar-h: 60px;
+  --row-h-comfortable: 52px;
+  --row-h-compact: 44px;
+  --app-gutter: clamp(16px, 2vw, 28px);
+
+  /* --- type: marketing, fluid ------------------------------------------ */
+  --text-display: clamp(2.75rem, 1.6rem + 5.2vw, 6rem);
+  --text-h1: clamp(2rem, 1.4rem + 2.2vw, 3rem);
+  --text-h2: clamp(1.75rem, 1.3rem + 1.9vw, 2.5rem);
+  --text-h3: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+  --text-h4: clamp(1.25rem, 1.1rem + 0.7vw, 1.5rem);
+  --text-body: clamp(1rem, 0.96rem + 0.18vw, 1.125rem);
+
+  /* --- section rhythm, also fluid -------------------------------------- */
+  --space-section: clamp(48px, 7vw, 104px);
+  --space-block: clamp(40px, 5vw, 72px);
+  --space-stack: clamp(24px, 4vw, 64px);
+  --site-gutter: clamp(20px, 3vw, 40px);
+
+  /* --- motion ---------------------------------------------------------- */
+  --ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit: cubic-bezier(0.55, 0, 1, 0.45);
+  --ease-drift: cubic-bezier(0.32, 0.72, 0, 1);
+  --dur-micro: 200ms;
+  --dur-surface: 320ms;
+  --dur-section: 520ms;
+
+  /* --- shadcn/ui semantic layer, mapped onto the Coditu tokens above.
+         `ui-hover` is shadcn's hover surface; it is deliberately NOT the
+         brand action colour, which is --accent. --------------------------- */
+  --radius: 0.875rem;
+  --navbar-height: 5.5rem;
+  --background: var(--canvas);
+  --foreground: var(--ink);
+  --card: var(--raised);
+  --card-foreground: var(--ink);
+  --popover: var(--overlay);
+  --popover-foreground: var(--ink);
+  --primary: var(--accent);
+  --primary-foreground: #ffffff;
+  --secondary: var(--raised);
+  --secondary-foreground: var(--ink);
+  --muted: var(--raised);
+  --muted-foreground: var(--ink-muted);
+  --ui-hover: rgba(11, 14, 20, 0.045);
+  --ui-hover-foreground: var(--ink);
+  --destructive: var(--rose);
+  --border: var(--hairline);
+  --input: var(--hairline-strong);
+  --ring: var(--accent);
+}
+
+.dark {
+  --canvas: #07090e;
+  --raised: #0c1119;
+  --overlay: #111826;
+  --hairline: rgba(255, 255, 255, 0.07);
+  --hairline-strong: rgba(255, 255, 255, 0.13);
+  --tint: rgba(255, 255, 255, 0.05);
+
+  /* 34% white measures 3.01:1 at the worst of the four tint layers on the
+     darkest surface. See the note beside its light-theme counterpart. */
+  --ring-track: rgba(255, 255, 255, 0.34);
+
+  --ink: #edf1f7;
+  --ink-muted: #93a0b4;
+  --ink-faint: #7c899c;
+
+  --accent: #21e2c6;
+  --scrim: rgba(7, 9, 14, 0.72);
+
+  --amber-text: #ffc24d;
+
+  --chip-draft-fg: #9aa7bb;
+  --chip-draft-bg: rgba(147, 160, 180, 0.16);
+  --chip-ready-fg: #aebacd;
+  --chip-ready-bg: rgba(147, 160, 180, 0.16);
+  --chip-in-progress-fg: #89a7ff;
+  --chip-in-progress-bg: rgba(43, 87, 255, 0.22);
+  --chip-in-peer-review-fg: #ffc24d;
+  --chip-in-peer-review-bg: rgba(255, 176, 32, 0.18);
+  --chip-in-qa-fg: #4fe9d2;
+  --chip-in-qa-bg: rgba(33, 226, 198, 0.16);
+  --chip-changes-requested-fg: #ff9aa2;
+  --chip-changes-requested-bg: rgba(255, 95, 109, 0.18);
+  --chip-done-fg: #63e3a9;
+  --chip-done-bg: rgba(35, 201, 127, 0.16);
+  --chip-blocked-fg: #ff9aa2;
+  --chip-blocked-bg: rgba(255, 95, 109, 0.22);
+
+  --tone-amber-fg: #ffc24d;
+  --tone-amber-bg: rgba(255, 176, 32, 0.18);
+  --tone-jade-fg: #63e3a9;
+  --tone-jade-bg: rgba(35, 201, 127, 0.16);
+  --tone-slate-fg: #aebacd;
+  --tone-slate-bg: rgba(147, 160, 180, 0.16);
+  --tone-rose-fg: #ff9aa2;
+  --tone-rose-bg: rgba(255, 95, 109, 0.18);
+  --tone-cobalt-fg: #89a7ff;
+  --tone-cobalt-bg: rgba(43, 87, 255, 0.2);
+
+  --group-1-sticky: #111827;
+  --group-2-sticky: #0f1a1c;
+  --group-chip-bg: rgba(255, 255, 255, 0.06);
+
+  --shadow-overlay: 0 24px 64px -24px rgba(0, 0, 0, 0.45);
+
+  --ui-hover: rgba(255, 255, 255, 0.055);
+  --primary-foreground: #07090e;
+}
+
+/* ==========================================================================
+   Tailwind theme — semantic names only. `inline` so utilities reference the
+   custom property rather than copying its value, which is what lets a single
+   `.dark` class re-theme every utility at once.
+   ========================================================================== */
+
+@theme inline {
+  --font-sans: var(--font-satoshi);
+  --font-display: var(--font-satoshi);
+  --font-mono: var(--font-jetbrains);
+
+  --color-canvas: var(--canvas);
+  --color-raised: var(--raised);
+  --color-overlay: var(--overlay);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+  --color-ring-track: var(--ring-track);
+
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+
+  --color-accent: var(--accent);
+  --color-scrim: var(--scrim);
+
+  --color-signal-from: var(--signal-from);
+  --color-signal-to: var(--signal-to);
+
+  --color-amber: var(--amber);
+  --color-amber-text: var(--amber-text);
+  --color-rose: var(--rose);
+  --color-jade: var(--jade);
+  --color-slate: var(--slate);
+
+  --color-group-1: var(--group-1);
+  --color-group-2: var(--group-2);
+
+  --radius-chip: var(--radius-chip);
+  --radius-control: var(--radius-control);
+  --radius-inner: var(--radius-inner);
+  --radius-card: var(--radius-card);
+  --radius-list: var(--radius-list);
+  --radius-section: var(--radius-section);
+  --radius-pill: var(--radius-pill);
+
+  --shadow-overlay: var(--shadow-overlay);
+
+  --spacing-rail: var(--rail-collapsed);
+  --spacing-rail-open: var(--rail-expanded);
+  --spacing-topbar: var(--topbar-h);
+  --spacing-tabbar: var(--tabbar-h);
+  --spacing-row: var(--row-h-comfortable);
+  --spacing-row-compact: var(--row-h-compact);
+
+  --text-display: var(--text-display);
+  --text-h1: var(--text-h1);
+  --text-h2: var(--text-h2);
+  --text-h3: var(--text-h3);
+  --text-h4: var(--text-h4);
+
+  --ease-entrance: var(--ease-entrance);
+  --ease-exit: var(--ease-exit);
+  --ease-drift: var(--ease-drift);
+
+  /* shadcn/ui semantic layer */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-ui-hover: var(--ui-hover);
+  --color-ui-hover-foreground: var(--ui-hover-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body {
+    min-height: 100%;
+    max-width: 100%;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* every number that sits in a column or updates in place must not jitter */
+    font-variant-numeric: tabular-nums;
+  }
+
+  /*
+   * ...except while somebody is writing. PF-6.
+   *
+   * The browser scrolls the caret back into view on every keystroke, and with
+   * `scroll-behavior: smooth` it has to ANIMATE that — so at typing speed each
+   * keystroke restarts an animation that never arrives. Measured on a
+   * production build, thirty to-do items typed into the sprint notes at
+   * 1440x900: the caret sat 419 px below the fold after ten items and 856 px
+   * below it after twenty, and only came back about 0.7 s after typing stopped.
+   * With `auto` it never left the viewport once — 878 px, the same line, all
+   * the way through. Chrome only; WebKit keeps the caret either way.
+   *
+   * That is what "writing is not instant" means here. The keystroke itself was
+   * already measured at 12.3 ms; what was wrong is that you could not see it.
+   *
+   * `:has()` rather than a class toggled from JavaScript: this is a statement
+   * about a state the document already knows, and the app shell has no bytes
+   * to spend on a focus listener that CSS can read directly.
+   */
+  html:has(.ProseMirror:focus) {
+    scroll-behavior: auto;
+  }
+
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-satoshi), "Instrument Sans", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+
+  /* 2px accent ring plus a 2px canvas-coloured offset so it reads on any
+     surface — raised card, overlay, or a tinted table row alike. */
+  *:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/* ==========================================================================
+   Keyframes — carried over from the bundle verbatim
+   ========================================================================== */
+
+@keyframes cd-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cd-word {
+  from {
+    opacity: 0;
+    transform: translateY(0.6em);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes cd-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* A backdrop resolves; it does not snap. The scrim fades 0 -> 1 while its
+   blur goes 0 -> 10px over 240ms, and the panel inside enters ONE FRAME behind
+   it — so the panel reads as arriving *through* the backdrop rather than
+   pasted on top of it. */
+@keyframes cd-scrim {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(10px);
+  }
+}
+
+@keyframes cd-draw {
+  from {
+    stroke-dashoffset: var(--len, 1200);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes cd-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(1.35);
+  }
+}
+
+/* --- the mark's three motion states ---------------------------------------
+   The shipped mark is a FILLED tapered path, not a stroked one, so "draw-on
+   via stroke-dashoffset" is done on a mask: a stroked circle on the arc's own
+   radius sweeps open and reveals the fill beneath it. Same mechanism the brief
+   asks for, applied to the object we actually ship. -------------------------- */
+
+@keyframes cd-mark-draw {
+  from {
+    stroke-dashoffset: 69.115;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes cd-mark-node-in {
+  0% {
+    transform: scale(0);
+  }
+  70% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes cd-mark-node-travel {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- the reveal tiers ------------------------------------------------------
+   These are CSS, not JavaScript, and that is the whole point: a server-rendered
+   section must be VISIBLE before hydration. A JS-driven reveal ships its hidden
+   state in the HTML, so a slow or failed hydration leaves real content at
+   opacity 0 — invisible to a reader, and an LCP element that never paints.
+   `animation-fill-mode: both` plus a parse-time start gives the same resolve
+   with none of that exposure. -------------------------------------------- */
+
+@keyframes cd-reveal-micro {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cd-reveal-surface {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* A DOCKED panel comes in from the edge it is docked to.
+   =========================================================================
+   The side peek is full height with no gutter above or below it, so
+   `cd-reveal-surface`'s `translateY(10px)` puts its bottom edge 10px past the
+   viewport for the length of the entrance. `item-detail.spec.ts` measures the
+   panel the moment it is visible and caught exactly that: 562.59 of a 560px
+   viewport, on WebKit.
+
+   Raising the gutter would have fixed the number and kept the wrong motion. A
+   panel docked to the right edge sliding UP is not what a side peek does; it
+   arrives from the side it lives on. Same duration, same easing, same blur —
+   only the axis changes, and the overflow goes with it. */
+@keyframes cd-reveal-peek {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes cd-reveal-section {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+    filter: blur(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes cd-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   Animation and helper classes.
+
+   Deliberately NOT inside `@layer utilities`. Tailwind v4 prunes that layer to
+   the utilities it can see used, and an attribute selector like
+   `[data-reveal="section"]` is not a class name — it gets dropped from the
+   build silently, keyframes and all, and the reveal quietly stops animating
+   with nothing in the output to explain why.
+   ========================================================================== */
+
+/* --- loading skeletons -----------------------------------------------------
+   A `loading.tsx` skeleton has one job: hold the same box the real screen will
+   occupy, so the arriving content replaces it instead of pushing it out of the
+   way. Every bar is drawn in `--hairline`, which is the same rule colour the
+   real rows are separated by, and the pulse is opacity ONLY — a gradient sweep
+   across forty bars is a full-width repaint every frame for a state that is
+   supposed to last 200ms.
+   -------------------------------------------------------------------------- */
+
+@keyframes cd-skeleton {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.cd-skeleton,
+.cd-skeleton-rows {
+  animation: cd-skeleton 1.5s var(--ease-drift) infinite;
+}
+
+.cd-skeleton {
+  background: var(--hairline);
+  border-radius: var(--radius-chip);
+}
+
+/* --- a whole list of rows, in one element ----------------------------------
+   Measured, not stylistic. The first version of these skeletons drew every row
+   out of three or four `<span>`s, and a Suspense fallback is serialized into
+   the flight payload of **every** page beneath its boundary — so `/app/import`,
+   whose own skeleton is three bars, was carrying the forty-odd elements of the
+   `/app` fallback above it as well. In dev that is about 1KB per element:
+   `/app/import` went 77KB → 128KB and `/app/people` 109KB → 181KB, and the
+   e2e suite started failing on hydration races that had never flaked before.
+
+   So the rows are painted rather than built. Four repeating layers — a rule,
+   a key, a title and a right-hand figure — tiled every `--row-h`, with the
+   block's height set from `--skeleton-rows`. Twelve rows cost one element and
+   occupy exactly the box the real twelve will.
+   -------------------------------------------------------------------------- */
+
+.cd-skeleton-rows {
+  --row-h: 52px;
+  --skeleton-rows: 6;
+  height: calc(var(--skeleton-rows) * var(--row-h));
+  background-repeat: repeat-y;
+  background-image:
+    /* the row's bottom rule */
+    linear-gradient(
+      to bottom,
+      transparent 0 calc(var(--row-h) - 1px),
+      var(--hairline) calc(var(--row-h) - 1px) var(--row-h)
+    ),
+    /* the key */
+    linear-gradient(
+      to bottom,
+      transparent 0 calc(50% - 6px),
+      var(--hairline) calc(50% - 6px) calc(50% + 6px),
+      transparent calc(50% + 6px) 100%
+    ),
+    /* the title */
+    linear-gradient(
+      to bottom,
+      transparent 0 calc(50% - 7px),
+      var(--hairline) calc(50% - 7px) calc(50% + 7px),
+      transparent calc(50% + 7px) 100%
+    ),
+    /* the figure on the right */
+    linear-gradient(
+      to bottom,
+      transparent 0 calc(50% - 6px),
+      var(--hairline) calc(50% - 6px) calc(50% + 6px),
+      transparent calc(50% + 6px) 100%
+    );
+  background-size:
+    100% var(--row-h),
+    54px var(--row-h),
+    38% var(--row-h),
+    64px var(--row-h);
+  background-position:
+    0 0,
+    16px 0,
+    86px 0,
+    right 16px top 0;
+}
+
+/* The app's only spinner is the rotating Coditu mark. */
+.cd-spin {
+  animation: cd-spin 1.4s linear infinite;
+  transform-box: view-box;
+  transform-origin: 16px 16px;
+}
+
+.cd-word {
+  display: inline-block;
+  animation: cd-word 620ms var(--ease-entrance) both;
+}
+
+.cd-rise {
+  animation: cd-rise 520ms var(--ease-entrance) both;
+}
+
+.cd-draw {
+  animation: cd-draw 1100ms var(--ease-entrance) both;
+}
+
+.cd-pulse {
+  animation: cd-pulse 3.2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Draw-on: the arc resolves over 900ms, then the node overshoots in. Runs
+   once, on first paint of the hero. */
+.cd-mark-draw {
+  animation: cd-mark-draw 900ms var(--ease-entrance) both;
+}
+
+.cd-mark-node-in {
+  animation: cd-mark-node-in 260ms var(--ease-entrance) 900ms both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Hover: the node runs the arc and settles back at the aperture. Rotating
+   about the mark's centre traces the same circle `offset-path` would, with
+   no layout cost and no JS. */
+.cd-mark-hover:hover .cd-mark-node,
+.cd-mark-hover:focus-visible .cd-mark-node {
+  animation: cd-mark-node-travel 600ms var(--ease-entrance);
+  transform-box: view-box;
+  transform-origin: 16px 16px;
+}
+
+/* --- past the blur ceiling ------------------------------------------------
+   `filter: blur()` costs an offscreen composite pass every frame, so §4 sets a
+   hard ceiling: never blur-animate an element taller than ~40vh. Its remedy —
+   stagger the container's children instead — does not apply to a table, where
+   §4 is equally explicit that the body reveals once as ONE group and never per
+   row.
+
+   Both hold at the same time if the group keeps its tier's travel and fade and
+   simply drops the blur. That is what `data-reveal-flat` is: not a fourth tier,
+   the same tier with the expensive part removed where it is not affordable.
+   -------------------------------------------------------------------------- */
+
+@keyframes cd-reveal-flat {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+[data-reveal][data-reveal-flat] {
+  animation-name: cd-reveal-flat;
+}
+
+[data-reveal="micro"] {
+  animation: cd-reveal-micro var(--dur-micro) var(--ease-entrance) both;
+}
+
+[data-reveal="surface"] {
+  animation: cd-reveal-surface var(--dur-surface) var(--ease-entrance) both;
+}
+
+[data-reveal="section"] {
+  animation: cd-reveal-section var(--dur-section) var(--ease-entrance) both;
+}
+
+/* Below `md` the peek IS the bottom sheet, and a sheet rises — so the base
+   tier is the ordinary surface entrance and only the DOCKED form changes axis.
+   `prefers-reduced-motion` needs no clause of its own: the block at the end of
+   this file collapses every `[data-reveal]`, whatever its value, to a plain
+   120ms opacity fade. */
+[data-reveal="peek"] {
+  animation: cd-reveal-surface var(--dur-surface) var(--ease-entrance) both;
+}
+
+@media (min-width: 768px) {
+  [data-reveal="peek"] {
+    animation-name: cd-reveal-peek;
+  }
+}
+
+/* Scroll-triggered reveals hold at frame zero until an observer releases
+   them — but ONLY when JS is actually running. Without the `js` class on
+   <html> the animation simply plays on parse, so a reader with a broken
+   bundle sees the content rather than an empty page. */
+
+/* No hand-written `-webkit-backdrop-filter`. Lightning CSS derives prefixes
+   from the browser targets, and a manual prefix written AFTER the standard
+   property makes it drop BOTH — the scrim shipped with no blur at all, and the
+   only symptom was a backdrop that looked slightly wrong. */
+[data-scrim] {
+  background: var(--scrim);
+  backdrop-filter: blur(10px);
+  animation: cd-scrim 240ms var(--ease-entrance) both;
+
+  /* Below `md` the panel is a bottom SHEET, so the only thing between it and
+     the bottom of the screen is the home indicator. A margin here would leave
+     a strip of blurred page under the sheet, which reads as a dialog that
+     failed to reach the edge rather than as a sheet. */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@media (min-width: 768px) {
+  /* A centred dialog wants a real gutter, and the inset on top of it wherever
+     there is one. Same `max()` this used to carry inline. */
+  [data-scrim] {
+    padding-bottom: max(clamp(12px, 3vh, 40px), env(safe-area-inset-bottom));
+  }
+
+  /* The side peek is docked, not floating. A centred dialog wants a real
+     margin below it; a panel against the right edge that stops 27px short of
+     the bottom reads as a dialog that failed to reach the edge — the same
+     failure the mobile sheet rule above exists to prevent, in the other
+     direction. The handoff's geometry is `margin: 0` at full height. */
+  [data-scrim][data-variant="peek"] {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* One frame, so the panel trails the backdrop it arrives through. */
+[data-scrim] > [data-reveal] {
+  animation-delay: 16ms;
+}
+
+.js [data-reveal-on-view] {
+  animation-play-state: paused;
+}
+
+.js [data-reveal-on-view][data-revealed] {
+  animation-play-state: running;
+}
+
+.signal-gradient {
+  background-image: var(--signal);
+}
+
+.section-anchor {
+  scroll-margin-top: calc(var(--navbar-height) + 0.75rem);
+}
+
+
+/* ==========================================================================
+   Coarse pointers — one check, one place, applied globally.
+
+   The same shape as the reduced-motion block below, and for the same reason:
+   these are facts about the input device, not decisions any single component
+   should be making for itself.
+   ========================================================================== */
+
+@media (pointer: coarse) {
+  /* --- 16px, or iOS zooms ---------------------------------------------------
+     Focusing an input whose text is under 16px makes mobile Safari zoom the
+     whole page in — and it does not zoom back out afterwards, so one tap on a
+     filter leaves the reader stranded at 1.4x with the table off the side of
+     the screen. Twelve components declare a field with a 13.5px face; raising
+     each of them by hand would be twelve chances to miss one and no way to
+     stop the thirteenth.
+
+     `max(16px, 1em)` rather than `16px`: anything already larger keeps its
+     size, so the comment composer's own type scale is untouched.
+
+     No `!important`, and it is worth knowing why it is not needed: these
+     fields set their size with a Tailwind arbitrary value — `text-[13.5px]`,
+     a CLASS, which beats a bare element selector on specificity. It loses
+     anyway, because Tailwind v4 emits its utilities inside `@layer utilities`
+     and an UNLAYERED rule outranks any layered one however specific. This
+     block is deliberately outside every layer. */
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+
+  /* The editor is none of those three, and raising it cannot be done from
+     here — see the block at the very bottom of this file, which explains why
+     its position in the file is the whole point. */
+
+  /* --- 44px, on the controls that can afford it -----------------------------
+     WCAG 2.5.8 asks for 24px and Apple's guidance asks for 44px; the brief
+     asks for 44. Scoped to standalone controls rather than everything: a table
+     cell's editor already fills a 52px row, and a link inside a sentence is
+     explicitly exempt from the rule — padding one to 44px would break the
+     paragraph it sits in. `data-dense` is the opt-out for a control that is
+     deliberately part of a denser arrangement. */
+  button:not([data-dense]),
+  [role="button"]:not([data-dense]),
+  /* `summary` is a control the browser gives you for free, which is exactly
+     why this list had never named it: nothing declares it, so nothing thought
+     to size it. The sprint's burn-up disclosure measured 308x17 on a phone —
+     found by the aggregate coarse-pointer sweep, on the first run after the
+     sweep itself was repaired to use a real touch context. */
+  summary:not([data-dense]),
+  a[href]:not([data-dense]):not(p a) {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* The exception, and it is the only one: a control that fills a table cell
+     or a flex track is already as large as its slot, and a `min-width` on it
+     would push the slot wider than the layout that sized it. `w-full` says
+     "I am the width of whatever holds me", which is the same promise. */
+  button.w-full:not([data-dense]),
+  a.w-full:not([data-dense]) {
+    min-width: 0;
+  }
+
+  /* --- 44px on the FIELDS, which this rule had never covered ----------------
+     The block above has said 44px for buttons and links since W14. It has
+     never said it for `input`, `select` or `textarea`, and the a11y spec that
+     was supposed to catch that only ran on four screens — so a role picker at
+     115x28, an allowlist field at 308x38, a projects search at 358x34 and
+     seven number fields in Workspace settings at 110x34 were all under the
+     floor, on every phone, for as long as they have existed. Found by
+     sweeping every route in the application rather than four of them.
+
+     `min-height` rather than `height`: a field that sets `h-[34px]` keeps its
+     declaration and the computed height becomes the larger of the two, which
+     is what `min-height` means. Nothing has to be edited component by
+     component, and the thirteenth field somebody adds is covered too — the
+     same argument the 16px rule above makes at length.
+
+     No `min-width`, deliberately. A field is as wide as its slot; a 44px floor
+     on the width would push a narrow numeric input out of a column that sized
+     it, and no field in this application is narrower than 44px anyway.
+
+     Two exclusions, and both are exclusions because the INPUT is not the
+     target:
+
+     - a checkbox or radio is wrapped in a `<label>` that carries the click,
+       and every one of them in this app already clears 44px — growing the box
+       itself would put an 44px tick beside a 20px word;
+     - `.sr-only` is a visually-hidden field — the file inputs behind "Choose a
+       picture" and "Choose an export" — whose target is the visible control
+       that labels it. Giving it a size would give it a size ON SCREEN. */
+  input:not([type="checkbox"]):not([type="radio"]):not(.sr-only):not([data-dense]),
+  select:not([data-dense]),
+  textarea:not([data-dense]) {
+    min-height: 44px;
+  }
+
+  /* --- and a `<select>` needs one more thing, on WebKit only ----------------
+     `min-height` above is enough for an input and a textarea, and enough for a
+     select in Chromium. **Safari ignores it on a select entirely**, because a
+     native `menulist` is sized by the platform from its font and internal
+     padding, not by the box model. Measured on Playwright's WebKit rather than
+     assumed, against the role picker on `/app/people`:
+
+       baseline                          28px
+       min-height: 44px                  28px   ← ignored
+       padding-block: 12px               28px   ← ignored too
+       appearance: none + min-height     44px   ✓
+
+     So the only thing that works is leaving the native control behind, and the
+     cost of that is the chevron: `appearance: none` takes away the one mark
+     that says "this opens a list". Drawing it back is not decoration, it is
+     replacing the affordance the reset removed.
+
+     A fixed grey rather than a token, because `background-image` cannot read a
+     CSS variable inside a data URI. `#7c899c` is `--ink-faint`'s DARK value,
+     which sits between the two themes' idea of a muted mark and clears 3:1
+     against both `--canvas` surfaces — a non-text control boundary, which is
+     the contrast rule that applies to it.
+
+     Scoped to coarse pointers, so a desktop select keeps the native control
+     it has always had. */
+  select:not([data-dense]) {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 30px;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237c899c' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px 12px;
+  }
+}
+
+/* ==========================================================================
+   Reduced motion — one check, one place, applied globally.
+   Not "animation-duration: 0.01ms" on everything: the brief asks for a calm
+   but still-animated interface (120ms opacity), with no transforms and no
+   blur, the trace frozen at full draw, and the spinner stopped.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 120ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 120ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* transform- and blur-carrying entrances degrade to a plain opacity fade */
+  .cd-word,
+  .cd-rise {
+    animation: cd-fade 120ms linear both !important;
+  }
+
+  /* the trace freezes at full draw; the spinner and the trace nodes stop */
+  .cd-draw {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+
+  .cd-spin,
+  .cd-pulse,
+  .cd-skeleton,
+  .cd-skeleton-rows {
+    animation: none !important;
+  }
+
+  /* the mark resolves instantly and its node neither overshoots nor travels */
+  .cd-mark-draw {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+
+  .cd-mark-node-in,
+  .cd-mark-hover:hover .cd-mark-node,
+  .cd-mark-hover:focus-visible .cd-mark-node {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* every tier collapses to a plain 120ms opacity fade — no travel, no blur */
+  [data-reveal] {
+    animation-name: cd-fade !important;
+    animation-duration: 120ms !important;
+    animation-timing-function: linear !important;
+  }
+
+  /* Nothing waits for a scroll. A reduced-motion reader gets the page, not a
+     sequence — and it removes an entire failure mode, because content held at
+     frame zero by a paused animation is invisible if the observer never fires. */
+  .js [data-reveal-on-view] {
+    animation-play-state: running !important;
+  }
+
+  /* The backdrop still darkens and blurs; it arrives in 120ms instead of
+     resolving, and the panel no longer trails it. */
+  [data-scrim] {
+    animation: cd-fade 120ms linear both !important;
+  }
+
+  [data-scrim] > [data-reveal] {
+    animation-delay: 0ms !important;
+  }
+
+  /* Staggering IS motion. A reduced-motion reader gets the whole section at
+     once rather than a 600ms sequence. */
+  [data-reveal],
+  .cd-word,
+  .cd-rise {
+    animation-delay: 0ms !important;
+  }
+}
+
+
+/* ==========================================================================
+   The comment editor and the rendered thread.
+
+   ProseMirror owns its own DOM inside `.coditu-prose`, so these are plain
+   descendant rules rather than Tailwind classes on elements we do not render.
+   ========================================================================== */
+
+/* The editing surface sits under a `position: sticky` top bar. A browser
+   scrolling a focused element into view measures the viewport, not what is
+   painted over it, so the caret can land behind the header — 53 of 74 pixels
+   covered, measured on an iPhone. `scroll-margin` is how you tell a scroll
+   where the usable top of the page actually is; `rich-text-editor.client.tsx`
+   asks for `block: "nearest"`, which then moves it by exactly that much and
+   not at all when it is already clear. */
+.coditu-prose {
+  scroll-margin-top: calc(var(--topbar-h) + 12px);
+  scroll-margin-bottom: 12px;
+}
+
+.coditu-prose p {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.coditu-prose p + p,
+.coditu-prose ul,
+.coditu-prose ol,
+.coditu-prose blockquote,
+.coditu-prose pre {
+  margin-top: 8px;
+}
+
+.coditu-prose ul,
+.coditu-prose ol {
+  padding-left: 20px;
+}
+
+.coditu-prose ul {
+  list-style: disc;
+}
+
+.coditu-prose ol {
+  list-style: decimal;
+}
+
+.coditu-prose blockquote {
+  border-left: 2px solid var(--hairline-strong);
+  padding-left: 12px;
+}
+
+.coditu-prose code {
+  background: var(--canvas);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 12.5px;
+  color: var(--ink);
+}
+
+.coditu-prose pre {
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  padding: 12px;
+  /* A long line scrolls inside the block, so the thread itself never scrolls
+     sideways. */
+  overflow-x: auto;
+}
+
+.coditu-prose pre code {
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.coditu-prose .coditu-mention,
+.coditu-prose [data-type="mention"] {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-radius: 4px;
+  padding: 1px 4px;
+  font-weight: 500;
+}
+
+/* TipTap's placeholder. `is-editor-empty` is set on the first node only. */
+.coditu-prose p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--ink-faint);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Syntax highlighting.
+
+   Hues are drawn from the functional palette rather than a stock highlight.js
+   theme, so a code block reads as part of this design and not as a screenshot
+   from a different one.
+   ========================================================================== */
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-section {
+  color: var(--chip-in-progress-fg);
+}
+
+.hljs-string,
+.hljs-attr,
+.hljs-addition {
+  color: var(--tone-jade-fg);
+}
+
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet {
+  color: var(--tone-amber-fg);
+}
+
+.hljs-comment,
+.hljs-quote,
+.hljs-meta {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+.hljs-title,
+.hljs-name,
+.hljs-type {
+  color: var(--accent);
+}
+
+.hljs-deletion {
+  color: var(--chip-blocked-fg);
+}
+
+/* ==========================================================================
+   The editor's 16px floor — and why it is the last thing in this file.
+
+   iOS Safari auto-zooms any focusable editable element whose text is under
+   16px, and does not zoom back out: one tap into the composer leaves the
+   reader at 1.4x with the sheet off the side of the screen. The coarse-pointer
+   block above handles `input, select, textarea`. The rich-text surface is a
+   `contenteditable` **div**, so it matches none of them and needs its own rule.
+
+   That rule was first written inside the block above, which looked right and
+   did nothing: `.coditu-prose p { font-size: 14px }` is declared LATER in this
+   file, at equal specificity, and a media query adds none. Source order decided
+   it, the 14px won, and the fix shipped with the bug still in it — measured as
+   a computed style by `e2e/mobile.spec.ts`, which is the only reason anyone
+   found out.
+
+   So it lives here, after every `.coditu-prose` declaration, and it must stay
+   here. Anything added below this comment that sets a font size inside the
+   editor will silently undo it.
+   ========================================================================== */
+
+@media (pointer: coarse) {
+  /* `max(16px, 1em)` rather than a flat 16px: anything already larger keeps
+     its size, so headings and code inside the editor are untouched.
+
+     Scoped to `.coditu-prose`, which is the editing surface and nothing else —
+     `comment-body.tsx` renders a stored comment with its own classes, so how a
+     thread READS on a phone is unchanged. Only what you type into is raised. */
+  .coditu-prose,
+  .coditu-prose p,
+  .coditu-prose li,
+  .coditu-prose p.is-editor-empty:first-child::before {
+    font-size: max(16px, 1em);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   The sidebar's two widths.
+   
+   Written here rather than as Tailwind variants, and that is not a style
+   preference. `min-[1180px]:data-[collapsed]:w-[...]` and
+   `min-[1180px]:group-data-[collapsed]/rail:opacity-0` compile to NOTHING in
+   this setup, and the failure is silent in the worst way: the base class still
+   applies, so the sidebar looks right in one state and simply never changes.
+   It took setting the attribute by hand in a browser to see it, because every
+   static check passes on a class name that was never turned into a rule.
+
+   Two plain rules, keyed on an attribute React sets. No variant stacking, no
+   named group, nothing to compile wrongly.
+   --------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------
+   The tablet drawer's trigger: 768–1179 and nowhere else.
+
+   Written here rather than as `md:flex min-[1180px]:hidden`, and measured
+   rather than assumed — that pair put the hamburger on a 1920px screen beside
+   a fully labelled sidebar. Two utilities from different breakpoint families
+   do not order the way reading them suggests, which is the same class of
+   failure this file already records for the sidebar's own two states.
+
+   One rule, one range, nothing to sort wrongly.
+   --------------------------------------------------------------------------- */
+[data-nav-drawer-trigger] {
+  display: none;
+}
+
+@media (min-width: 768px) and (max-width: 1179.98px) {
+  [data-nav-drawer-trigger] {
+    display: flex;
+  }
+}
+
+@media (min-width: 1180px) {
+  /* Workspace Home's two columns. `homeCols` in the prototype is
+     `minmax(0, 1fr) 320px` at this same width and one column below it.
+
+     Written here for the reason the sidebar rules above are: an arbitrary
+     Tailwind variant at a non-ladder width has already compiled to nothing once
+     in this file, silently, with the base class making one state look right.
+     One plain rule on an attribute React sets. */
+  [data-home-grid] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    align-items: start;
+  }
+
+  aside[data-app-chrome]:not([data-collapsed]) {
+    width: var(--rail-expanded);
+  }
+  /* The label is present at every width for a screen reader and visible only
+     where there is room — hence opacity rather than `display: none`. */
+  aside[data-app-chrome]:not([data-collapsed]) [data-rail-label] {
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Project spaces and favourites exist only where the sidebar has labels.
+
+   `display: none`, not the `opacity: 0` the labels above use, and the
+   difference is the point. A nav label fades because its ICON survives and
+   still needs a name at 64px. A tree has no icon representation at all — so
+   leaving it in the accessibility tree at 64px would hand a screen reader a
+   dozen rows that nobody sighted can see and nobody can reach.
+   --------------------------------------------------------------------------- */
+
+aside[data-app-chrome] [data-rail-spaces],
+aside[data-app-chrome] [data-rail-favourites] {
+  display: none;
+}
+@media (min-width: 1180px) {
+  aside[data-app-chrome]:not([data-collapsed]) [data-rail-spaces],
+  aside[data-app-chrome]:not([data-collapsed]) [data-rail-favourites] {
+    display: block;
+  }
+}
+
+/* The collapse control only exists where collapsing changes anything: below
+   `--rail-wide` the sidebar is icons at every setting, and a button that
+   appears to change that and does not is worse than no button. */
+aside[data-app-chrome] [data-rail-toggle] {
+  display: none;
+}
+@media (min-width: 1180px) {
+  aside[data-app-chrome] [data-rail-toggle] {
+    display: flex;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   The interactive-state contract.
+
+   PF-4. Six states — idle, hover, active, pending, disabled, error — written
+   once, here, for every control that opts in with `data-control`. The
+   attributes come from `lib/interactive.ts`; what they LOOK like is this block
+   and nothing else.
+
+   The split is deliberate and it is most of the value. Hover, active and
+   disabled already have correct native spellings — `:hover`, `aria-pressed` /
+   `aria-current`, `disabled` — so they are read here rather than reimplemented
+   in React, which is how they drift apart button by button. Only `pending` and
+   `error` have no native spelling, and only those two carry a `data-state`.
+
+   It also costs nothing to ship. The app shell had 0.6 KB of JavaScript budget
+   left when this was written; a styling helper that ships class strings would
+   have spent it, and a stylesheet is not measured by `npm run budgets` at all.
+   --------------------------------------------------------------------------- */
+
+[data-control] {
+  /* The pending line is an `::after` pinned to the bottom edge. Anything with
+     `position: static` would pin it to the nearest positioned ancestor
+     instead, which is usually the whole panel. */
+  position: relative;
+  transition:
+    background-color var(--dur-micro) var(--ease-drift),
+    border-color var(--dur-micro) var(--ease-drift),
+    color var(--dur-micro) var(--ease-drift),
+    opacity var(--dur-micro) var(--ease-drift);
+}
+
+/* --- pending ---------------------------------------------------------------
+   An indeterminate line that grows along the bottom edge. Not a spinner: a
+   spinner needs a box of its own, and these controls range from a 34px chip to
+   a full-width row — the one thing they all have is a bottom edge.
+
+   `scaleX` from a left origin, so it never paints outside the control and no
+   `overflow: hidden` is needed on a button that may have a focus ring. */
+[data-control][data-state="pending"] {
+  cursor: progress;
+}
+
+[data-control][data-state="pending"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: cd-pending 900ms var(--ease-drift) infinite;
+  /* A decoration. It must never eat the click it is reporting on. */
+  pointer-events: none;
+}
+
+@keyframes cd-pending {
+  0% {
+    transform: scaleX(0);
+    opacity: 1;
+  }
+  65% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+
+/* --- error -----------------------------------------------------------------
+   The state invariant 4 exists for: "a failed write that silently reverts is
+   worse than no optimism". The control itself says so, next to the toast that
+   says why — a toast is easy to miss and impossible to point at. */
+[data-control][data-state="error"] {
+  border-color: var(--rose);
+}
+
+[data-control][data-state="error"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--rose);
+  pointer-events: none;
+}
+
+/* --- disabled --------------------------------------------------------------
+   Both spellings. `disabled` removes the control from the tab order, which is
+   right for a submit and wrong for a control that must keep focus through its
+   own pending state — `aria-disabled` is that case, and it looks identical. */
+[data-control]:disabled,
+[data-control][aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* A disabled control reports nothing. Without this, a control disabled WHILE
+   pending draws both, and the pending line under a greyed-out button reads as
+   a control that is stuck rather than one that is working. */
+[data-control]:disabled::after,
+[data-control][aria-disabled="true"]::after {
+  content: none;
+}
+
+/* --- hover -----------------------------------------------------------------
+   `:hover` on a touch screen is a lie the browser tells after a tap and keeps
+   telling until something else is tapped. `@media (hover: hover)` is what
+   makes this a mouse-only rule.
+
+   Deliberately not a background: these controls set their own, and a blanket
+   one here would fight every chip in the app. The border is the shared part. */
+@media (hover: hover) {
+  [data-control]:not(:disabled):not([aria-disabled="true"]):not([data-state="pending"]):hover {
+    border-color: var(--hairline-strong);
+  }
+}
+
+/* --- active ----------------------------------------------------------------
+   Announced as well as drawn. A filter chip that is on is `aria-pressed`; a nav
+   item for the page you are on is `aria-current`. Both are read out; a class
+   name is not. */
+[data-control][aria-pressed="true"],
+[data-control][aria-current="page"],
+[data-control][aria-current="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The global block above collapses every animation to 120ms and one
+     iteration, which for `cd-pending` means it flashes once and lands on its
+     last keyframe — `opacity: 0`. The pending state would be invisible exactly
+     for the readers most likely to need a slow, legible one. So: no animation,
+     and the line simply sits there for as long as the work does. */
+  [data-control][data-state="pending"]::after {
+    animation: none !important;
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
