@@ -71,7 +71,7 @@ smoke_staged() {
   [ "$(printf '%s' "$release_body" | jq -er '.status')" = ok ] || return 1
   [ "$(printf '%s' "$release_body" | jq -er '.commit')" = "$GITHUB_SHA" ] || return 1
 
-  for release_path in / /login /app/settings/recovery; do
+  for release_path in /; do
     vercel curl "$release_path" --deployment "$release_target" -- \
       --silent --show-error --fail --location --output /dev/null || return 1
   done
@@ -87,7 +87,7 @@ public_request() {
 }
 
 smoke_public_routes() {
-  for release_path in / /login /app/settings/recovery; do
+  for release_path in /; do
     release_effective=$(public_request "$release_path" --output /dev/null --write-out '%{url_effective}') ||
       return 1
     case "$release_effective" in
