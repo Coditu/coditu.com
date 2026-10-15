@@ -1,5 +1,11 @@
 # Migration — from the shipped system to Blueprint
 
+> **Status 2026-10-15:** done differently than planned below. The old design was removed in one
+> step (backup tag `old-design`), Blueprint tokens, Geist and the shared components were added,
+> and sections are rebuilt one by one. Decisions taken by the team: `/de` + `/en` (`/` → `/de`),
+> copy in `messages/de.ts` + `messages/en.ts`, dark mode follows the system only, existing
+> logo/OG/favicon kept for now. The plan below is kept as history.
+
 **Current state (2026-10-15):** the live site (`app/globals.css`, `components/site/*`) still uses
 the previous system — dark-first canvas `#EBEFF6` / `#07090E`, Satoshi, cobalt→aqua gradient,
 radii 6–20 px. That system is documented in `docs/01-DESIGN-SYSTEM.md`, which is now **legacy**.

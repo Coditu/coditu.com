@@ -1,4 +1,4 @@
-import { marketingContent } from "@/lib/marketing-content";
+import { SITE_URL } from "@/lib/site-config";
 
 const LOCALHOST_FALLBACK = "http://localhost:3000";
 
@@ -30,7 +30,7 @@ export function getSiteUrl(): URL {
   if (fromVercelDeployment) return fromVercelDeployment;
 
   if (process.env.NODE_ENV === "production") {
-    const fromContent = toUrl(marketingContent.siteMeta.siteUrl);
+    const fromContent = toUrl(SITE_URL);
     if (fromContent) return fromContent;
   }
 

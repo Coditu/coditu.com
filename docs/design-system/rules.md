@@ -9,7 +9,7 @@
 - 1 px lines, flat fills, 2–4 px radius.
 - Mono only for labels, tags, metadata, drawing annotations — uppercase, ≥ 11 px.
 - Mark illustrative data „Beispiel“ / "Example".
-- German first; every string also in English; both in `lib/marketing-content.ts`.
+- German first; every string also in English; in `messages/de.ts` and `messages/en.ts`.
 - Real team photos, real project names from `docs/00-CONTEXT.md`.
 
 ## Don't
@@ -29,7 +29,7 @@
 | Hype words (seamless, cutting-edge, empower…) | Voice rules in `docs/00-CONTEXT.md` |
 | More drawing motifs than the budget | See `blueprint-motifs.md` budget table |
 | Gradient logo | `CoditusMark variant="mono"` |
-| Text in components | Copy in `lib/marketing-content.ts` |
+| Text in components | Copy in `messages/de.ts` + `messages/en.ts` |
 
 ## Review checklist (run before saying "done")
 
@@ -59,10 +59,10 @@ Accessibility
 
 Layout
 [ ] No horizontal scroll at 320, 375, 768, 1024, 1440
-[ ] Dark mode checked (.dark on <html>)
+[ ] Dark mode checked (prefers-color-scheme: dark)
 
 Content
-[ ] All strings in lib/marketing-content.ts, DE + EN
+[ ] All strings in messages/de.ts + messages/en.ts
 [ ] Nothing invented; demo data marked „Beispiel“
 [ ] Spelling: „Maßstab“, dates 23.10., „33 %“
 

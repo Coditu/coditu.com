@@ -47,7 +47,7 @@ export function RevealScope({ root }: { root?: string }) {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
           const target = entry.target as HTMLElement;
-          target.style.willChange = "filter, transform, opacity";
+          target.style.willChange = "transform, opacity";
           target.setAttribute("data-revealed", "");
           observer.unobserve(target);
         }

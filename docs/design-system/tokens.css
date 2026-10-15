@@ -8,6 +8,9 @@
    base layer, keyframes and reveal rules that follow them in globals.css.
    See docs/design-system/migration.md before swapping — the gate checks
    the old values (scripts/verify-tokens.sh).
+   NOTE: the site follows the system setting only — app/globals.css puts the
+   dark values under `@media (prefers-color-scheme: dark) { :root { … } }`
+   instead of `.dark`, and has no `.light` mirror. Values are identical.
    ========================================================================== */
 
 /* --- Light (default). `.light` lets a subtree force light inside `.dark`. */

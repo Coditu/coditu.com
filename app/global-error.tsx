@@ -1,83 +1,31 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { fontVariables } from "@/lib/fonts";
+import de from "@/messages/de";
+import en from "@/messages/en";
 
 import "./globals.css";
 
 /**
- * The last resort: the root layout itself threw, so this REPLACES it — which
- * means it owns `<html>` and `<body>`, and nothing above it exists to inherit
- * from. No ThemeProvider, so no stored theme is read and `:root` decides; light
- * is the default the team asked for, so the page paints correctly anyway.
- *
- * Deliberately plain. Every dependency this file takes is a dependency that
- * could be the reason it is being shown, so it uses the token variables and the
- * font stack and nothing else — no rail, no topbar, no data, no icons.
+ * The root layout itself failed. The language is unknown here, so it speaks
+ * both, German first.
  */
-export default function GlobalError({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
+export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
-    <html lang="en" className={fontVariables}>
-      <body
-        style={{
-          margin: 0,
-          minHeight: "100dvh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "24px",
-          background: "var(--canvas)",
-          color: "var(--ink)",
-          fontFamily: "var(--font-satoshi), system-ui, sans-serif",
-        }}
-      >
-        <main style={{ maxWidth: "60ch" }}>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, letterSpacing: "-0.022em" }}>
-            Coditu could not start.
-          </h1>
-          <p style={{ marginTop: 12, fontSize: 14, lineHeight: 1.6, color: "var(--ink-muted)" }}>
-            This is the application failing to load at all, not one screen failing to render.
-            Nothing has been written and no data has been touched — reloading is safe, and if it
-            keeps happening the deployment is the thing to look at.
-          </p>
-
-          <button
-            type="button"
-            onClick={reset}
-            style={{
-              marginTop: 20,
-              height: 44,
-              padding: "0 16px",
-              borderRadius: "var(--radius-control)",
-              border: "1px solid var(--hairline-strong)",
-              background: "transparent",
-              color: "inherit",
-              font: "inherit",
-              fontSize: 13.5,
-              fontWeight: 500,
-              cursor: "pointer",
-            }}
-          >
-            Reload the application
-          </button>
-
-          {error.digest ? (
-            <p
-              style={{
-                marginTop: 16,
-                fontFamily: "var(--font-jetbrains), ui-monospace, monospace",
-                fontSize: 11,
-                color: "var(--ink-faint)",
-              }}
-            >
-              reference {error.digest}
-            </p>
-          ) : null}
+    <html lang="de">
+      <body className={`${fontVariables} bg-paper font-sans antialiased`}>
+        <main className="mx-auto flex min-h-dvh max-w-[60ch] flex-col justify-center gap-8 px-4 py-16">
+          {[de, en].map((t, i) => (
+            <section key={t.locale} lang={t.locale} className="flex flex-col gap-3">
+              {i === 0 ? <h1 className="text-h2">{t.error.title}</h1> : <h2 className="text-h2">{t.error.title}</h2>}
+              <p className="text-body text-ink-muted">{t.error.body}</p>
+            </section>
+          ))}
+          <Button onClick={reset} className="self-start">
+            {de.error.retry} / {en.error.retry}
+          </Button>
+          {error.digest && <p className="font-mono text-label text-ink-muted uppercase">ref {error.digest}</p>}
         </main>
       </body>
     </html>

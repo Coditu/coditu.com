@@ -2,7 +2,7 @@
 
 Shows clients what we work on — the "no black box" promise. On the marketing site it is a
 **read-only illustration** inside a `<Sheet>` marked „Beispiel“. Data comes from
-`lib/marketing-content.ts`, typed.
+`messages/de.ts` / `messages/en.ts`, typed.
 
 ## Data shape
 

@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  The Coditu site: one statically prerendered Next.js page, no backend.
+  The Coditu site: statically prerendered Next.js, German (<code>/de</code>) and English (<code>/en</code>), no backend.
 </p>
 
 ---
@@ -20,11 +20,12 @@ No environment variables are required. `NEXT_PUBLIC_SITE_URL` is optional; see
 
 ## Where things are
 
-- `app/(marketing)/page.tsx` — the page.
-- `components/site/` — its sections.
-- `lib/marketing-content.ts` — every word of copy and all structured data.
-- `app/globals.css` — the design tokens; documented in
-  [`docs/01-DESIGN-SYSTEM.md`](./docs/01-DESIGN-SYSTEM.md).
+- `app/[lang]/` — the pages, once per language. `/` redirects to `/de`.
+- `components/site/` — nav, footer and the page sections.
+- `components/ui/`, `components/blueprint/` — shared components and drawing motifs.
+- `messages/de.ts`, `messages/en.ts` — every word of copy, German first.
+- `app/globals.css` — the design tokens ("Blueprint"); documented in
+  [`docs/design-system/`](./docs/design-system/README.md).
 - [`docs/00-CONTEXT.md`](./docs/00-CONTEXT.md) — who Coditu is and the voice rules.
 
 ## Checks

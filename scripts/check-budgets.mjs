@@ -1,5 +1,5 @@
 /**
- * The JavaScript budget for `/`, measured the way a budget is written: the
+ * The JavaScript budget for the home page (`/de`, `/en`), measured the way a budget is written: the
  * total compressed JS a browser actually downloads to render the route.
  *
  * Not a manifest sum. A manifest tells you which chunks a route *references*;
@@ -50,7 +50,7 @@ async function measure(browser) {
   // `networkidle` plus a short sleep is NOT a stable reading: chunks were still
   // arriving after it on a slower machine. Wait for `load`, then for the
   // network to actually go quiet, then settle again.
-  await page.goto(`${BASE}/`, { waitUntil: "load" });
+  await page.goto(`${BASE}/de`, { waitUntil: "load" });
   await page.waitForLoadState("networkidle").catch(() => undefined);
   await page.waitForTimeout(2500);
   await context.close();
@@ -69,12 +69,12 @@ try {
     // Zero chunks is a small, plausible number that is under budget. Silence
     // and success are indistinguishable unless the check says which it is.
     failed = true;
-    console.log("FAIL  / loaded ZERO JavaScript chunks — nothing was measured.");
+    console.log("FAIL  /de loaded ZERO JavaScript chunks — nothing was measured.");
   } else {
     const over = total > GATE_KB;
     if (over) failed = true;
     console.log(
-      `${over ? "FAIL" : "ok  "}  / total ${total.toFixed(1)} KB gz / ${GATE_KB} KB   ` +
+      `${over ? "FAIL" : "ok  "}  /de total ${total.toFixed(1)} KB gz / ${GATE_KB} KB   ` +
         `(${scripts.size} chunks; the brief's figure is ${BRIEF_KB} KB)`
     );
     if (over) {
@@ -87,20 +87,22 @@ try {
   await browser.close();
 }
 
-// `/` is the same for everyone and changes only when someone deploys, so it is
-// built once and served as a file. That is one `cookies()`, `headers()` or
-// `searchParams` away from being untrue, and nothing else would go red: the
-// page still renders, it just quietly starts running React for every visitor.
-//
-// A prerendered route leaves its HTML on disk. A dynamic one does not.
-const prerendered = ".next/server/app/index.html";
-if (existsSync(prerendered)) {
-  console.log(`ok    / is prerendered  (${prerendered})`);
-} else {
-  failed = true;
-  console.log(`FAIL  / is no longer prerendered — ${prerendered} was not built.`);
-  console.log("        Something in the tree opted the route into dynamic rendering:");
-  console.log("        cookies(), headers(), searchParams, or `dynamic = 'force-dynamic'`.");
+// Every page is the same for everyone and changes only when someone deploys,
+// so each is built once and served as a file. That is one `cookies()`,
+// `headers()` or `searchParams` away from being untrue, and nothing else would
+// go red: the page still renders, it just quietly starts running React for
+// every visitor. A prerendered route leaves its HTML on disk; a dynamic one
+// does not.
+for (const route of ["de", "en", "de/impressum", "de/datenschutz", "en/legal-notice", "en/privacy"]) {
+  const prerendered = `.next/server/app/${route}.html`;
+  if (existsSync(prerendered)) {
+    console.log(`ok    /${route} is prerendered`);
+  } else {
+    failed = true;
+    console.log(`FAIL  /${route} is no longer prerendered — ${prerendered} was not built.`);
+    console.log("        Something in the tree opted the route into dynamic rendering:");
+    console.log("        cookies(), headers(), searchParams, or `dynamic = 'force-dynamic'`.");
+  }
 }
 
 console.log(failed ? "\nbudgets: FAILED" : "\nbudgets: OK");

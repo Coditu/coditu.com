@@ -51,7 +51,7 @@ labels (`BLATT 01 · ARBEITSWEISE`). Sketches (dashed, mono, blue) sit next to t
 8. **Two fonts.** Geist for headings and text. JetBrains Mono only for labels, tags, metadata, numbers in drawings — uppercase, tracking 0.08em, **never under 11 px**, never for running text.
 9. **Every section starts with a sheet label** (`<SheetLabel>`), then a heading.
 10. **WCAG 2.2 AA, both themes.** Text 4.5:1 (3:1 at ≥ 24 px), field borders 3:1, visible `:focus-visible`, targets ≥ 44 px, real `<button>` / `<a href>` / `<label>`.
-11. **Copy lives in `lib/marketing-content.ts`**, German first, English second. Components hold no strings. Invent nothing (no metrics, clients, testimonials).
+11. **Copy lives in `messages/de.ts` + `messages/en.ts`**, German first, English second. Components hold no strings. Invent nothing (no metrics, clients, testimonials).
 12. **Mobile first.** Works at 320 px with no horizontal scroll. Desktop is the enhancement.
 
 ## How to build a new component (agent workflow)
@@ -65,7 +65,7 @@ labels (`BLATT 01 · ARBEITSWEISE`). Sketches (dashed, mono, blue) sit next to t
    - interactive files end in `.client.tsx`; everything else stays a Server Component.
 4. Merge classes with `cn()` from `lib/utils.ts`. Variants as a typed `variant` prop, not ad-hoc classes.
 5. Add all states: default, hover, `focus-visible`, disabled (and error for fields).
-6. Check dark mode (`.dark` on `<html>`) and 320 px width.
+6. Check dark mode (emulate `prefers-color-scheme: dark`) and 320 px width.
 7. Run the checklist at the bottom of [`rules.md`](./rules.md), then `npm run gate -- --fast`.
 
 ## Stack facts that change how you write code
@@ -74,7 +74,7 @@ labels (`BLATT 01 · ARBEITSWEISE`). Sketches (dashed, mono, blue) sit next to t
 - **Next.js 16 / React 19.** Read `node_modules/next/dist/docs/` before using a Next API (see `CLAUDE.md`).
 - `/` must stay statically prerendered. No `cookies()`, `headers()`, `searchParams`.
 - Icons: `lucide-react`, `strokeWidth={1.5}`, 24 px (20 px inline, 16 px in dense UI). Color via `currentColor`.
-- Dark mode: `next-themes` class strategy, variant `dark:`.
+- Dark mode: follows the system (`prefers-color-scheme`), no toggle; variant `dark:` maps to the media query.
 
 ## Vocabulary
 
