@@ -1,5 +1,8 @@
 # 01 — Design system
 
+> **Legacy.** Superseded by [`design-system/`](./design-system/README.md) (Blueprint, Rev. A, 2026-10-15).
+> This file still describes what `app/globals.css` ships until the migration lands. Do not use it for new work.
+
 Extracted from `design/project/*.dc.html`. **Every number here is the spec.** Components read tokens;
 no component hardcodes a hex.
 
