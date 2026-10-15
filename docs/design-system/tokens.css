@@ -1,0 +1,243 @@
+/* ==========================================================================
+   Coditu "Blueprint" tokens — Rev. A — Tailwind v4
+   Source of truth for values: docs/design-system/tokens.md
+
+   HOW TO USE
+   This replaces the TOKEN part of app/globals.css (the `:root, .light`,
+   `.dark` and `@theme inline` blocks). Keep the imports, `@custom-variant`,
+   base layer, keyframes and reveal rules that follow them in globals.css.
+   See docs/design-system/migration.md before swapping — the gate checks
+   the old values (scripts/verify-tokens.sh).
+   ========================================================================== */
+
+/* --- Light (default). `.light` lets a subtree force light inside `.dark`. */
+:root,
+.light {
+  /* surfaces */
+  --paper: #f7f6f2;
+  --surface: #ffffff;
+  --surface-sunk: #efede7;
+
+  /* ink */
+  --ink: #14171c;          /* 16.6:1 on paper */
+  --ink-muted: #5a5e66;    /*  6.0:1 */
+
+  /* lines */
+  --line: #d9d7d0;         /* decoration only */
+  --line-input: #7d8189;   /*  3.6:1 — field borders */
+
+  /* primary: blueprint blue */
+  --blueprint: #1f4fd8;    /*  6.1:1 */
+  --blueprint-hover: #1a42b8;
+  --blueprint-light: #e8edfb;
+  --blueprint-ink: #ffffff; /* text on blue fills, 6.6:1 */
+  --grid-major: rgb(31 79 216 / 0.09);
+  --grid-minor: rgb(31 79 216 / 0.04);
+
+  /* the one CTA per screen */
+  --cta: #ff8a1f;
+  --cta-hover: #e8780f;
+  --cta-ink: #14171c;      /*  7.6:1 on --cta. Never white (2.4:1). */
+
+  /* status: text/icon + background */
+  --success: #2e7048;  --success-bg: #e6f1ea;
+  --warning: #8a5a00;  --warning-bg: #f7eedc;
+  --error:   #b3382c;  --error-bg:   #f7e5e2;
+  --info:    #1f6e8c;  --info-bg:    #e2f0f5;
+
+  /* elevation */
+  --shadow-sm: 0 1px 0 rgb(20 23 28 / 0.06);
+  --shadow-lift: 0 12px 24px -16px rgb(20 23 28 / 0.3);
+
+  /* motion */
+  --ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* shadcn/ui semantic layer. shadcn's `accent` is a HOVER SURFACE —
+     the orange is `cta`, never `accent`. */
+  --radius: 4px;
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
+  --primary: var(--blueprint);
+  --primary-foreground: var(--blueprint-ink);
+  --secondary: var(--blueprint-light);
+  --secondary-foreground: var(--blueprint);
+  --muted: var(--surface-sunk);
+  --muted-foreground: var(--ink-muted);
+  --accent: var(--blueprint-light);
+  --accent-foreground: var(--ink);
+  --destructive: var(--error);
+  --border: var(--line);
+  --input: var(--line-input);
+  --ring: var(--blueprint);
+}
+
+.dark {
+  --paper: #0f1216;
+  --surface: #171b21;
+  --surface-sunk: #1e232a;
+
+  --ink: #eceae4;          /* 15.6:1 */
+  --ink-muted: #a2a6ae;    /*  7.7:1 */
+
+  --line: #2a2f37;
+  --line-input: #6e7480;   /*  3.7:1 on surface */
+
+  --blueprint: #86a2ff;    /*  7.7:1 */
+  --blueprint-hover: #a3b8ff;
+  --blueprint-light: #1c2437;
+  --blueprint-ink: #0f1216;
+  --grid-major: rgb(134 162 255 / 0.08);
+  --grid-minor: rgb(134 162 255 / 0.03);
+
+  --cta: #ff8a1f;
+  --cta-hover: #ffa04d;
+  --cta-ink: #14171c;
+
+  --success: #6fc48f;  --success-bg: rgb(111 196 143 / 0.12);
+  --warning: #e7b04e;  --warning-bg: rgb(231 176 78 / 0.12);
+  --error:   #f08a7e;  --error-bg:   rgb(240 138 126 / 0.12);
+  --info:    #6cc0de;  --info-bg:    rgb(108 192 222 / 0.12);
+
+  --shadow-sm: 0 1px 0 rgb(0 0 0 / 0.3);
+  --shadow-lift: 0 12px 24px -16px rgb(0 0 0 / 0.6);
+}
+
+/* --- Static theme values (not themed) ----------------------------------- */
+@theme {
+  --breakpoint-sm: 40rem;   /*  640 */
+  --breakpoint-md: 48rem;   /*  768 */
+  --breakpoint-lg: 64rem;   /* 1024 */
+  --breakpoint-xl: 80rem;   /* 1280 */
+  --breakpoint-2xl: 90rem;  /* 1440 */
+
+  --container-page: 80rem;  /* max-w-page = 1280 */
+
+  /* Type scale. Fluid between 375 px and 1100 px viewports. */
+  --text-display: clamp(2.875rem, 1.906rem + 4.14vw, 4.75rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.04em;
+  --text-display--font-weight: 700;
+
+  --text-h1: clamp(2.25rem, 1.733rem + 2.207vw, 3.25rem);
+  --text-h1--line-height: 1.06;
+  --text-h1--letter-spacing: -0.035em;
+  --text-h1--font-weight: 700;
+
+  --text-h2: clamp(1.75rem, 1.491rem + 1.103vw, 2.25rem);
+  --text-h2--line-height: 1.15;
+  --text-h2--letter-spacing: -0.03em;
+  --text-h2--font-weight: 700;
+
+  --text-h3: clamp(1.25rem, 1.186rem + 0.276vw, 1.375rem);
+  --text-h3--line-height: 1.3;
+  --text-h3--letter-spacing: -0.01em;
+  --text-h3--font-weight: 600;
+
+  --text-lead: clamp(1.125rem, 1.061rem + 0.276vw, 1.25rem);
+  --text-lead--line-height: 1.55;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.55;
+
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.45;
+
+  --text-label: 0.6875rem;  /* 11 px — the floor for mono */
+  --text-label--line-height: 1.3;
+  --text-label--letter-spacing: 0.08em;
+  --text-label--font-weight: 500;
+
+  --radius-tag: 2px;
+  --radius-ui: 4px;
+}
+
+/* --- Themed values → utilities. `inline` so `.dark` re-themes them. ----- */
+@theme inline {
+  --font-sans: var(--font-geist), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-surface-sunk: var(--surface-sunk);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-line: var(--line);
+  --color-line-input: var(--line-input);
+  --color-blueprint: var(--blueprint);
+  --color-blueprint-hover: var(--blueprint-hover);
+  --color-blueprint-light: var(--blueprint-light);
+  --color-blueprint-ink: var(--blueprint-ink);
+  --color-cta: var(--cta);
+  --color-cta-hover: var(--cta-hover);
+  --color-cta-ink: var(--cta-ink);
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-error: var(--error);
+  --color-error-bg: var(--error-bg);
+  --color-info: var(--info);
+  --color-info-bg: var(--info-bg);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-lift: var(--shadow-lift);
+  --ease-entrance: var(--ease-entrance);
+
+  /* shadcn/ui */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* shadcn primitives read these — clamp them to the 2–4 px system */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+}
+
+/* --- Blueprint utilities --------------------------------------------------- */
+
+/* Grid paper: 40 px major + 8 px minor lines. Use on the page wrapper or a
+   hero — not on cards (cards are white). */
+@utility bg-blueprint-grid {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid-major) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
+    linear-gradient(var(--grid-minor) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-minor) 1px, transparent 1px);
+  background-size: 40px 40px, 40px 40px, 8px 8px, 8px 8px;
+}
+
+/* Base: focus ring + defaults. Merge into globals.css `@layer base`. */
+@layer base {
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  *:focus-visible {
+    outline: 2px solid var(--blueprint);
+    outline-offset: 3px;
+  }
+}

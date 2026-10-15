@@ -26,6 +26,7 @@ npm run gate        # the whole list, in order (`npm run gate -- --fast` skips e
 
 ## Rules
 
+- **UI follows `docs/design-system/`.** Start at its README; read only the component file you need.
 - **Invent nothing.** No testimonials, metrics, client counts or logo walls. The facts and the
   voice rules are in `docs/00-CONTEXT.md`, and `e2e/marketing.spec.ts` asserts several of them.
 - **Copy lives in `lib/marketing-content.ts`**, not in components.
@@ -40,7 +41,8 @@ npm run gate        # the whole list, in order (`npm run gate -- --fast` skips e
 | File | What lives there |
 |---|---|
 | `docs/00-CONTEXT.md` | Who Coditu is, the real work, the team, the voice rules, the things that must never ship. |
-| `docs/01-DESIGN-SYSTEM.md` | Tokens, type, geometry, motion tiers, the accessibility contract. Parts describe the removed app. |
+| `docs/design-system/` | **The design system ("Blueprint", Rev. A). Read `docs/design-system/README.md` before building or changing any UI.** Tokens, motifs, component specs, rules, migration plan. |
+| `docs/01-DESIGN-SYSTEM.md` | Legacy: the previous system the site still ships until `docs/design-system/migration.md` lands. Not for new work. |
 | `docs/05-DECISIONS.md` | Append-only ADR log. Mostly about the removed app; kept unedited as history. |
 | `docs/coditu-revamp-prompt.md` | The brief the site was built from. Source for voice, positioning, and company facts. |
 | `design/` | The approved Claude Design bundle, committed verbatim. Prototypes, not code. |
