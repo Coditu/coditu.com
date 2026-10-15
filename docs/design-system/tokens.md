@@ -34,7 +34,7 @@ reference. Contrast ratios were computed (WCAG formula), not eyeballed.
 
 Status colors mean status. Never decoration. Always pair with a word or icon — color is never the only signal.
 
-## Color — dark (`.dark`)
+## Color — dark (`prefers-color-scheme: dark`)
 
 | Token | Hex | Contrast on paper `#0F1216` |
 |---|---|---|

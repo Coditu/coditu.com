@@ -44,52 +44,28 @@ need() {
 }
 
 echo
-echo "surface + ink tokens, both themes"
-need "light canvas"        "--canvas: #ebeff6"
-need "dark canvas"         "--canvas: #07090e"
-need "light ink"           "--ink: #0b0e14"
-need "dark ink"            "--ink: #edf1f7"
-need "light accent"        "--accent: #1e4ae0"
-need "dark accent"         "--accent: #21e2c6"
-need ".light mirror"       ".light"
-
-echo
-echo "status chip pairs — a light-only value would sit at ~2.4:1 on the dark canvas"
-need "in_progress light"   "--chip-in-progress-fg: #183fbf"
-need "in_progress dark"    "--chip-in-progress-fg: #89a7ff"
-need "peer review light"   "--chip-in-peer-review-fg: #7a4f00"
-need "peer review dark"    "--chip-in-peer-review-fg: #ffc24d"
-need "done light"          "--chip-done-fg: #0e6b4b"
-need "done dark"           "--chip-done-fg: #63e3a9"
-
-echo
-echo "grouping — opaque, pre-mixed sticky cells"
-need "group 1 hue"         "--group-1: #5b8cff"
-need "group 2 hue"         "--group-2: #12a594"
-need "group 1 sticky light" "--group-1-sticky: #f4f7fe"
-need "group 1 sticky dark"  "--group-1-sticky: #111827"
+echo "Blueprint tokens, both themes (docs/design-system/tokens.md)"
+need "light paper"         "--paper: #f7f6f2"
+need "dark paper"          "--paper: #0f1216"
+need "light ink"           "--ink: #14171c"
+need "dark ink"            "--ink: #eceae4"
+need "light blueprint"     "--blueprint: #1f4fd8"
+need "dark blueprint"      "--blueprint: #86a2ff"
+need "cta"                 "--cta: #ff8a1f"
+need "cta ink"             "--cta-ink: #14171c"
+need "field border"        "--line-input: #7d8189"
+need "dark = system"       "prefers-color-scheme:dark"
+need "grid paper"          "bg-blueprint-grid"
 
 echo
 echo "motion — the rules Tailwind is most likely to prune"
 need "micro tier"          '[data-reveal="micro"]'
-need "surface tier"        '[data-reveal="surface"]'
 need "section tier"        '[data-reveal="section"]'
 need "micro keyframes"     "cd-reveal-micro"
-need "surface keyframes"   "cd-reveal-surface"
 need "section keyframes"   "cd-reveal-section"
+need "headline words"      "cd-word"
+need "draw-on"             "cd-draw"
 need "on-view pause gate"  "[data-reveal-on-view]"
-need "spinner"             "cd-spin"
-need "mark draw-on"        "cd-mark-draw"
-need "mark node overshoot" "cd-mark-node-in"
-need "mark hover travel"   "cd-mark-node-travel"
-need "flat variant"        "[data-reveal-flat]"
-need "flat keyframes"      "cd-reveal-flat"
-need "scrim"               "[data-scrim]"
-need "scrim keyframes"     "cd-scrim"
-# The blur itself, not just the rule: Lightning CSS drops `backdrop-filter`
-# outright when a manual -webkit- prefix follows the standard property.
-need "scrim blur"          "backdrop-filter:blur(10px)"
-need "panel trails scrim"  "[data-scrim]>[data-reveal]"
 need "reduced motion"      "prefers-reduced-motion"
 
 # The reduced-motion block is where a dropped rule is least likely to be
@@ -98,7 +74,7 @@ need "rm: reveal collapses"   "animation-name:cd-fade!important"
 need "rm: no scroll gate"     ".js[data-reveal-on-view]{animation-play-state:running!important}"
 # Lightning CSS normalises `0ms` to `0s`, so match what actually ships.
 need "rm: no stagger"         "animation-delay:0s!important"
-need "rm: trace frozen"       "stroke-dashoffset:0!important"
+need "rm: lines drawn"        "stroke-dashoffset:0!important"
 
 echo
 echo "server-rendered content must never ship hidden"
@@ -106,7 +82,7 @@ echo "server-rendered content must never ship hidden"
 # real content at opacity 0 and stays invisible until React hydrates. `<Reveal>`
 # is CSS-driven precisely to avoid that. Since step 12 there is no Framer reveal
 # left anywhere, so this is a hard failure rather than a warning.
-offenders=$(grep -lF 'opacity:0' .next/server/app/*.html 2>/dev/null || true)
+offenders=$(grep -rlF 'opacity:0' --include='*.html' .next/server/app 2>/dev/null || true)
 if [ -n "$offenders" ]; then
   for f in $offenders; do
     echo "  FAIL $f prerenders content at opacity:0"

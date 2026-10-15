@@ -38,6 +38,12 @@ printf '%s\n' "$PRODUCTION_BASE_URL" | grep -Eq '^https://[A-Za-z0-9.-]+(:[0-9]+
 
 release_script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 release_repo_root=$(CDPATH= cd -- "$release_script_dir/.." && pwd)
+
+# Impressum and Datenschutz are legally required and still carry fields only
+# the team can fill. Never ship them unfilled.
+if grep -rnF '[PLACEHOLDER' "$release_repo_root/messages"; then
+  fail "messages/ still contains [PLACEHOLDER: …] fields — fill them before deploying to production"
+fi
 release_health_file=$release_repo_root/public/build-health.json
 [ -f "$release_health_file" ] || fail "public/build-health.json was not written before the deploy"
 [ "$(jq -er '.status' "$release_health_file")" = ok ] || fail "local build-health status is not ok"
@@ -71,7 +77,7 @@ smoke_staged() {
   [ "$(printf '%s' "$release_body" | jq -er '.status')" = ok ] || return 1
   [ "$(printf '%s' "$release_body" | jq -er '.commit')" = "$GITHUB_SHA" ] || return 1
 
-  for release_path in /; do
+  for release_path in / /de /en; do
     vercel curl "$release_path" --deployment "$release_target" -- \
       --silent --show-error --fail --location --output /dev/null || return 1
   done
@@ -87,7 +93,7 @@ public_request() {
 }
 
 smoke_public_routes() {
-  for release_path in /; do
+  for release_path in / /de /en; do
     release_effective=$(public_request "$release_path" --output /dev/null --write-out '%{url_effective}') ||
       return 1
     case "$release_effective" in

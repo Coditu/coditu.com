@@ -24,7 +24,7 @@ byte-identical between the two, and the four files below are the whole of what i
 
 ## The August bundle
 
-Read `README.md` for that export's own notes. The five artboards:
+Read `README.md` for that export's own notes. The artboards:
 
 | File | What it defines |
 |---|---|
@@ -32,7 +32,6 @@ Read `README.md` for that export's own notes. The five artboards:
 | `project/Coditu Brand.dc.html` | Mark construction, the two rejected variants, lockups, OG compositions |
 | `project/Coditu Site.dc.html` | The marketing site — `#top #work #services #process #use-cases #team #insights #faq #contact` |
 | `project/Coditu Sprint Report.dc.html` | The client PDF — cover, "Progress at a glance", "Where each item stands", "What happens next" |
-| `project/Current Site - Strukture Digital.dc.html` | The site as it exists today. **Reference only — do not port it.** |
 
 **These are prototypes, not production code.** They use a template runtime (`<x-dc>`, `sc-for`, `sc-if`,
 `{{ }}`, inline styles) that exists only in the design tool. Recreate the *visual and behavioural

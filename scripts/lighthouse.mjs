@@ -22,7 +22,7 @@
 import lighthouse from "lighthouse";
 
 const BASE = process.env.E2E_PROD_URL ?? "http://localhost:3000";
-const TARGET = `${BASE}/`;
+const TARGET = `${BASE}/de`;
 const RUNS = 3;
 
 /** §5. */

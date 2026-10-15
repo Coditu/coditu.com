@@ -40,7 +40,7 @@ They are not an agency that subcontracts. One team owns discovery through post-l
 Locations are **Munich · Ulm · Cairo**. There is nobody in Berlin. The current site says Berlin; that is
 a bug, not a fact.
 
-Contact: `hello@coditu.com`.
+Contact: `contact@coditu.com` (`hello@` does not exist).
 
 ---
 

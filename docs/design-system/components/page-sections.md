@@ -97,7 +97,7 @@ transparency → `SquareKanban`, contact → `MessageSquare`.
 | Part | Spec |
 |---|---|
 | Wrapper | `<footer>` `border-t border-ink pt-8 pb-6` |
-| Columns | `grid gap-6 sm:grid-cols-2 lg:grid-cols-4`: brand + slogan · Leistungen · Rechtliches (Impressum, Datenschutz — required in DE) · Kontakt (`hello@coditu.com`, DE/EN switch) |
+| Columns | `grid gap-6 sm:grid-cols-2 lg:grid-cols-4`: brand + slogan · Leistungen · Rechtliches (Impressum, Datenschutz — required in DE) · Kontakt (`contact@coditu.com`, DE/EN switch) |
 | Column title | `font-mono text-label uppercase text-ink-muted` |
 | Links | `text-[14px] text-ink hover:text-blueprint` |
 | Bottom strip | `border-t border-line py-3.5 font-mono text-label uppercase text-ink-muted`: `© {year} Coditu` left, `Blatt NN / NN · Rev. X` right |
