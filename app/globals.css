@@ -373,6 +373,48 @@
 .cd-steps > :nth-child(2) .cd-step-on { animation-delay: 2500ms; }
 .cd-steps > :nth-child(3) .cd-step-on { animation-delay: 2800ms; }
 
+/* --- Services parts list (components/site/services.tsx) ------------------
+   Without JS every detail shows under its row. With JS only the open one
+   does, and from lg it moves to the right-hand column and sticks. A detail
+   fades in when it opens; on desktop the outgoing one fades out over it. */
+.js .cd-svc-detail {
+  transition: opacity 180ms ease-out;
+}
+
+.js .cd-svc-detail:not([data-open]) {
+  display: none;
+  opacity: 0;
+}
+
+@starting-style {
+  .js .cd-svc-detail[data-open] {
+    opacity: 0;
+  }
+}
+
+@media (min-width: 64rem) {
+  .js .cd-svc {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    /* The trailing 1fr row takes the detail's extra height, so the rows keep theirs. */
+    grid-template-rows: repeat(var(--rows), auto) 1fr;
+    column-gap: 1.5rem;
+  }
+
+  .js .cd-svc > * {
+    grid-column: 1 / span 7;
+  }
+
+  .js .cd-svc > .cd-svc-detail {
+    grid-column: 8 / span 5;
+    grid-row: 1 / -1;
+    align-self: start;
+    position: sticky;
+    top: 108px; /* nav 84 + 24 */
+    transition-property: opacity, display;
+    transition-behavior: allow-discrete;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* The hero shows its resting state: slider in the middle, all steps lit. */
   .cd-wipe,
@@ -380,6 +422,11 @@
   .cd-sketch-in > *,
   .cd-step-on {
     animation: none !important;
+  }
+
+  /* The services detail swaps instantly. */
+  .js .cd-svc-detail {
+    transition: none !important;
   }
 
   *,

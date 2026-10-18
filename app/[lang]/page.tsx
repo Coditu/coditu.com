@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { RevealScope } from "@/components/motion/reveal-scope.client";
 import { Hero } from "@/components/site/hero";
+import { Services } from "@/components/site/services";
 import { getMessages, hasLocale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/metadata";
 
@@ -21,6 +22,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
   return (
     <>
       <Hero locale={lang} />
+      <Services locale={lang} />
       {/* One observer for every [data-reveal-on-view] on the page. */}
       <RevealScope />
     </>

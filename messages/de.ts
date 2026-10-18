@@ -115,6 +115,104 @@ const de = {
     },
   },
 
+  /**
+   * Blatt 02, drawn as a parts list: the client's problem in their words, what
+   * we build, proof, tech. Every number here is from real sprint data — add none.
+   */
+  servicesSection: {
+    label: "Blatt 02 · Leistungen",
+    title: "Was wir bauen – und welches Problem es löst",
+    intro:
+      "Jede Leistung beginnt mit dem Satz, mit dem Kunden zu uns kommen. Daneben steht, was wir bauen und womit.",
+    columns: ["Pos.", "Problem", "Was wir bauen", "Technik"],
+    detail: "Detail",
+    facts: "Aus der Praxis",
+    example: "Beispiel",
+    more: { label: "Nicht sicher, was passt? Schicken Sie uns Ihre Skizze.", subject: "Projektanfrage" },
+    rows: [
+      {
+        pos: "01",
+        title: "SharePoint-Webparts",
+        problem: "„Unser Intranet ist unübersichtlich und veraltet.“",
+        text: "Webparts, die sich in Ihre bestehenden SharePoint-Seiten einfügen.",
+        facts: "Über 35 Webparts für eine Organisation · meist 1–2 Tage pro Webpart",
+        tags: ["SharePoint", "SPFx", "React", "TypeScript", "Fluent UI"],
+      },
+      {
+        pos: "02",
+        title: "Interne Apps",
+        problem: "„Das läuft bei uns noch über Papier, Excel und E-Mail.“",
+        text: "Kleine, fokussierte Apps nach Ihrer Skizze – für Anträge, Onboarding oder den Redaktionsplan. Mit Microsoft-Anmeldung und Rechten nach Gruppen.",
+        facts: "Erste Version in wenigen Tagen",
+        tags: ["React", "Next.js", "Python", "Microsoft Graph"],
+      },
+      {
+        pos: "03",
+        title: "Websites & Frontend",
+        problem: "„Unsere Website ist langsam oder wirkt veraltet.“",
+        text: "Schnelle Websites und Frontends, gebaut, um bei Google gefunden zu werden.",
+        tags: ["Next.js", "React", "Core Web Vitals", "Technisches SEO"],
+      },
+      {
+        pos: "04",
+        title: "Betreuung nach dem Start",
+        problem: "„Und wer kümmert sich danach darum?“",
+        text: "Wartung, wenn Sie sie brauchen – abgerechnet pro Anfrage.",
+        facts:
+          "Seit fast einem Jahr wöchentliche Sprints für denselben Kunden · kleine Änderungen meist unter 2 Stunden Aufwand",
+        tags: ["Wartung", "Änderungen", "Support"],
+      },
+    ],
+    /** Detail 01: web parts we really built. */
+    catalogue: {
+      label: "Katalog · Auswahl",
+      groups: [
+        {
+          name: "Neuigkeiten & Kommunikation",
+          items: ["News Center", "Banner mit News", "Newspart", "Social Corner", "Instagram-/LinkedIn-Feed", "Hinweis-Banner"],
+        },
+        {
+          name: "Navigation & Suche",
+          items: ["Hauptnavigation", "Quick Links", "Link-Karussell", "Link-Kacheln", "Schnellzugriffe", "Finder", "Suchbanner"],
+        },
+        { name: "Menschen", items: ["Organigramm", "Personenverzeichnis", "Jubiläen", "Kontaktkarten"] },
+        {
+          name: "Seitenaufbau",
+          items: ["Tabs", "Tabs mit Karten", "Akkordeon", "Überschrift & Trenner", "Banner", "Prozess & Zeitleiste", "Kennzahlen"],
+        },
+        {
+          name: "Medien & Beteiligung",
+          items: ["Video-Karussell", "Interaktives Video", "Folien", "Umfrage", "Feedback", "Kalender"],
+        },
+      ],
+    },
+    /** Detail 02: a small sketch → live pair. `hint` is the sketch, `value` the live example. */
+    app: {
+      sketch: { label: "Anfrage", id: "A-02", caption: "A · Entwurf", button: "Anfrage senden" },
+      live: { title: "Anfrage", login: "Anmeldung mit Microsoft", caption: "B · Ergebnis", button: "Anfrage senden" },
+      fields: [
+        { label: "Betreff", hint: "Text · Pflichtfeld", value: "Laptop für neue Kollegin" },
+        { label: "Team", hint: "Auswahl · Gruppe", value: "Beratung" },
+      ],
+    },
+    /** Detail 03: real projects, public/work/thumbs/<slug>.webp. */
+    projects: [
+      { slug: "nvrmiss", name: "NVRMiss", line: "Produktseite für eine B2B-Software für Servicebetriebe" },
+      { slug: "nile-atelier", name: "Nile Atelier", line: "Website für eine ägyptische Modemarke" },
+    ],
+    /** Detail 04: example tickets, marked „Beispiel“. */
+    changelog: {
+      label: "Änderungsprotokoll",
+      from: "Änderung",
+      to: "Erledigt",
+      tickets: [
+        { id: "Ä-01", text: "Neuen Link in der Hauptnavigation ergänzen" },
+        { id: "Ä-02", text: "Banner auf der Startseite austauschen" },
+        { id: "Ä-03", text: "Feld „Kostenstelle“ im Antrag ergänzen" },
+      ],
+    },
+  },
+
   footer: {
     slogan: "Von der Skizze zur fertigen Software.",
     servicesTitle: "Leistungen",
