@@ -87,6 +87,33 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       }
     });
 
+    test("hero: one h1, mailto CTA, the form met once, slider by keyboard", async ({ page }) => {
+      await page.goto(home);
+      await expect(page.locator("h1")).toHaveCount(1);
+      await expect(page.locator('a[href^="mailto:contact@coditu.com?subject="]')).toHaveCount(1);
+
+      // The sketch is a picture: its labels are not form controls, and it is hidden.
+      await expect(page.getByLabel("Name", { exact: true })).toHaveCount(1);
+      await expect(page.locator("figure[aria-hidden='true'] input")).toHaveCount(0);
+
+      const range = page.locator(".cd-compare input[type=range]");
+      await expect(range).toHaveValue("50");
+      await range.focus();
+      await page.keyboard.press("ArrowRight");
+      await expect(range).toHaveValue("51");
+      await expect(page.locator(".cd-compare")).toHaveAttribute("style", /--pos:\s*51%/);
+      await expect(page.locator(".cd-compare")).toHaveAttribute("data-moved", "");
+    });
+
+    test("hero: reduced motion shows the resting state", async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(home);
+      const clip = await page.locator(".cd-wipe").evaluate((el) => getComputedStyle(el).clipPath);
+      expect(clip).toContain("50%");
+      const lit = await page.locator(".cd-step-on").evaluateAll((els) => els.map((el) => getComputedStyle(el).opacity));
+      expect(lit).toEqual(["1", "1", "1"]);
+    });
+
     test("no horizontal scroll from 320 to 2560", async ({ page }) => {
       await page.goto(home);
       for (const width of [320, 360, 390, 430, 640, 744, 834, 1024, 1280, 1440, 1728, 1920, 2560]) {

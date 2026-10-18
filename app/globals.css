@@ -304,7 +304,84 @@
   animation-play-state: running;
 }
 
+/* --- Hero compare (components/site/hero.tsx) ------------------------------
+   The base rules ARE the resting state: slider at `--pos`, every step lit.
+   The animations only play from a start frame into it, on parse, so no JS
+   and no hidden HTML are involved. Order: the sketch draws in (0–1 s), the
+   wipe sweeps from sketch to the middle (1–2.2 s), the steps light up.
+   `data-moved` (set by the range input) hands `--pos` to the visitor. */
+.cd-compare {
+  --pos: 50%;
+}
+
+.cd-wipe {
+  clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+  animation: cd-wipe 1200ms var(--ease-entrance) 1000ms both;
+}
+
+.cd-wipe-handle {
+  transform: translateX(var(--pos));
+  animation: cd-wipe-handle 1200ms var(--ease-entrance) 1000ms both;
+}
+
+.cd-compare[data-moved] .cd-wipe,
+.cd-compare[data-moved] .cd-wipe-handle {
+  animation: none;
+}
+
+@keyframes cd-wipe {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    clip-path: inset(0 50% 0 0);
+  }
+}
+
+@keyframes cd-wipe-handle {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(50%);
+  }
+}
+
+/* Each sketch row is revealed left to right, staggered. */
+.cd-sketch-in > * {
+  animation: cd-sketch-in 600ms var(--ease-entrance) both;
+}
+.cd-sketch-in > :nth-child(2) { animation-delay: 80ms; }
+.cd-sketch-in > :nth-child(3) { animation-delay: 160ms; }
+.cd-sketch-in > :nth-child(4) { animation-delay: 240ms; }
+.cd-sketch-in > :nth-child(5) { animation-delay: 320ms; }
+.cd-sketch-in > :nth-child(6) { animation-delay: 400ms; }
+
+@keyframes cd-sketch-in {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Skizze → Board → Live, after the sweep. */
+.cd-step-on {
+  animation: cd-fade 300ms linear 2200ms both;
+}
+.cd-steps > :nth-child(2) .cd-step-on { animation-delay: 2500ms; }
+.cd-steps > :nth-child(3) .cd-step-on { animation-delay: 2800ms; }
+
 @media (prefers-reduced-motion: reduce) {
+  /* The hero shows its resting state: slider in the middle, all steps lit. */
+  .cd-wipe,
+  .cd-wipe-handle,
+  .cd-sketch-in > *,
+  .cd-step-on {
+    animation: none !important;
+  }
+
   *,
   *::before,
   *::after {
