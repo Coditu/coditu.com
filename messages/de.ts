@@ -66,9 +66,8 @@ const de = {
     "Websites & Frontend",
   ],
 
-  /** Blatt 01. ENTWURF — Adam überarbeitet den Text. */
+  /** Hero. ENTWURF — Adam überarbeitet den Text. */
   hero: {
-    meta: ["Blatt 01 · Startseite", "Rev. A"] as [string, string],
     label: "SharePoint · Interne Apps",
     /** The blue period is added by the component. */
     title: "Von der Skizze zur fertigen Software",
@@ -79,6 +78,34 @@ const de = {
       body: "Hallo Coditu,\n\nunsere Idee in ein paar Sätzen:\n\n\nGern hängen wir auch ein Foto unserer Skizze an.\n",
     },
     secondary: "So arbeiten wir",
+    /**
+     * The hero picture: a request in words becomes the app. `[Words]` turn
+     * into the app — the first is its title, the rest its fields, one value
+     * each. Example data, marked „Beispiel“. Apps of the kinds we really built.
+     */
+    request: {
+      request: "Anfrage per E-Mail",
+      example: "Beispiel",
+      live: "Live",
+      summary: "Beispiel: Aus einer Anfrage in ein paar Sätzen wird eine fertige App.",
+      scenarios: [
+        {
+          request: "Neue Kolleginnen sollen eine [Onboarding-Checkliste] bekommen – mit [Startdatum], [Team] und [Ansprechpartner].",
+          values: ["03.11.2026", "Beratung", "Sarah Weber"],
+          button: "Anlegen",
+        },
+        {
+          request: "Unsere Intranet-Themen planen wir per E-Mail. Wir brauchen einen [Redaktionsplan] mit [Thema], [Datum] und [Zuständigkeit].",
+          values: ["Neue Kantine", "14.11.2026", "Team Kommunikation"],
+          button: "Einplanen",
+        },
+        {
+          request: "Alle sollen [Intranet-News] schreiben können – mit [Titel], [Bild] und [Freigabe] durch die Kommunikation.",
+          values: ["Sommerfest am 12. Juni", "sommerfest.jpg", "Freigegeben"],
+          button: "Veröffentlichen",
+        },
+      ],
+    },
     facts: [
       { id: "T.01", text: "Von der Skizze zur App in wenigen Tagen" },
       { id: "T.02", text: "Sie sehen jeden Schritt im Board" },
@@ -96,43 +123,21 @@ const de = {
         { slug: "adam-nafie", name: "Adam Nafie", role: "Kundenbetreuung & Partnerschaften" },
       ],
     },
-    demo: {
-      sheet: { label: "Blatt 01 · Beispiel", value: "Fortbildungsantrag" },
-      compareLabel: "Entwurf / Ergebnis vergleichen",
-      sketch: { label: "Fortbildungsantrag", id: "A-01", caption: "A · Entwurf", button: "Antrag senden" },
-      live: { title: "Fortbildungsantrag", status: "Live", caption: "B · Ergebnis", button: "Antrag senden" },
-      /** Same fields in both states. `hint` is the sketch, `value` the live example. */
-      fields: [
-        { label: "Name", hint: "Text · Pflichtfeld", value: "Jana Beispiel" },
-        { label: "Fortbildung", hint: "Text · Pflichtfeld", value: "Gesprächsführung in der Beratung" },
-        { label: "Zeitraum", hint: "Datum von – bis", value: "03.11. – 07.11.2026" },
-        { label: "Kosten", hint: "Betrag · €", value: "480 €" },
-        { label: "Begründung", hint: "Text · mehrzeilig", value: "Für die neue Elternberatung im Team" },
-      ],
-      stepsLabel: "Ablauf",
-      steps: ["Skizze", "Board", "Live"],
-      duration: "wenige Tage",
-      caption: "Beispiel — so sieht der Weg von der Skizze zur App bei uns aus.",
-    },
   },
 
   /**
-   * Blatt 02, drawn as a parts list: the client's problem in their words, what
-   * we build, proof, tech. Every number here is from real sprint data — add none.
+   * Services: a showcase with one tab per service. The client's problem in
+   * their words, what we build, proof, tech. Every number here is from real sprint data — add none.
    */
   servicesSection: {
-    label: "Blatt 02 · Leistungen",
     title: "Was wir bauen – und welches Problem es löst",
     intro:
-      "Jede Leistung beginnt mit dem Satz, mit dem Kunden zu uns kommen. Daneben steht, was wir bauen und womit.",
-    columns: ["Pos.", "Problem", "Was wir bauen", "Technik"],
-    detail: "Detail",
+      "Jede Leistung beginnt mit dem Satz, mit dem Kunden zu uns kommen. Darunter: was wir bauen und womit.",
     facts: "Aus der Praxis",
     example: "Beispiel",
     more: { label: "Nicht sicher, was passt? Schicken Sie uns Ihre Skizze.", subject: "Projektanfrage" },
     rows: [
       {
-        pos: "01",
         title: "SharePoint-Webparts",
         problem: "„Unser Intranet ist unübersichtlich und veraltet.“",
         text: "Webparts, die sich in Ihre bestehenden SharePoint-Seiten einfügen.",
@@ -140,7 +145,6 @@ const de = {
         tags: ["SharePoint", "SPFx", "React", "TypeScript", "Fluent UI"],
       },
       {
-        pos: "02",
         title: "Interne Apps",
         problem: "„Das läuft bei uns noch über Papier, Excel und E-Mail.“",
         text: "Kleine, fokussierte Apps nach Ihrer Skizze – für Anträge, Onboarding oder den Redaktionsplan. Mit Microsoft-Anmeldung und Rechten nach Gruppen.",
@@ -148,14 +152,12 @@ const de = {
         tags: ["React", "Next.js", "Python", "Microsoft Graph"],
       },
       {
-        pos: "03",
         title: "Websites & Frontend",
         problem: "„Unsere Website ist langsam oder wirkt veraltet.“",
         text: "Schnelle Websites und Frontends, gebaut, um bei Google gefunden zu werden.",
         tags: ["Next.js", "React", "Core Web Vitals", "Technisches SEO"],
       },
       {
-        pos: "04",
         title: "Betreuung nach dem Start",
         problem: "„Und wer kümmert sich danach darum?“",
         text: "Wartung, wenn Sie sie brauchen – abgerechnet pro Anfrage.",
@@ -222,7 +224,6 @@ const de = {
     privacy: "Datenschutz",
     contactTitle: "Kontakt",
     languageTitle: "Sprache",
-    sheet: "Blatt 07 / 07 · Rev. A",
   },
 
   legal: {

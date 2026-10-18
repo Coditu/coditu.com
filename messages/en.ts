@@ -56,7 +56,6 @@ const en: Messages = {
   ],
 
   hero: {
-    meta: ["Sheet 01 · Home", "Rev. A"],
     label: "SharePoint · Internal apps",
     title: "From sketch to finished software",
     lead: "We build software for social organisations, associations and mid-sized companies. Your sketch becomes an app that works in your day-to-day. You see every step on a shared board.",
@@ -66,6 +65,29 @@ const en: Messages = {
       body: "Hello Coditu,\n\nOur idea in a few sentences:\n\n\nWe are happy to attach a photo of our sketch.\n",
     },
     secondary: "How we work",
+    request: {
+      request: "Request by email",
+      example: "Example",
+      live: "Live",
+      summary: "Example: a request in a few sentences becomes a finished app.",
+      scenarios: [
+        {
+          request: "New colleagues should get an [Onboarding checklist] – with [Start date], [Team] and [Contact person].",
+          values: ["03 Nov 2026", "Consulting", "Sarah Weber"],
+          button: "Create",
+        },
+        {
+          request: "We plan our intranet topics by email. We need an [Editorial calendar] with [Topic], [Date] and [Owner].",
+          values: ["New canteen", "14 Nov 2026", "Communications team"],
+          button: "Schedule",
+        },
+        {
+          request: "Everyone should be able to write [Intranet news] – with [Title], [Image] and [Approval] by communications.",
+          values: ["Summer party on 12 June", "summer-party.jpg", "Approved"],
+          button: "Publish",
+        },
+      ],
+    },
     facts: [
       { id: "T.01", text: "From sketch to app in a few days" },
       { id: "T.02", text: "You see every step on the board" },
@@ -82,37 +104,16 @@ const en: Messages = {
         { slug: "adam-nafie", name: "Adam Nafie", role: "Client partnerships" },
       ],
     },
-    demo: {
-      sheet: { label: "Sheet 01 · Example", value: "Training request" },
-      compareLabel: "Compare sketch / result",
-      sketch: { label: "Training request", id: "A-01", caption: "A · Sketch", button: "Send request" },
-      live: { title: "Training request", status: "Live", caption: "B · Result", button: "Send request" },
-      fields: [
-        { label: "Name", hint: "Text · required", value: "Jana Example" },
-        { label: "Course", hint: "Text · required", value: "Counselling conversations" },
-        { label: "Dates", hint: "Date from – to", value: "03.11. – 07.11.2026" },
-        { label: "Cost", hint: "Amount · €", value: "€480" },
-        { label: "Reason", hint: "Text · multi-line", value: "For the team's new parent counselling" },
-      ],
-      stepsLabel: "Process",
-      steps: ["Sketch", "Board", "Live"],
-      duration: "a few days",
-      caption: "Example — this is how a sketch becomes an app with us.",
-    },
   },
 
   servicesSection: {
-    label: "Sheet 02 · Services",
     title: "What we build — and the problem it solves",
-    intro: "Each service starts with the sentence clients bring to us. Next to it: what we build, and with what.",
-    columns: ["Pos.", "Problem", "What we build", "Tech"],
-    detail: "Detail",
+    intro: "Each service starts with the sentence clients bring to us. Below it: what we build, and with what.",
     facts: "From practice",
     example: "Example",
     more: { label: "Not sure what fits? Send us your sketch.", subject: "Project request" },
     rows: [
       {
-        pos: "01",
         title: "SharePoint web parts",
         problem: "“Our intranet is cluttered and out of date.”",
         text: "Web parts that fit into your existing SharePoint pages.",
@@ -120,7 +121,6 @@ const en: Messages = {
         tags: ["SharePoint", "SPFx", "React", "TypeScript", "Fluent UI"],
       },
       {
-        pos: "02",
         title: "Internal apps",
         problem: "“We still do this on paper, in Excel and by email.”",
         text: "Small, focused apps from your sketch — for requests, onboarding or the editorial calendar. With Microsoft sign-in and permissions by group.",
@@ -128,14 +128,12 @@ const en: Messages = {
         tags: ["React", "Next.js", "Python", "Microsoft Graph"],
       },
       {
-        pos: "03",
         title: "Websites & frontend",
         problem: "“Our website is slow or looks dated.”",
         text: "Fast websites and frontends, built to be found on Google.",
         tags: ["Next.js", "React", "Core Web Vitals", "Technical SEO"],
       },
       {
-        pos: "04",
         title: "Care after launch",
         problem: "“And who looks after it afterwards?”",
         text: "Maintenance when you need it, billed per request.",
@@ -197,7 +195,6 @@ const en: Messages = {
     privacy: "Privacy policy",
     contactTitle: "Contact",
     languageTitle: "Language",
-    sheet: "Sheet 07 / 07 · Rev. A",
   },
 
   legal: {

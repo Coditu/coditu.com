@@ -30,14 +30,13 @@ not the logo. Clear space ≥ 0.5 × mark height; minimum mark 20 px.
 ```tsx
 <div className="grid gap-6 lg:grid-cols-12 lg:items-end">
   <div className="lg:col-span-7">
-    <SheetLabel>Blatt 02 · Arbeitsweise</SheetLabel>
-    <h2 className="mt-5 text-h1 max-w-[18ch]">So arbeiten wir: Sie sehen jeden Schritt.</h2>
+    <h2 className="text-h1 max-w-[18ch]">So arbeiten wir: Sie sehen jeden Schritt.</h2>
   </div>
   <p className="text-lead text-ink-muted lg:col-span-5 max-w-[46ch]">{intro}</p>
 </div>
 ```
 
-Content starts `mt-12` below. One sheet label + one heading + optional intro. No eyebrow on top of the label.
+Content starts `mt-12` below. One heading + optional intro. No numbered sheet labels („Blatt 02 · …“) and no sheet meta line („Rev. A“): they read as decoration. Sections start with the heading.
 
 ## Hero
 
@@ -45,11 +44,11 @@ The only place for `text-display` and the page's orange CTA.
 
 | Part | Spec |
 |---|---|
-| Section | `pt-8 pb-16 lg:pb-24`, sheet meta line on top (`mb-12`) |
-| Grid | `grid gap-14 lg:grid-cols-12 lg:items-center` — copy `lg:col-span-5`, visual `lg:col-start-7 lg:col-span-6` |
-| Copy | SheetLabel (services) → `<h1 class="text-display mt-6">` → `text-lead text-ink-muted mt-6 max-w-[52ch]` → buttons `mt-9` (`cta lg` + `outline lg`) → facts row |
+| Section | `grid lg:grid-cols-12 lg:items-center`: text `lg:col-span-6` left, request card `lg:col-span-6` right; on phones the card follows the text. No sheet meta line. |
+| Copy | blue label → `<h1 class="text-display mt-5">` → `text-lead text-ink-muted mt-6 max-w-[56ch]` → buttons `mt-9` (`cta lg` + `outline lg`) → facts row → team |
+| Request card | `<RequestToApp>`: a client's request types itself out, its `[key words]` are underlined, fly into place and the card becomes that app („Live“). Loops through `hero.request.scenarios` while on screen. Marked „Beispiel“; hidden from screen readers with one sr-only sentence. Reduced motion: no typing, no flying, it just switches. |
 | Headline | the slogan „Von der Skizze zur fertigen Software“ + a blue period `<span class="text-blueprint">.</span>` |
-| Facts row | `mt-12 grid sm:grid-cols-3 gap-4 border-t border-ink`, each: mono label `T.01` blue + 15 px semibold fact. Facts must be true (see `docs/00-CONTEXT.md`). |
+| Facts row | `mt-12 grid sm:grid-cols-3 gap-4 border-t border-ink`, each a 15 px semibold fact (no T.01 ids shown). Facts must be true (see `docs/00-CONTEXT.md`). |
 | Visual | a `<Sheet>` with crop marks containing a **sketch → live** pair ([`../blueprint-motifs.md`](../blueprint-motifs.md) §7) |
 | Mobile | visual below copy; sketch and live stack; connector hidden |
 
@@ -100,4 +99,4 @@ transparency → `SquareKanban`, contact → `MessageSquare`.
 | Columns | `grid gap-6 sm:grid-cols-2 lg:grid-cols-4`: brand + slogan · Leistungen · Rechtliches (Impressum, Datenschutz — required in DE) · Kontakt (`contact@coditu.com`, DE/EN switch) |
 | Column title | `font-mono text-label uppercase text-ink-muted` |
 | Links | `text-[14px] text-ink hover:text-blueprint` |
-| Bottom strip | `border-t border-line py-3.5 font-mono text-label uppercase text-ink-muted`: `© {year} Coditu` left, `Blatt NN / NN · Rev. X` right |
+| Bottom strip | `border-t border-line py-3.5 font-mono text-label uppercase text-ink-muted`: `© {year} Coditu` |

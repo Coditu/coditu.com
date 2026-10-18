@@ -12,7 +12,7 @@ never the content itself. All go in `components/blueprint/`. All decorative SVG/
 | Crop marks | 2 sets (one per important sheet) |
 | Dimension lines | 2 |
 | Dashed connectors | 2 |
-| Sheet label | 1 per section (required) |
+| Sheet label | none on the home page — see §1 |
 
 More than this turns a drawing into noise.
 
@@ -20,21 +20,20 @@ More than this turns a drawing into noise.
 
 ## 1. Sheet label — `<SheetLabel>`
 
-Starts every section. Blue 8 px square + mono uppercase text.
+**Not used on the home page.** No numbered sheet labels („Blatt 02 · …“) and no sheet meta line („Rev. A“): they read as decoration. Sections start with the heading. `<SheetLabel>` stays only for short, unnumbered labels (404, legal pages). Blue 8 px square + mono uppercase text.
 
 ```tsx
 <p className="flex items-center gap-2.5 font-mono text-label uppercase text-[12px] text-blueprint">
   <span aria-hidden="true" className="size-2 bg-blueprint" />
-  {label /* "Blatt 02 · Arbeitsweise" */}
+  {label /* "Rechtliches" */}
 </p>
 ```
 
-Format: `Blatt NN · Thema` / `Sheet NN · Topic`. Two-digit number. Middle dot `·` with spaces.
-Numbers follow page order (Blatt 01 = hero).
+Never number it.
 
 ## 2. Sheet meta line
 
-Top of a page or hero. Left: what it is. Right (hidden < `sm`): revision + scale.
+**Not used** (removed from the hero). Kept for reference only: Left: what it is. Right (hidden < `sm`): revision + scale.
 
 ```tsx
 <div className="flex justify-between gap-4 font-mono text-label uppercase text-ink-muted">
@@ -151,7 +150,6 @@ first line `font-mono text-label` („Hinweis 1“), second line mono 11 px semi
 
 | DE | EN | Where |
 |---|---|---|
-| Blatt 01 · … | Sheet 01 · … | section label |
 | Rev. C | Rev. C | sheet meta |
 | Maßstab 1:1 | Scale 1:1 | sheet meta |
 | Skizze 01 | Sketch 01 | sheet meta |

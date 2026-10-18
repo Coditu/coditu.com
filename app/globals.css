@@ -8,7 +8,8 @@
 /* ==========================================================================
    Coditu "Blueprint" tokens — Rev. A. Values: docs/design-system/tokens.md.
    Copied from docs/design-system/tokens.css; only the dark selector differs
-   (`[data-theme="dark"]` instead of a `.dark` class).
+   (`[data-theme="dark"]` instead of a `.dark` class) and the shadcn/ui layer
+   is left out until a shadcn component needs it.
    ========================================================================== */
 
 :root {
@@ -54,28 +55,6 @@
   --ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
   --dur-micro: 200ms;
   --dur-section: 520ms;
-
-  /* shadcn/ui semantic layer. Aliases only, so the dark block re-themes them.
-     shadcn's `accent` is a HOVER SURFACE — the orange is `cta`, never `accent`. */
-  --radius: 4px;
-  --background: var(--paper);
-  --foreground: var(--ink);
-  --card: var(--surface);
-  --card-foreground: var(--ink);
-  --popover: var(--surface);
-  --popover-foreground: var(--ink);
-  --primary: var(--blueprint);
-  --primary-foreground: var(--blueprint-ink);
-  --secondary: var(--blueprint-light);
-  --secondary-foreground: var(--blueprint);
-  --muted: var(--surface-sunk);
-  --muted-foreground: var(--ink-muted);
-  --accent: var(--blueprint-light);
-  --accent-foreground: var(--ink);
-  --destructive: var(--error);
-  --border: var(--line);
-  --input: var(--line-input);
-  --ring: var(--blueprint);
 }
 
 :root[data-theme="dark"] {
@@ -191,32 +170,6 @@
   --shadow-sm: var(--shadow-sm);
   --shadow-lift: var(--shadow-lift);
   --ease-entrance: var(--ease-entrance);
-
-  /* shadcn/ui */
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-
-  /* shadcn primitives read these — clamp them to the 2–4 px system */
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 4px;
-  --radius-xl: 4px;
 }
 
 /* Grid paper: 40 px major + 8 px minor lines. Page wrapper or hero only. */
@@ -354,58 +307,17 @@
   animation-play-state: running;
 }
 
-/* --- Hero compare (components/site/hero.tsx) ------------------------------
-   The base rules ARE the resting state: slider at `--pos`, every step lit.
-   The animations only play from a start frame into it, on parse, so no JS
-   and no hidden HTML are involved. Order: the sketch draws in (0–1 s), the
-   wipe sweeps from sketch to the middle (1–2.2 s), the steps light up.
-   `data-moved` (set by the range input) hands `--pos` to the visitor. */
-.cd-compare {
-  --pos: 50%;
+/* --- Hero request → app (components/site/request-to-app.client.tsx) -------
+   The phases run in JS; CSS only blinks the typing caret. */
+.cd-caret {
+  animation: cd-caret 1s steps(1) infinite;
 }
 
-.cd-wipe {
-  clip-path: inset(0 calc(100% - var(--pos)) 0 0);
-  animation: cd-wipe 1200ms var(--ease-entrance) 1000ms both;
-}
-
-.cd-wipe-handle {
-  transform: translateX(var(--pos));
-  animation: cd-wipe-handle 1200ms var(--ease-entrance) 1000ms both;
-}
-
-.cd-compare[data-moved] .cd-wipe,
-.cd-compare[data-moved] .cd-wipe-handle {
-  animation: none;
-}
-
-@keyframes cd-wipe {
-  from {
-    clip-path: inset(0 0 0 0);
-  }
-  to {
-    clip-path: inset(0 50% 0 0);
+@keyframes cd-caret {
+  50% {
+    opacity: 0;
   }
 }
-
-@keyframes cd-wipe-handle {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(50%);
-  }
-}
-
-/* Each sketch row is revealed left to right, staggered. */
-.cd-sketch-in > * {
-  animation: cd-sketch-in 600ms var(--ease-entrance) both;
-}
-.cd-sketch-in > :nth-child(2) { animation-delay: 80ms; }
-.cd-sketch-in > :nth-child(3) { animation-delay: 160ms; }
-.cd-sketch-in > :nth-child(4) { animation-delay: 240ms; }
-.cd-sketch-in > :nth-child(5) { animation-delay: 320ms; }
-.cd-sketch-in > :nth-child(6) { animation-delay: 400ms; }
 
 @keyframes cd-sketch-in {
   from {
@@ -416,66 +328,65 @@
   }
 }
 
-/* Skizze → Board → Live, after the sweep. */
-.cd-step-on {
-  animation: cd-fade 300ms linear 2200ms both;
+/* Sketch rows (services demo) are revealed left to right, staggered. */
+.cd-sketch-in > * {
+  animation: cd-sketch-in 600ms var(--ease-entrance) both;
 }
-.cd-steps > :nth-child(2) .cd-step-on { animation-delay: 2500ms; }
-.cd-steps > :nth-child(3) .cd-step-on { animation-delay: 2800ms; }
+.cd-sketch-in > :nth-child(2) { animation-delay: 80ms; }
+.cd-sketch-in > :nth-child(3) { animation-delay: 160ms; }
 
-/* --- Services parts list (components/site/services.tsx) ------------------
-   Without JS every detail shows under its row. With JS only the open one
-   does, and from lg it moves to the right-hand column and sticks. A detail
-   fades in when it opens; on desktop the outgoing one fades out over it. */
-.js .cd-svc-detail {
+/* --- Services showcase (components/site/services.tsx) ---------------------
+   Without JS the tab bar is hidden and every panel shows, one under the
+   other. With JS only the open panel shows. From lg all panels share one
+   grid cell, so the sheet keeps the height of the tallest one and the tabs
+   under it never move; the open one fades in. Below lg the tabs sit above. */
+.cd-svc-tabs {
+  display: none;
+}
+
+.js .cd-svc-tabs {
+  display: grid;
+  order: -1;
+}
+
+.cd-svc-panels {
+  display: grid;
+  gap: 2rem;
+}
+
+.js .cd-svc-panel {
   transition: opacity 180ms ease-out;
 }
 
-.js .cd-svc-detail:not([data-open]) {
+.js .cd-svc-panel:not([data-open]) {
   display: none;
-  opacity: 0;
 }
 
-@starting-style {
-  .js .cd-svc-detail[data-open] {
+@media (min-width: 64rem) {
+  .js .cd-svc-tabs {
+    order: 0;
+  }
+
+  .js .cd-svc-panel {
+    grid-area: 1 / 1;
+  }
+
+  .js .cd-svc-panel:not([data-open]) {
+    display: block;
+    visibility: hidden;
     opacity: 0;
   }
 }
 
-@media (min-width: 64rem) {
-  .js .cd-svc {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    /* The trailing 1fr row takes the detail's extra height, so the rows keep theirs. */
-    grid-template-rows: repeat(var(--rows), auto) 1fr;
-    column-gap: 1.5rem;
-  }
-
-  .js .cd-svc > * {
-    grid-column: 1 / span 7;
-  }
-
-  .js .cd-svc > .cd-svc-detail {
-    grid-column: 8 / span 5;
-    grid-row: 1 / -1;
-    align-self: start;
-    position: sticky;
-    top: 108px; /* nav 84 + 24 */
-    transition-property: opacity, display;
-    transition-behavior: allow-discrete;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  /* The hero shows its resting state: slider in the middle, all steps lit. */
-  .cd-wipe,
-  .cd-wipe-handle,
-  .cd-sketch-in > *,
-  .cd-step-on {
+  /* No typing caret blink, no sketch reveal. */
+  .cd-caret,
+  .cd-sketch-in > * {
     animation: none !important;
   }
 
-  /* The services detail swaps instantly. */
-  .js .cd-svc-detail {
+  /* The services panel swaps instantly. */
+  .js .cd-svc-panel {
     transition: none !important;
   }
 

@@ -4,7 +4,7 @@
 
 - Orange **once per screen**, for the most important action.
 - Blue for lines, grid, links, app buttons, active states, sheet labels.
-- Start each section with a sheet label („Blatt 02 · Arbeitsweise“).
+- Start each section with its heading. No numbered sheet labels („Blatt 02 · …“).
 - Show sketch and live UI side by side, joined by a dashed connector.
 - 1 px lines, flat fills, 2–4 px radius.
 - Mono only for labels, tags, metadata, drawing annotations — uppercase, ≥ 11 px.
@@ -43,7 +43,7 @@ Tokens
 
 Brand
 [ ] Max one bg-cta in any viewport, with text-cta-ink
-[ ] Section starts with a SheetLabel
+[ ] No „Blatt NN“ / „Sheet NN“ / „Rev.“ text anywhere
 [ ] Motifs within budget; decorative SVG aria-hidden
 [ ] Logo is mono
 
