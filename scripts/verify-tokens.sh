@@ -67,9 +67,9 @@ need "headline words"      "cd-word"
 need "draw-on"             "cd-draw"
 need "on-view pause gate"  "[data-reveal-on-view]"
 need "reduced motion"      "prefers-reduced-motion"
-need "hero wipe"           "cd-wipe-handle"
-need "hero sketch draw-in" "cd-sketch-in"
-need "hero steps"          "cd-step-on"
+need "hero caret"          "cd-caret"
+need "sketch draw-in"      "cd-sketch-in"
+need "services panel"      "cd-svc-panel"
 
 # The reduced-motion block is where a dropped rule is least likely to be
 # noticed, because nobody testing on a normal machine ever sees it.
