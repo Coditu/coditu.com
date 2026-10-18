@@ -68,7 +68,8 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       for (const path of [home, imprint, privacy]) {
         await page.goto(path);
         const text = (await page.locator("body").innerText()).toLowerCase();
-        expect(text).not.toContain("berlin");
+        // Retired locations; the team is in Berlin and Cairo (docs/00-CONTEXT.md).
+        expect(text).not.toMatch(/\b(munich|münchen|ulm)\b/);
         expect(text).not.toContain("hello@coditu.com");
         expect(text).not.toContain("strukture");
         expect(text).not.toMatch(/\b\d+\+? (happy )?(clients|kunden)\b/);
