@@ -44,6 +44,16 @@ export const viewport: Viewport = {
   ],
 };
 
+/** The saved choice from `<ThemeToggle>`, else the system setting (followed live). */
+const themeScript = `(function(){
+var d=document.documentElement,m=matchMedia("(prefers-color-scheme: dark)");
+d.classList.add("js");
+function saved(){try{return localStorage.getItem("theme")}catch(e){return null}}
+function apply(){d.dataset.theme=saved()||(m.matches?"dark":"light")}
+apply();
+m.addEventListener("change",function(){if(!saved())apply()});
+})()`;
+
 export default async function RootLayout({ children, params }: LayoutProps<"/[lang]">) {
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
@@ -51,12 +61,14 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
   const hashMap = sectionMap(lang);
 
   return (
-    <html lang={lang} className="overflow-x-clip">
+    // The script below sets `data-theme` before hydration.
+    <html lang={lang} className="overflow-x-clip" suppressHydrationWarning>
       <body className={`${fontVariables} min-w-0 overflow-x-clip bg-blueprint-grid font-sans antialiased`}>
-        {/* Marks that JS is running, before first paint. Scroll-triggered
-            reveals only hold their hidden frame when this class is present, so
-            a broken bundle degrades to content that is simply visible. */}
-        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+        {/* Before first paint: marks that JS is running (scroll-triggered
+            reveals only hold their hidden frame with the `js` class, so a
+            broken bundle degrades to content that is simply visible), and sets
+            the theme. */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <a
           href="#inhalt"
           className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-surface focus:px-4 focus:py-3 focus:text-ink"

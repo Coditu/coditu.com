@@ -6,6 +6,7 @@ import { BOOKING_HREF } from "@/lib/site-config";
 import { Container } from "./container";
 import { LanguageSwitch } from "./language-switch.client";
 import { MobileMenu } from "./mobile-menu.client";
+import { ThemeToggle } from "./theme-toggle.client";
 
 export function SiteNav({ locale, hashMap }: { locale: Locale; hashMap: Record<string, string> }) {
   const t = getMessages(locale);
@@ -35,6 +36,7 @@ export function SiteNav({ locale, hashMap }: { locale: Locale; hashMap: Record<s
 
         <div className="flex items-center gap-4">
           <LanguageSwitch locale={locale} label={t.language.groupLabel} switchTo={t.language.switchTo} hashMap={hashMap} />
+          <ThemeToggle label={t.nav.themeToggle} />
           <ButtonLink href={BOOKING_HREF} variant="outline" size="sm" className="hidden lg:inline-flex">
             {t.nav.booking}
           </ButtonLink>

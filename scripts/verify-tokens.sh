@@ -54,7 +54,7 @@ need "dark blueprint"      "--blueprint: #86a2ff"
 need "cta"                 "--cta: #ff8a1f"
 need "cta ink"             "--cta-ink: #14171c"
 need "field border"        "--line-input: #7d8189"
-need "dark = system"       "prefers-color-scheme:dark"
+need "dark = data-theme"   '[data-theme=dark]'
 need "grid paper"          "bg-blueprint-grid"
 
 echo

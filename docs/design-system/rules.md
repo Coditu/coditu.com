@@ -59,7 +59,7 @@ Accessibility
 
 Layout
 [ ] No horizontal scroll at 320, 375, 768, 1024, 1440
-[ ] Dark mode checked (prefers-color-scheme: dark)
+[ ] Dark mode checked (toggle, or prefers-color-scheme: dark)
 
 Content
 [ ] All strings in messages/de.ts + messages/en.ts

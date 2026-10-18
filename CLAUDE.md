@@ -33,7 +33,9 @@ npm run gate        # the whole list, in order (`npm run gate -- --fast` skips e
   first; `en.ts` has the same shape (`Messages`), so a missing string is a type error.
 - **Every page stays prerendered.** No `cookies()`, `headers()` or `searchParams` anywhere in the
   tree; `npm run budgets` fails if a route goes dynamic.
-- **Dark mode follows the system setting only** (`prefers-color-scheme`). There is no toggle.
+- **Dark mode:** `data-theme="dark"` on `<html>`, set before paint by the inline script in
+  `app/[lang]/layout.tsx` — the visitor's choice from the nav toggle (`localStorage`), else the
+  system setting. No cookie, so pages stay prerendered.
 - **`[PLACEHOLDER: …]`** marks legal details only the team can fill (Impressum, Datenschutz).
   `scripts/deploy-production.sh` refuses to deploy while any are left in `messages/`.
 - **Dates:** never `new Date("2026-08-23")` — that parses as UTC midnight and shows the previous
