@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -23,18 +23,27 @@ const APP_MS = 3600;
 const OUT_MS = 450;
 const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
 
-type Segment = { text: string; key: number | null };
+type Segment = { text: string; key: number | null; start: number };
 
-/** "a [b] c" → [{a}, {b, key 0}, {c}] */
+/** "a [b] c" → [{a}, {b, key 0}, {c}], each with its offset in the typed text */
 function parse(request: string): Segment[] {
   const out: Segment[] = [];
   let key = 0;
+  let start = 0;
   for (const part of request.split(/(\[[^\]]+\])/)) {
     if (!part) continue;
-    if (part.startsWith("[")) out.push({ text: part.slice(1, -1), key: key++ });
-    else out.push({ text: part, key: null });
+    const text = part.startsWith("[") ? part.slice(1, -1) : part;
+    out.push({ text, key: part.startsWith("[") ? key++ : null, start });
+    start += text.length;
   }
   return out;
+}
+
+const REDUCED = "(prefers-reduced-motion: reduce)";
+function subscribeReduced(onChange: () => void) {
+  const media = matchMedia(REDUCED);
+  media.addEventListener("change", onChange);
+  return () => media.removeEventListener("change", onChange);
 }
 
 type Clone = { text: string; left: number; top: number; height: number; dx: number; dy: number; scale: number; strong: boolean };
@@ -54,7 +63,7 @@ export function RequestToApp({ scenarios, labels }: { scenarios: Scenario[]; lab
   const [marked, setMarked] = useState(0);
   const [clones, setClones] = useState<Clone[]>([]);
   const [running, setRunning] = useState(false);
-  const [reduced, setReduced] = useState(false);
+  const reduced = useSyncExternalStore(subscribeReduced, () => matchMedia(REDUCED).matches, () => false);
 
   const card = useRef<HTMLDivElement>(null);
   const sources = useRef<(HTMLSpanElement | null)[]>([]);
@@ -68,11 +77,6 @@ export function RequestToApp({ scenarios, labels }: { scenarios: Scenario[]; lab
 
   // Run only while the card is on screen and the tab is visible.
   useEffect(() => {
-    const media = matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(media.matches);
-    const onMedia = () => setReduced(media.matches);
-    media.addEventListener("change", onMedia);
-
     let onScreen = false;
     const update = () => setRunning(onScreen && document.visibilityState === "visible");
     const observer = new IntersectionObserver(([entry]) => {
@@ -82,7 +86,6 @@ export function RequestToApp({ scenarios, labels }: { scenarios: Scenario[]; lab
     if (card.current) observer.observe(card.current);
     document.addEventListener("visibilitychange", update);
     return () => {
-      media.removeEventListener("change", onMedia);
       observer.disconnect();
       document.removeEventListener("visibilitychange", update);
     };
@@ -103,8 +106,7 @@ export function RequestToApp({ scenarios, labels }: { scenarios: Scenario[]; lab
       if (reduced || marked >= words.length) next(() => setPhase("morph"), reduced ? 0 : 450);
       else next(() => setMarked((n) => n + 1), MARK_MS);
     } else if (phase === "morph") {
-      if (reduced) setPhase("app");
-      else next(() => setPhase("app"), MORPH_MS);
+      next(() => setPhase("app"), reduced ? 0 : MORPH_MS);
     } else if (phase === "app") {
       next(() => setPhase("out"), reduced ? APP_MS + 1500 : APP_MS);
     } else if (phase === "out") {
@@ -155,7 +157,6 @@ export function RequestToApp({ scenarios, labels }: { scenarios: Scenario[]; lab
   const showApp = phase === "morph" || phase === "app";
   const appDone = phase === "app";
   const out = phase === "out";
-  let count = 0;
 
   return (
     <div className="relative mx-auto w-full max-w-2xl">
@@ -177,11 +178,11 @@ export function RequestToApp({ scenarios, labels }: { scenarios: Scenario[]; lab
           <p className="font-mono text-label text-ink-muted uppercase">{labels.request}</p>
           <p className="mt-4 text-[19px] leading-relaxed sm:text-[21px]">
             {segments.map((segment, si) => {
-              const start = count;
-              count += segment.text.length;
+              const { start } = segment;
+              const end = start + segment.text.length;
               const shown = segment.text.slice(0, Math.max(0, typed - start));
               const hidden = segment.text.slice(shown.length);
-              const caret = phase === "typing" && typed >= start && typed < count && !reduced;
+              const caret = phase === "typing" && typed >= start && typed < end && !reduced;
               if (segment.key === null)
                 return (
                   <span key={si}>
