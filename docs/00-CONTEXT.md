@@ -33,12 +33,11 @@ They are not an agency that subcontracts. One team owns discovery through post-l
 | Name | Role | Base |
 |---|---|---|
 | Mohamed Tamer | Frontend Lead — UI/UX, motion, design systems, frontend architecture | Cairo, EG |
-| Adam Nafie | Client Partnerships Lead — discovery, solution design, roadmapping, QA | Munich, DE |
+| Adam Nafie | Client Partnerships — the client's contact from first call to launch; no development | Berlin, DE |
 | Abdelrahman Elkhateeb | Frontend Engineer — performance (CWV), technical SEO, scalable UI | Cairo, EG |
-| Ahmed Yehia | Backend & DevOps — APIs, CI/CD, databases, infrastructure, RAG pipelines | Ulm, DE |
+| Ahmed Yehia | Backend & DevOps — APIs, CI/CD, databases, infrastructure, RAG pipelines | EG |
 
-Locations are **Munich · Ulm · Cairo**. There is nobody in Berlin. The current site says Berlin; that is
-a bug, not a fact.
+Locations are **Berlin · Kairo** (EN: Berlin · Cairo).
 
 Contact: `contact@coditu.com` (`hello@` does not exist).
 
