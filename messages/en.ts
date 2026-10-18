@@ -100,6 +100,94 @@ const en: Messages = {
     },
   },
 
+  servicesSection: {
+    label: "Sheet 02 · Services",
+    title: "What we build — and the problem it solves",
+    intro: "Each service starts with the sentence clients bring to us. Next to it: what we build, and with what.",
+    columns: ["Pos.", "Problem", "What we build", "Tech"],
+    detail: "Detail",
+    facts: "From practice",
+    example: "Example",
+    more: { label: "Not sure what fits? Send us your sketch.", subject: "Project request" },
+    rows: [
+      {
+        pos: "01",
+        title: "SharePoint web parts",
+        problem: "“Our intranet is cluttered and out of date.”",
+        text: "Web parts that fit into your existing SharePoint pages.",
+        facts: "More than 35 web parts for one organisation · usually 1–2 days per web part",
+        tags: ["SharePoint", "SPFx", "React", "TypeScript", "Fluent UI"],
+      },
+      {
+        pos: "02",
+        title: "Internal apps",
+        problem: "“We still do this on paper, in Excel and by email.”",
+        text: "Small, focused apps from your sketch — for requests, onboarding or the editorial calendar. With Microsoft sign-in and permissions by group.",
+        facts: "First version in a few days",
+        tags: ["React", "Next.js", "Python", "Microsoft Graph"],
+      },
+      {
+        pos: "03",
+        title: "Websites & frontend",
+        problem: "“Our website is slow or looks dated.”",
+        text: "Fast websites and frontends, built to be found on Google.",
+        tags: ["Next.js", "React", "Core Web Vitals", "Technical SEO"],
+      },
+      {
+        pos: "04",
+        title: "Care after launch",
+        problem: "“And who looks after it afterwards?”",
+        text: "Maintenance when you need it, billed per request.",
+        facts: "Weekly sprints for the same client for almost a year · small changes usually under 2 hours of work",
+        tags: ["Maintenance", "Changes", "Support"],
+      },
+    ],
+    catalogue: {
+      label: "Catalogue · selection",
+      groups: [
+        {
+          name: "News & communication",
+          items: ["News centre", "Banner with news", "News part", "Social corner", "Instagram/LinkedIn feed", "Notice banner"],
+        },
+        {
+          name: "Navigation & search",
+          items: ["Main navigation", "Quick links", "Link carousel", "Link tiles", "Shortcuts", "Finder", "Search banner"],
+        },
+        { name: "People", items: ["Org chart", "People directory", "Anniversaries", "Contact cards"] },
+        {
+          name: "Page layout",
+          items: ["Tabs", "Tabs with cards", "Accordion", "Heading & divider", "Banner", "Process & timeline", "Key figures"],
+        },
+        {
+          name: "Media & engagement",
+          items: ["Video carousel", "Interactive video", "Slides", "Poll", "Feedback", "Calendar"],
+        },
+      ],
+    },
+    app: {
+      sketch: { label: "Request", id: "A-02", caption: "A · Sketch", button: "Send request" },
+      live: { title: "Request", login: "Sign-in with Microsoft", caption: "B · Result", button: "Send request" },
+      fields: [
+        { label: "Subject", hint: "Text · required", value: "Laptop for a new colleague" },
+        { label: "Team", hint: "Choice · group", value: "Counselling" },
+      ],
+    },
+    projects: [
+      { slug: "nvrmiss", name: "NVRMiss", line: "Product site for B2B software for service businesses" },
+      { slug: "nile-atelier", name: "Nile Atelier", line: "Website for an Egyptian fashion label" },
+    ],
+    changelog: {
+      label: "Change log",
+      from: "Change",
+      to: "Done",
+      tickets: [
+        { id: "C-01", text: "Add a new link to the main navigation" },
+        { id: "C-02", text: "Replace the banner on the home page" },
+        { id: "C-03", text: "Add a “cost centre” field to the request" },
+      ],
+    },
+  },
+
   footer: {
     slogan: "From sketch to finished software.",
     servicesTitle: "Services",

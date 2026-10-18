@@ -90,7 +90,7 @@ for (const { lang, home, imprint, privacy } of LANGS) {
     test("hero: one h1, mailto CTA, the form met once, slider by keyboard", async ({ page }) => {
       await page.goto(home);
       await expect(page.locator("h1")).toHaveCount(1);
-      await expect(page.locator('a[href^="mailto:contact@coditu.com?subject="]')).toHaveCount(1);
+      await expect(page.locator('#hero-title ~ * a[href^="mailto:contact@coditu.com?subject="]')).toHaveCount(1);
 
       // The sketch is a picture: its labels are not form controls, and it is hidden.
       await expect(page.getByLabel("Name", { exact: true })).toHaveCount(1);
@@ -114,6 +114,51 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       expect(lit).toEqual(["1", "1", "1"]);
     });
 
+    test("services: one detail at a time, by mouse and keyboard", async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto(home);
+      const rows = page.locator('section[aria-labelledby="services-title"] button[aria-controls]');
+      await expect(rows).toHaveCount(4);
+      await expect(rows.nth(0)).toHaveAttribute("aria-expanded", "true");
+      await expect(page.locator("#svc-detail-0")).toBeVisible();
+      await expect(page.locator("#svc-detail-1")).toBeHidden();
+
+      await rows.nth(1).click();
+      await expect(rows.nth(1)).toHaveAttribute("aria-expanded", "true");
+      await expect(rows.nth(0)).toHaveAttribute("aria-expanded", "false");
+      await expect(page.locator("#svc-detail-1")).toBeVisible();
+      await expect(page.locator("#svc-detail-0")).toBeHidden();
+
+      // Desktop always shows a detail: clicking the open row keeps it open.
+      await rows.nth(1).click();
+      await expect(rows.nth(1)).toHaveAttribute("aria-expanded", "true");
+
+      await rows.nth(2).focus();
+      await page.keyboard.press("Enter");
+      await expect(rows.nth(2)).toHaveAttribute("aria-expanded", "true");
+      await rows.nth(3).focus();
+      await page.keyboard.press("Space");
+      await expect(rows.nth(3)).toHaveAttribute("aria-expanded", "true");
+      await expect(page.locator("#svc-detail-3")).toBeVisible();
+    });
+
+    test("services: on a phone each detail opens under its row, and closes", async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.goto(home);
+      const rows = page.locator('section[aria-labelledby="services-title"] button[aria-controls]');
+      await rows.nth(0).click();
+      await expect(rows.nth(0)).toHaveAttribute("aria-expanded", "false");
+      await expect(page.locator("#svc-detail-0")).toBeHidden();
+
+      await rows.nth(2).click();
+      const detail = page.locator("#svc-detail-2");
+      await expect(detail).toBeVisible();
+      const row = (await rows.nth(2).boundingBox())!;
+      const box = (await detail.boundingBox())!;
+      expect(box.y).toBeGreaterThanOrEqual(row.y + row.height - 1);
+      expect(box.y).toBeLessThan((await rows.nth(3).boundingBox())!.y);
+    });
+
     test("no horizontal scroll from 320 to 2560", async ({ page }) => {
       await page.goto(home);
       for (const width of [320, 360, 390, 430, 640, 744, 834, 1024, 1280, 1440, 1728, 1920, 2560]) {
@@ -126,6 +171,15 @@ for (const { lang, home, imprint, privacy } of LANGS) {
     });
   });
 }
+
+test.describe("without JS", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("services: every detail is shown", async ({ page }) => {
+    await page.goto("/de");
+    for (let i = 0; i < 4; i++) await expect(page.locator(`#svc-detail-${i}`)).toBeVisible();
+  });
+});
 
 test("the mobile menu opens, closes on Escape, and says so", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 });
