@@ -10,9 +10,9 @@ const en: Messages = {
   locale: "en-GB",
 
   meta: {
-    title: "Coditu — SharePoint web parts, internal apps and AI assistants",
+    title: "Coditu — SharePoint web parts and internal apps",
     description:
-      "Coditu builds SharePoint and SPFx web parts, internal apps and RAG-based AI assistants for organisations in Germany. One team from sketch to operation.",
+      "Coditu builds SharePoint and SPFx web parts and internal apps for organisations in Germany. One team from sketch to operation.",
     ogAlt: "Coditu — From sketch to finished software",
   },
 
@@ -51,13 +51,12 @@ const en: Messages = {
   services: [
     "SharePoint & SPFx web parts",
     "Internal apps",
-    "AI assistants (RAG)",
     "Websites & frontend",
   ],
 
   hero: {
     meta: ["Sheet 01 · Home", "Rev. A"],
-    label: "SharePoint · Internal apps · AI assistants",
+    label: "SharePoint · Internal apps",
     title: "From sketch to finished software",
     lead: "We build software for social organisations, associations and mid-sized companies. Your sketch becomes an app that works in your day-to-day. You see every step on a shared board.",
     cta: {

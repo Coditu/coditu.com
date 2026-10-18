@@ -18,9 +18,9 @@ const de = {
   locale: "de-DE",
 
   meta: {
-    title: "Coditu — SharePoint-Webparts, interne Apps und KI-Assistenten",
+    title: "Coditu — SharePoint-Webparts und interne Apps",
     description:
-      "Coditu entwickelt SharePoint- und SPFx-Webparts, interne Apps und KI-Assistenten mit RAG für Organisationen in Deutschland. Ein Team von der Skizze bis zum Betrieb.",
+      "Coditu entwickelt SharePoint- und SPFx-Webparts und interne Apps für Organisationen in Deutschland. Ein Team von der Skizze bis zum Betrieb.",
     ogAlt: "Coditu — Von der Skizze zur fertigen Software",
   },
 
@@ -62,14 +62,13 @@ const de = {
   services: [
     "SharePoint & SPFx-Webparts",
     "Interne Apps",
-    "KI-Assistenten (RAG)",
     "Websites & Frontend",
   ],
 
   /** Blatt 01. ENTWURF — Adam überarbeitet den Text. */
   hero: {
     meta: ["Blatt 01 · Startseite", "Rev. A"] as [string, string],
-    label: "SharePoint · Interne Apps · KI-Assistenten",
+    label: "SharePoint · Interne Apps",
     /** The blue period is added by the component. */
     title: "Von der Skizze zur fertigen Software",
     lead: "Wir bauen Software für soziale Organisationen, Vereine und den Mittelstand. Aus Ihrer Skizze wird eine App, die im Alltag funktioniert. Jeden Schritt sehen Sie auf einem gemeinsamen Board.",
