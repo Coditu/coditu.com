@@ -1,7 +1,7 @@
 import { SheetLabel } from "@/components/blueprint/sheet-label";
 
 /**
- * Sheet label + heading + optional intro. Content starts `mt-12` below.
+ * Optional label + heading + optional intro. Content starts `mt-12` below.
  * `headingId` is what the section's `aria-labelledby` points at.
  */
 export function SectionHeader({
@@ -10,7 +10,7 @@ export function SectionHeader({
   intro,
   headingId,
 }: {
-  label: string;
+  label?: string;
   title: string;
   intro?: string;
   headingId: string;
@@ -18,8 +18,8 @@ export function SectionHeader({
   return (
     <div className="grid gap-6 lg:grid-cols-12 lg:items-end">
       <div className="lg:col-span-7">
-        <SheetLabel>{label}</SheetLabel>
-        <h2 id={headingId} className="mt-5 max-w-[18ch] text-h1">
+        {label && <SheetLabel>{label}</SheetLabel>}
+        <h2 id={headingId} className={`max-w-[18ch] text-h1 ${label ? "mt-5" : ""}`}>
           {title}
         </h2>
       </div>

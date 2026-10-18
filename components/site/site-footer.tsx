@@ -68,7 +68,6 @@ export function SiteFooter({ locale, hashMap }: { locale: Locale; hashMap: Recor
 
         <div className="mt-8 flex flex-wrap justify-between gap-x-6 gap-y-1 border-t border-line py-3.5 font-mono text-label text-ink-muted uppercase">
           <span>© {new Date().getFullYear()} Coditu</span>
-          <span>{t.footer.sheet}</span>
         </div>
       </Container>
     </footer>

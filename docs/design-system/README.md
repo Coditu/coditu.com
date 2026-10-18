@@ -49,7 +49,7 @@ labels (`BLATT 01 · ARBEITSWEISE`). Sketches (dashed, mono, blue) sit next to t
 6. **Small radius.** `rounded-tag` (2 px) tags, `rounded-ui` (4 px) controls and cards, `rounded-none` sheets, `rounded-full` only for status pills, avatars, dots.
 7. **1 px borders.** 2 px only for the focus ring.
 8. **Two fonts.** Geist for headings and text. JetBrains Mono only for labels, tags, metadata, numbers in drawings — uppercase, tracking 0.08em, **never under 11 px**, never for running text.
-9. **Every section starts with a sheet label** (`<SheetLabel>`), then a heading.
+9. **Sections start with the heading.** No numbered sheet labels („Blatt 02 · …“), no „Rev. A“ meta line.
 10. **WCAG 2.2 AA, both themes.** Text 4.5:1 (3:1 at ≥ 24 px), field borders 3:1, visible `:focus-visible`, targets ≥ 44 px, real `<button>` / `<a href>` / `<label>`.
 11. **Copy lives in `messages/de.ts` + `messages/en.ts`**, German first, English second. Components hold no strings. Invent nothing (no metrics, clients, testimonials).
 12. **Mobile first.** Works at 320 px with no horizontal scroll. Desktop is the enhancement.

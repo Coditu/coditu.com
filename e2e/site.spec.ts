@@ -99,76 +99,73 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(html).toHaveAttribute("data-theme", "light");
     });
 
-    test("hero: one h1, mailto CTA, the form met once, slider by keyboard", async ({ page }) => {
+    test("hero: one h1, mailto CTA, the request turns into the app", async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto(home);
       await expect(page.locator("h1")).toHaveCount(1);
       await expect(page.locator('#hero-title ~ * a[href^="mailto:contact@coditu.com?subject="]')).toHaveCount(1);
+      // Text on the left, the card beside it on the right, both above the fold.
+      const h1 = (await page.locator("h1").boundingBox())!;
+      const box = (await page.locator('section[aria-labelledby="hero-title"] [aria-hidden="true"]').first().boundingBox())!;
+      expect(box.x).toBeGreaterThan(h1.x + h1.width / 2);
+      expect(box.y).toBeLessThan(900);
 
-      // The sketch is a picture: its labels are not form controls, and it is hidden.
-      await expect(page.getByLabel("Name", { exact: true })).toHaveCount(1);
-      await expect(page.locator("figure[aria-hidden='true'] input")).toHaveCount(0);
-
-      const range = page.locator(".cd-compare input[type=range]");
-      await expect(range).toHaveValue("50");
-      await range.focus();
-      await page.keyboard.press("ArrowRight");
-      await expect(range).toHaveValue("51");
-      await expect(page.locator(".cd-compare")).toHaveAttribute("style", /--pos:\s*51%/);
-      await expect(page.locator(".cd-compare")).toHaveAttribute("data-moved", "");
+      // The card is decoration with one sentence for screen readers; its app goes live.
+      const card = page.locator('section[aria-labelledby="hero-title"] [aria-hidden="true"]').first();
+      await expect(card).toBeVisible();
+      await expect(page.locator('section[aria-labelledby="hero-title"] .sr-only')).toHaveCount(1);
+      await expect(card.getByText(/^Live$/)).toBeVisible({ timeout: 8000 });
     });
 
-    test("hero: reduced motion shows the resting state", async ({ page }) => {
+    test("hero: reduced motion skips the typing and still shows the app", async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto(home);
-      const clip = await page.locator(".cd-wipe").evaluate((el) => getComputedStyle(el).clipPath);
-      expect(clip).toContain("50%");
-      const lit = await page.locator(".cd-step-on").evaluateAll((els) => els.map((el) => getComputedStyle(el).opacity));
-      expect(lit).toEqual(["1", "1", "1"]);
+      await expect(page.locator(".cd-caret")).toHaveCount(0);
+      const card = page.locator('section[aria-labelledby="hero-title"] [aria-hidden="true"]').first();
+      await expect(card.getByText(/^Live$/)).toBeVisible({ timeout: 8000 });
     });
 
-    test("services: one detail at a time, by mouse and keyboard", async ({ page }) => {
+    test("services: tabs under the showcase, by mouse and keyboard", async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto(home);
-      const rows = page.locator('section[aria-labelledby="services-title"] button[aria-controls]');
-      await expect(rows).toHaveCount(4);
-      await expect(rows.nth(0)).toHaveAttribute("aria-expanded", "true");
-      await expect(page.locator("#svc-detail-0")).toBeVisible();
-      await expect(page.locator("#svc-detail-1")).toBeHidden();
+      const tabs = page.locator('section[aria-labelledby="services-title"] [role="tab"]');
+      await expect(tabs).toHaveCount(4);
+      await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
+      await expect(page.locator("#svc-panel-0")).toBeVisible();
+      await expect(page.locator("#svc-panel-1")).toBeHidden();
 
-      await rows.nth(1).click();
-      await expect(rows.nth(1)).toHaveAttribute("aria-expanded", "true");
-      await expect(rows.nth(0)).toHaveAttribute("aria-expanded", "false");
-      await expect(page.locator("#svc-detail-1")).toBeVisible();
-      await expect(page.locator("#svc-detail-0")).toBeHidden();
+      // The tabs sit under the showcase and do not move when the panel changes.
+      const panel = (await page.locator("#svc-panel-0").boundingBox())!;
+      const before = (await tabs.nth(0).boundingBox())!;
+      expect(before.y).toBeGreaterThanOrEqual(panel.y + panel.height - 1);
 
-      // Desktop always shows a detail: clicking the open row keeps it open.
-      await rows.nth(1).click();
-      await expect(rows.nth(1)).toHaveAttribute("aria-expanded", "true");
+      await tabs.nth(1).click();
+      await expect(tabs.nth(1)).toHaveAttribute("aria-selected", "true");
+      await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "false");
+      await expect(page.locator("#svc-panel-1")).toBeVisible();
+      await expect(page.locator("#svc-panel-0")).toBeHidden();
+      expect((await tabs.nth(0).boundingBox())!.y).toBeCloseTo(before.y, 0);
 
-      await rows.nth(2).focus();
-      await page.keyboard.press("Enter");
-      await expect(rows.nth(2)).toHaveAttribute("aria-expanded", "true");
-      await rows.nth(3).focus();
-      await page.keyboard.press("Space");
-      await expect(rows.nth(3)).toHaveAttribute("aria-expanded", "true");
-      await expect(page.locator("#svc-detail-3")).toBeVisible();
+      await page.keyboard.press("ArrowRight");
+      await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "true");
+      await expect(tabs.nth(2)).toBeFocused();
+      await page.keyboard.press("End");
+      await expect(tabs.nth(3)).toHaveAttribute("aria-selected", "true");
+      await page.keyboard.press("ArrowRight");
+      await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
+      await expect(page.locator("#svc-panel-0")).toBeVisible();
     });
 
-    test("services: on a phone each detail opens under its row, and closes", async ({ page }) => {
+    test("services: on a phone the tabs sit above the showcase", async ({ page }) => {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(home);
-      const rows = page.locator('section[aria-labelledby="services-title"] button[aria-controls]');
-      await rows.nth(0).click();
-      await expect(rows.nth(0)).toHaveAttribute("aria-expanded", "false");
-      await expect(page.locator("#svc-detail-0")).toBeHidden();
-
-      await rows.nth(2).click();
-      const detail = page.locator("#svc-detail-2");
-      await expect(detail).toBeVisible();
-      const row = (await rows.nth(2).boundingBox())!;
-      const box = (await detail.boundingBox())!;
-      expect(box.y).toBeGreaterThanOrEqual(row.y + row.height - 1);
-      expect(box.y).toBeLessThan((await rows.nth(3).boundingBox())!.y);
+      const tabs = page.locator('section[aria-labelledby="services-title"] [role="tab"]');
+      await tabs.nth(2).click();
+      const panel = page.locator("#svc-panel-2");
+      await expect(panel).toBeVisible();
+      const tab = (await tabs.nth(3).boundingBox())!;
+      expect((await panel.boundingBox())!.y).toBeGreaterThanOrEqual(tab.y + tab.height - 1);
     });
 
     test("no horizontal scroll from 320 to 2560", async ({ page }) => {
@@ -187,9 +184,10 @@ for (const { lang, home, imprint, privacy } of LANGS) {
 test.describe("without JS", () => {
   test.use({ javaScriptEnabled: false });
 
-  test("services: every detail is shown", async ({ page }) => {
+  test("services: every panel is shown, no tab bar", async ({ page }) => {
     await page.goto("/de");
-    for (let i = 0; i < 4; i++) await expect(page.locator(`#svc-detail-${i}`)).toBeVisible();
+    for (let i = 0; i < 4; i++) await expect(page.locator(`#svc-panel-${i}`)).toBeVisible();
+    await expect(page.locator('[role="tablist"]')).toBeHidden();
   });
 });
 
