@@ -40,6 +40,7 @@ const en: Messages = {
     booking: "Book a call",
     menuOpen: "Open menu",
     menuClose: "Close menu",
+    themeToggle: "Toggle light / dark mode",
     menu: "Menu",
   },
 

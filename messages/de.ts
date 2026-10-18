@@ -49,6 +49,7 @@ const de = {
     booking: "Gespräch buchen",
     menuOpen: "Menü öffnen",
     menuClose: "Menü schließen",
+    themeToggle: "Hell / Dunkel umschalten",
     menu: "Menü",
   },
 

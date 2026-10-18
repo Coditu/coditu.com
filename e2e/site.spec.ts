@@ -87,6 +87,18 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       }
     });
 
+    test("theme: system by default, toggle overrides and is kept", async ({ page }) => {
+      const html = page.locator("html");
+      await page.emulateMedia({ colorScheme: "dark" });
+      await page.goto(home);
+      await expect(html).toHaveAttribute("data-theme", "dark");
+
+      await page.getByRole("button", { name: /hell \/ dunkel|light \/ dark/i }).click();
+      await expect(html).toHaveAttribute("data-theme", "light");
+      await page.reload();
+      await expect(html).toHaveAttribute("data-theme", "light");
+    });
+
     test("hero: one h1, mailto CTA, the form met once, slider by keyboard", async ({ page }) => {
       await page.goto(home);
       await expect(page.locator("h1")).toHaveCount(1);

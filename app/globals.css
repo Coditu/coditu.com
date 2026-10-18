@@ -1,16 +1,18 @@
 @import "tailwindcss";
 
-/* Dark mode follows the operating system only — there is no toggle. */
-@custom-variant dark (@media (prefers-color-scheme: dark));
+/* Dark mode = `data-theme="dark"` on <html>. The inline script in
+   app/[lang]/layout.tsx sets it before first paint: the visitor's choice from
+   the toggle, else the system setting. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ==========================================================================
    Coditu "Blueprint" tokens — Rev. A. Values: docs/design-system/tokens.md.
    Copied from docs/design-system/tokens.css; only the dark selector differs
-   (system preference instead of a `.dark` class).
+   (`[data-theme="dark"]` instead of a `.dark` class).
    ========================================================================== */
 
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
 
   /* surfaces */
   --paper: #f7f6f2;
@@ -52,39 +54,61 @@
   --ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
   --dur-micro: 200ms;
   --dur-section: 520ms;
+
+  /* shadcn/ui semantic layer. Aliases only, so the dark block re-themes them.
+     shadcn's `accent` is a HOVER SURFACE — the orange is `cta`, never `accent`. */
+  --radius: 4px;
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
+  --primary: var(--blueprint);
+  --primary-foreground: var(--blueprint-ink);
+  --secondary: var(--blueprint-light);
+  --secondary-foreground: var(--blueprint);
+  --muted: var(--surface-sunk);
+  --muted-foreground: var(--ink-muted);
+  --accent: var(--blueprint-light);
+  --accent-foreground: var(--ink);
+  --destructive: var(--error);
+  --border: var(--line);
+  --input: var(--line-input);
+  --ring: var(--blueprint);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #0f1216;
-    --surface: #171b21;
-    --surface-sunk: #1e232a;
+:root[data-theme="dark"] {
+  color-scheme: dark;
 
-    --ink: #eceae4;          /* 15.6:1 */
-    --ink-muted: #a2a6ae;    /*  7.7:1 */
+  --paper: #0f1216;
+  --surface: #171b21;
+  --surface-sunk: #1e232a;
 
-    --line: #2a2f37;
-    --line-input: #6e7480;   /*  3.7:1 on surface */
+  --ink: #eceae4;          /* 15.6:1 */
+  --ink-muted: #a2a6ae;    /*  7.7:1 */
 
-    --blueprint: #86a2ff;    /*  7.7:1 */
-    --blueprint-hover: #a3b8ff;
-    --blueprint-light: #1c2437;
-    --blueprint-ink: #0f1216;
-    --grid-major: rgb(134 162 255 / 0.08);
-    --grid-minor: rgb(134 162 255 / 0.03);
+  --line: #2a2f37;
+  --line-input: #6e7480;   /*  3.7:1 on surface */
 
-    --cta: #ff8a1f;
-    --cta-hover: #ffa04d;
-    --cta-ink: #14171c;
+  --blueprint: #86a2ff;    /*  7.7:1 */
+  --blueprint-hover: #a3b8ff;
+  --blueprint-light: #1c2437;
+  --blueprint-ink: #0f1216;
+  --grid-major: rgb(134 162 255 / 0.08);
+  --grid-minor: rgb(134 162 255 / 0.03);
 
-    --success: #6fc48f;  --success-bg: rgb(111 196 143 / 0.12);
-    --warning: #e7b04e;  --warning-bg: rgb(231 176 78 / 0.12);
-    --error:   #f08a7e;  --error-bg:   rgb(240 138 126 / 0.12);
-    --info:    #6cc0de;  --info-bg:    rgb(108 192 222 / 0.12);
+  --cta: #ff8a1f;
+  --cta-hover: #ffa04d;
+  --cta-ink: #14171c;
 
-    --shadow-sm: 0 1px 0 rgb(0 0 0 / 0.3);
-    --shadow-lift: 0 12px 24px -16px rgb(0 0 0 / 0.6);
-  }
+  --success: #6fc48f;  --success-bg: rgb(111 196 143 / 0.12);
+  --warning: #e7b04e;  --warning-bg: rgb(231 176 78 / 0.12);
+  --error:   #f08a7e;  --error-bg:   rgb(240 138 126 / 0.12);
+  --info:    #6cc0de;  --info-bg:    rgb(108 192 222 / 0.12);
+
+  --shadow-sm: 0 1px 0 rgb(0 0 0 / 0.3);
+  --shadow-lift: 0 12px 24px -16px rgb(0 0 0 / 0.6);
 }
 
 /* --- Static theme values (not themed) ----------------------------------- */
@@ -167,6 +191,32 @@
   --shadow-sm: var(--shadow-sm);
   --shadow-lift: var(--shadow-lift);
   --ease-entrance: var(--ease-entrance);
+
+  /* shadcn/ui */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* shadcn primitives read these — clamp them to the 2–4 px system */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
 }
 
 /* Grid paper: 40 px major + 8 px minor lines. Page wrapper or hero only. */
