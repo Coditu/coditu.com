@@ -161,8 +161,7 @@ const de = {
         title: "Betreuung nach dem Start",
         problem: "„Und wer kümmert sich danach darum?“",
         text: "Wartung, wenn Sie sie brauchen – abgerechnet pro Anfrage.",
-        facts:
-          "Seit fast einem Jahr wöchentliche Sprints für denselben Kunden · kleine Änderungen meist unter 2 Stunden Aufwand",
+        facts: "Kleine Änderungen meist unter 2 Stunden Aufwand",
         tags: ["Wartung", "Änderungen", "Support"],
       },
     ],
@@ -214,6 +213,66 @@ const de = {
         { id: "Ä-03", text: "Feld „Kostenstelle“ im Antrag ergänzen" },
       ],
     },
+  },
+
+  /**
+   * How we work: an example board, then the four steps. The board is example
+   * data, marked „Beispiel“. Columns in order: Skizze, In Arbeit (active),
+   * Review, Live (done). The weekly-sprint proof lives here, not in Services.
+   */
+  processSection: {
+    title: "So arbeiten wir – und Sie sehen jeden Schritt",
+    intro:
+      "Jede Aufgabe steht auf einem gemeinsamen Board. Sie sehen, was gerade entsteht, was auf Ihr Feedback wartet und was live ist.",
+    board: {
+      label: "Projektboard",
+      example: "Beispiel",
+      footer: ["Alle Angaben beispielhaft", "Ansicht für Kunden · nur lesen"],
+      columns: [
+        {
+          name: "Skizze",
+          tasks: [
+            { title: "Redaktionsplan", tag: "App", who: "Adam Nafie" },
+            { title: "Feld „Kostenstelle“ im Antrag", tag: "Änderung", who: "Ahmed Yehia" },
+          ],
+        },
+        {
+          name: "In Arbeit",
+          tasks: [{ title: "Onboarding-Checkliste", tag: "App", who: "Abdelrahman Elkhateeb" }],
+        },
+        {
+          name: "Review",
+          tasks: [
+            { title: "Neuer Link in der Hauptnavigation", tag: "Webpart", who: "Mohamed Tamer" },
+            { title: "Banner auf der Startseite", tag: "Webpart", who: "Mohamed Tamer" },
+          ],
+        },
+        {
+          name: "Live",
+          tasks: [{ title: "Intranet-News mit Freigabe", tag: "Webpart", who: "Abdelrahman Elkhateeb" }],
+        },
+      ],
+    },
+    proofLabel: "Aus der Praxis",
+    steps: [
+      {
+        title: "Skizze & Gespräch",
+        text: "Sie schicken uns eine Skizze, ein Foto oder ein paar Sätze. Im Gespräch klären wir, was die App können muss.",
+      },
+      {
+        title: "Erste Version in wenigen Tagen",
+        text: "Zuerst bekommen Sie etwas zum Anklicken. Eine erste App-Version braucht bei uns etwa 10 bis 14 Stunden Arbeit.",
+      },
+      {
+        title: "Wöchentlicher Sprint & Feedback",
+        text: "Jede Woche zeigen wir, was fertig ist, und Sie sagen, was sich ändern soll. Das Board zeigt, woran wir gerade arbeiten.",
+        proof: "Seit fast einem Jahr wöchentliche Sprints mit demselben Kunden",
+      },
+      {
+        title: "Livegang & Wartung",
+        text: "Wenn alles passt, geht die App live. Danach bleiben wir ansprechbar – für Änderungen und Wartung, wenn Sie sie brauchen.",
+      },
+    ],
   },
 
   footer: {
