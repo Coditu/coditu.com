@@ -66,6 +66,56 @@ const de = {
     "Websites & Frontend",
   ],
 
+  /** Blatt 01. ENTWURF — Adam überarbeitet den Text. */
+  hero: {
+    meta: ["Blatt 01 · Startseite", "Rev. A"] as [string, string],
+    label: "SharePoint · Interne Apps · KI-Assistenten",
+    /** The blue period is added by the component. */
+    title: "Von der Skizze zur fertigen Software",
+    lead: "Wir bauen Software für soziale Organisationen, Vereine und den Mittelstand. Aus Ihrer Skizze wird eine App, die im Alltag funktioniert. Jeden Schritt sehen Sie auf einem gemeinsamen Board.",
+    cta: {
+      label: "Projekt anfragen",
+      subject: "Projektanfrage",
+      body: "Hallo Coditu,\n\nunsere Idee in ein paar Sätzen:\n\n\nGern hängen wir auch ein Foto unserer Skizze an.\n",
+    },
+    secondary: "So arbeiten wir",
+    facts: [
+      { id: "T.01", text: "Von der Skizze zur App in wenigen Tagen" },
+      { id: "T.02", text: "Sie sehen jeden Schritt im Board" },
+      { id: "T.03", text: "Läuft in Ihrem Microsoft 365" },
+    ],
+    team: {
+      listLabel: "Das Team",
+      line: "Ihr Team · Berlin · Kairo",
+      /** Blocks the production deploy until public/team/<slug>.jpg exist for everyone. */
+      photos: "[PLACEHOLDER: Teamfotos]",
+      members: [
+        { slug: "mohamed-tamer", name: "Mohamed Tamer", role: "Frontend Lead" },
+        { slug: "abdelrahman-elkhateeb", name: "Abdelrahman Elkhateeb", role: "Frontend Engineer" },
+        { slug: "ahmed-yehia", name: "Ahmed Yehia", role: "Backend & DevOps" },
+        { slug: "adam-nafie", name: "Adam Nafie", role: "Kundenbetreuung & Partnerschaften" },
+      ],
+    },
+    demo: {
+      sheet: { label: "Blatt 01 · Beispiel", value: "Fortbildungsantrag" },
+      compareLabel: "Entwurf / Ergebnis vergleichen",
+      sketch: { label: "Fortbildungsantrag", id: "A-01", caption: "A · Entwurf", button: "Antrag senden" },
+      live: { title: "Fortbildungsantrag", status: "Live", caption: "B · Ergebnis", button: "Antrag senden" },
+      /** Same fields in both states. `hint` is the sketch, `value` the live example. */
+      fields: [
+        { label: "Name", hint: "Text · Pflichtfeld", value: "Jana Beispiel" },
+        { label: "Fortbildung", hint: "Text · Pflichtfeld", value: "Gesprächsführung in der Beratung" },
+        { label: "Zeitraum", hint: "Datum von – bis", value: "03.11. – 07.11.2026" },
+        { label: "Kosten", hint: "Betrag · €", value: "480 €" },
+        { label: "Begründung", hint: "Text · mehrzeilig", value: "Für die neue Elternberatung im Team" },
+      ],
+      stepsLabel: "Ablauf",
+      steps: ["Skizze", "Board", "Live"],
+      duration: "wenige Tage",
+      caption: "Beispiel — so sieht der Weg von der Skizze zur App bei uns aus.",
+    },
+  },
+
   footer: {
     slogan: "Von der Skizze zur fertigen Software.",
     servicesTitle: "Leistungen",

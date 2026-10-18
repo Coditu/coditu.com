@@ -55,6 +55,52 @@ const en: Messages = {
     "Websites & frontend",
   ],
 
+  hero: {
+    meta: ["Sheet 01 · Home", "Rev. A"],
+    label: "SharePoint · Internal apps · AI assistants",
+    title: "From sketch to finished software",
+    lead: "We build software for social organisations, associations and mid-sized companies. Your sketch becomes an app that works in your day-to-day. You see every step on a shared board.",
+    cta: {
+      label: "Request a project",
+      subject: "Project request",
+      body: "Hello Coditu,\n\nOur idea in a few sentences:\n\n\nWe are happy to attach a photo of our sketch.\n",
+    },
+    secondary: "How we work",
+    facts: [
+      { id: "T.01", text: "From sketch to app in a few days" },
+      { id: "T.02", text: "You see every step on the board" },
+      { id: "T.03", text: "Runs in your Microsoft 365" },
+    ],
+    team: {
+      listLabel: "The team",
+      line: "Your team · Berlin · Cairo",
+      photos: "[PLACEHOLDER: team photos]",
+      members: [
+        { slug: "mohamed-tamer", name: "Mohamed Tamer", role: "Frontend Lead" },
+        { slug: "abdelrahman-elkhateeb", name: "Abdelrahman Elkhateeb", role: "Frontend Engineer" },
+        { slug: "ahmed-yehia", name: "Ahmed Yehia", role: "Backend & DevOps" },
+        { slug: "adam-nafie", name: "Adam Nafie", role: "Client partnerships" },
+      ],
+    },
+    demo: {
+      sheet: { label: "Sheet 01 · Example", value: "Training request" },
+      compareLabel: "Compare sketch / result",
+      sketch: { label: "Training request", id: "A-01", caption: "A · Sketch", button: "Send request" },
+      live: { title: "Training request", status: "Live", caption: "B · Result", button: "Send request" },
+      fields: [
+        { label: "Name", hint: "Text · required", value: "Jana Example" },
+        { label: "Course", hint: "Text · required", value: "Counselling conversations" },
+        { label: "Dates", hint: "Date from – to", value: "03.11. – 07.11.2026" },
+        { label: "Cost", hint: "Amount · €", value: "€480" },
+        { label: "Reason", hint: "Text · multi-line", value: "For the team's new parent counselling" },
+      ],
+      stepsLabel: "Process",
+      steps: ["Sketch", "Board", "Live"],
+      duration: "a few days",
+      caption: "Example — this is how a sketch becomes an app with us.",
+    },
+  },
+
   footer: {
     slogan: "From sketch to finished software.",
     servicesTitle: "Services",
