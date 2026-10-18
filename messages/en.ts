@@ -137,7 +137,7 @@ const en: Messages = {
         title: "Care after launch",
         problem: "“And who looks after it afterwards?”",
         text: "Maintenance when you need it, billed per request.",
-        facts: "Weekly sprints for the same client for almost a year · small changes usually under 2 hours of work",
+        facts: "Small changes usually under 2 hours of work",
         tags: ["Maintenance", "Changes", "Support"],
       },
     ],
@@ -185,6 +185,61 @@ const en: Messages = {
         { id: "C-03", text: "Add a “cost centre” field to the request" },
       ],
     },
+  },
+
+  processSection: {
+    title: "How we work — and you see every step",
+    intro:
+      "Every task sits on a shared board. You see what is being built, what is waiting for your feedback and what is live.",
+    board: {
+      label: "Project board",
+      example: "Example",
+      footer: ["All data is illustrative", "Client view · read-only"],
+      columns: [
+        {
+          name: "Sketch",
+          tasks: [
+            { title: "Editorial calendar", tag: "App", who: "Adam Nafie" },
+            { title: "“Cost centre” field in the request", tag: "Change", who: "Ahmed Yehia" },
+          ],
+        },
+        {
+          name: "In progress",
+          tasks: [{ title: "Onboarding checklist", tag: "App", who: "Abdelrahman Elkhateeb" }],
+        },
+        {
+          name: "Review",
+          tasks: [
+            { title: "New link in the main navigation", tag: "Web part", who: "Mohamed Tamer" },
+            { title: "Banner on the home page", tag: "Web part", who: "Mohamed Tamer" },
+          ],
+        },
+        {
+          name: "Live",
+          tasks: [{ title: "Intranet news with approval", tag: "Web part", who: "Abdelrahman Elkhateeb" }],
+        },
+      ],
+    },
+    proofLabel: "From practice",
+    steps: [
+      {
+        title: "Sketch & call",
+        text: "You send us a sketch, a photo or a few sentences. On a call we work out what the app has to do.",
+      },
+      {
+        title: "First version in a few days",
+        text: "First you get something to click through. A first app version takes us about 10 to 14 hours of work.",
+      },
+      {
+        title: "Weekly sprint & feedback",
+        text: "Every week we show what is done and you tell us what should change. The board shows what we are working on.",
+        proof: "Weekly sprints with the same client for almost a year",
+      },
+      {
+        title: "Go live & maintenance",
+        text: "When everything fits, the app goes live. After that we stay on hand for changes and maintenance when you need them.",
+      },
+    ],
   },
 
   footer: {
