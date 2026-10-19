@@ -20,7 +20,6 @@ function Column({ title, children }: { title: string; children: ReactNode }) {
 
 export function SiteFooter({ locale, hashMap }: { locale: Locale; hashMap: Record<string, string> }) {
   const t = getMessages(locale);
-  const services = sectionHref(locale, "services");
 
   return (
     <footer className="border-t border-ink pt-8 pb-6">
@@ -28,15 +27,15 @@ export function SiteFooter({ locale, hashMap }: { locale: Locale; hashMap: Recor
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <div className="flex flex-col gap-3">
             <CoditusLockup markSize={24} />
-            <p className="text-[14px] text-ink-muted">{t.footer.slogan}</p>
+            <p className="max-w-[36ch] text-[14px] text-ink-muted">{t.footer.description}</p>
           </div>
 
-          <Column title={t.footer.servicesTitle}>
+          <Column title={t.footer.sectionsTitle}>
             <ul className="flex flex-col gap-2">
-              {t.services.map((name) => (
-                <li key={name}>
-                  <a href={services} className={link}>
-                    {name}
+              {t.footer.sections.map((item) => (
+                <li key={item.section}>
+                  <a href={sectionHref(locale, item.section)} className={link}>
+                    {item.label}
                   </a>
                 </li>
               ))}
@@ -62,6 +61,7 @@ export function SiteFooter({ locale, hashMap }: { locale: Locale; hashMap: Recor
             <a href={`mailto:${CONTACT_EMAIL}`} className={link}>
               {CONTACT_EMAIL}
             </a>
+            <p className="text-[14px] text-ink-muted">{t.footer.locations}</p>
             <LanguageSwitch locale={locale} label={t.footer.languageTitle} switchTo={t.language.switchTo} hashMap={hashMap} />
           </Column>
         </div>

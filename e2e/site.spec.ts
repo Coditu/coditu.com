@@ -101,11 +101,11 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(html).toHaveAttribute("data-theme", "light");
     });
 
-    test("hero: one h1, mailto CTA, the request turns into the app", async ({ page }) => {
+    test("hero: one h1, CTA to the contact section, the request turns into the app", async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto(home);
       await expect(page.locator("h1")).toHaveCount(1);
-      await expect(page.locator('#hero-title ~ * a[href^="mailto:contact@coditu.com?subject="]')).toHaveCount(1);
+      await expect(page.locator(`#hero-title ~ * a[href="#${lang === "de" ? "kontakt" : "contact"}"]`)).toHaveCount(1);
       // Text on the left, the card beside it on the right, both above the fold.
       const h1 = (await page.locator("h1").boundingBox())!;
       const box = (await page.locator('section[aria-labelledby="hero-title"] [aria-hidden="true"]').first().boundingBox())!;
@@ -206,6 +206,33 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       expect(ld["@type"]).toBe("FAQPage");
       const questions = (await section.locator("summary").allInnerTexts()).map((q) => q.trim());
       expect(ld.mainEntity.map((q: { name: string }) => q.name)).toEqual(questions);
+    });
+
+    test("contact: follows the FAQ, the hero CTA lands on it, mailto with a subject", async ({ page }) => {
+      await page.goto(home);
+      const id = lang === "de" ? "kontakt" : "contact";
+      await expect(page.locator('section[aria-labelledby="faq-title"] + section')).toHaveId(id);
+      const section = page.locator(`#${id}`);
+      await expect(section.locator('a[href^="mailto:contact@coditu.com?subject="]')).toHaveCount(1);
+      // No booking tool yet (BOOKING_URL is null): no booking button.
+      await expect(section.locator("a")).toHaveCount(2);
+      await expect(section.getByText("Adam Nafie")).toBeVisible();
+
+      await page.locator(`#hero-title ~ * a[href="#${id}"]`).click();
+      await expect(page).toHaveURL(new RegExp(`#${id}$`));
+      await expect(page.locator("#contact-title")).toBeInViewport();
+    });
+
+    test("footer: section links, legal pages, contact", async ({ page }) => {
+      await page.goto(home);
+      const footer = page.locator("footer");
+      for (const anchor of lang === "de" ? ["leistungen", "faq", "kontakt"] : ["services", "faq", "contact"]) {
+        await expect(footer.locator(`a[href="${home}#${anchor}"]`)).toHaveCount(1);
+      }
+      await expect(footer.locator(`a[href="${imprint}"]`)).toHaveCount(1);
+      await expect(footer.locator(`a[href="${privacy}"]`)).toHaveCount(1);
+      await expect(footer.locator('a[href="mailto:contact@coditu.com"]')).toHaveCount(1);
+      await expect(footer).toContainText(`© ${new Date().getFullYear()} Coditu`);
     });
 
     test("no horizontal scroll from 320 to 2560", async ({ page }) => {

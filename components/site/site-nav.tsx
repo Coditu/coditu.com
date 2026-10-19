@@ -1,7 +1,7 @@
 import { CoditusLockup } from "@/components/coditu/coditus-mark";
 import { ButtonLink } from "@/components/ui/button";
 import { getMessages, pages, sectionHref, type Locale } from "@/lib/i18n";
-import { BOOKING_HREF } from "@/lib/site-config";
+import { BOOKING_URL } from "@/lib/site-config";
 
 import { Container } from "./container";
 import { LanguageSwitch } from "./language-switch.client";
@@ -11,6 +11,7 @@ import { ThemeToggle } from "./theme-toggle.client";
 export function SiteNav({ locale, hashMap }: { locale: Locale; hashMap: Record<string, string> }) {
   const t = getMessages(locale);
   const links = t.nav.links.map((link) => ({ href: sectionHref(locale, link.section), label: link.label }));
+  const booking = BOOKING_URL ?? sectionHref(locale, "contact");
 
   return (
     <header className="sticky top-0 z-10 border-b border-line bg-paper/95">
@@ -37,12 +38,12 @@ export function SiteNav({ locale, hashMap }: { locale: Locale; hashMap: Record<s
         <div className="flex items-center gap-4">
           <LanguageSwitch locale={locale} label={t.language.groupLabel} switchTo={t.language.switchTo} hashMap={hashMap} />
           <ThemeToggle label={t.nav.themeToggle} />
-          <ButtonLink href={BOOKING_HREF} variant="outline" size="sm" className="hidden lg:inline-flex">
+          <ButtonLink href={booking} variant="outline" size="sm" className="hidden lg:inline-flex">
             {t.nav.booking}
           </ButtonLink>
           <MobileMenu
             links={links}
-            booking={{ href: BOOKING_HREF, label: t.nav.booking }}
+            booking={{ href: booking, label: t.nav.booking }}
             labels={{ open: t.nav.menuOpen, close: t.nav.menuClose, nav: t.nav.menu }}
           />
         </div>
