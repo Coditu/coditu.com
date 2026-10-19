@@ -183,6 +183,14 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(page.locator("#reference-title")).toBeInViewport();
     });
 
+    test("security: follows the case study, five points", async ({ page }) => {
+      await page.goto(home);
+      const section = page.locator('section[aria-labelledby="security-title"]');
+      expect(await section.getAttribute("id")).toBe(lang === "de" ? "sicherheit" : "security");
+      await expect(page.locator('section[aria-labelledby="reference-title"] + section')).toHaveId(/^(sicherheit|security)$/);
+      await expect(section.locator("h3")).toHaveCount(5);
+    });
+
     test("no horizontal scroll from 320 to 2560", async ({ page }) => {
       await page.goto(home);
       for (const width of [320, 360, 390, 430, 640, 744, 834, 1024, 1280, 1440, 1728, 1920, 2560]) {
