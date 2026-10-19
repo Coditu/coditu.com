@@ -108,12 +108,12 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(page.locator(`#hero-title ~ * a[href="#${lang === "de" ? "kontakt" : "contact"}"]`)).toHaveCount(1);
       // Text on the left, the card beside it on the right, both above the fold.
       const h1 = (await page.locator("h1").boundingBox())!;
-      const box = (await page.locator('section[aria-labelledby="hero-title"] [aria-hidden="true"]').first().boundingBox())!;
+      const box = (await page.locator('section[aria-labelledby="hero-title"] div[aria-hidden="true"]').first().boundingBox())!;
       expect(box.x).toBeGreaterThan(h1.x + h1.width / 2);
       expect(box.y).toBeLessThan(900);
 
       // The card is decoration with one sentence for screen readers; its app goes live.
-      const card = page.locator('section[aria-labelledby="hero-title"] [aria-hidden="true"]').first();
+      const card = page.locator('section[aria-labelledby="hero-title"] div[aria-hidden="true"]').first();
       await expect(card).toBeVisible();
       await expect(page.locator('section[aria-labelledby="hero-title"] .sr-only')).toHaveCount(1);
       await expect(card.getByText(/^Live$/)).toBeVisible({ timeout: 8000 });
@@ -124,7 +124,7 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto(home);
       await expect(page.locator(".cd-caret")).toHaveCount(0);
-      const card = page.locator('section[aria-labelledby="hero-title"] [aria-hidden="true"]').first();
+      const card = page.locator('section[aria-labelledby="hero-title"] div[aria-hidden="true"]').first();
       await expect(card.getByText(/^Live$/)).toBeVisible({ timeout: 8000 });
     });
 
@@ -138,6 +138,8 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(page.locator("#svc-panel-1")).toBeHidden();
 
       // The tabs sit under the showcase and do not move when the panel changes.
+      // Scroll first: boxes are viewport-relative and the click would scroll.
+      await tabs.nth(0).scrollIntoViewIfNeeded();
       const panel = (await page.locator("#svc-panel-0").boundingBox())!;
       const before = (await tabs.nth(0).boundingBox())!;
       expect(before.y).toBeGreaterThanOrEqual(panel.y + panel.height - 1);
