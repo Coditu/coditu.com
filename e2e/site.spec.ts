@@ -72,6 +72,8 @@ for (const { lang, home, imprint, privacy } of LANGS) {
         expect(text).not.toMatch(/\b(munich|münchen|ulm)\b/);
         expect(text).not.toContain("hello@coditu.com");
         expect(text).not.toContain("strukture");
+        // The reference client stays anonymous.
+        expect(text).not.toMatch(/evim/);
         expect(text).not.toMatch(/\b\d+\+? (happy )?(clients|kunden)\b/);
         expect((await page.title()).toLowerCase()).not.toContain("strukture");
       }
@@ -166,6 +168,19 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(panel).toBeVisible();
       const tab = (await tabs.nth(3).boundingBox())!;
       expect((await panel.boundingBox())!.y).toBeGreaterThanOrEqual(tab.y + tab.height - 1);
+    });
+
+    test("reference: the Services project cards land on the case study", async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto(home);
+      const section = page.locator('section[aria-labelledby="reference-title"]');
+      const id = await section.getAttribute("id");
+      expect(id).toBe(lang === "de" ? "referenz" : "reference");
+
+      await page.locator('section[aria-labelledby="services-title"] [role="tab"]').nth(2).click();
+      await page.locator(`#svc-panel-2 a[href="#${id}"]`).first().click();
+      await expect(page).toHaveURL(new RegExp(`#${id}$`));
+      await expect(page.locator("#reference-title")).toBeInViewport();
     });
 
     test("no horizontal scroll from 320 to 2560", async ({ page }) => {
