@@ -197,11 +197,7 @@ const de = {
         { label: "Team", hint: "Auswahl · Gruppe", value: "Beratung" },
       ],
     },
-    /** Detail 03: real projects, public/work/thumbs/<slug>.webp. */
-    projects: [
-      { slug: "nvrmiss", name: "NVRMiss", line: "Produktseite für eine B2B-Software für Servicebetriebe" },
-      { slug: "nile-atelier", name: "Nile Atelier", line: "Website für eine ägyptische Modemarke" },
-    ],
+    /** Detail 03 shows `referenceSection.projects`. */
     /** Detail 04: example tickets, marked „Beispiel“. */
     changelog: {
       label: "Änderungsprotokoll",
@@ -271,6 +267,81 @@ const de = {
       {
         title: "Livegang & Wartung",
         text: "Wenn alles passt, geht die App live. Danach bleiben wir ansprechbar – für Änderungen und Wartung, wenn Sie sie brauchen.",
+      },
+    ],
+  },
+
+  /**
+   * Our work: one case study, then two smaller projects. The client stays
+   * anonymous — no name, no logo, no screenshot of theirs. Every number is
+   * real data from that project; add none. The page drawing is our own,
+   * marked „Beispiel“, and shows kinds of web parts, not the client's content.
+   */
+  referenceSection: {
+    title: "Ein Intranet, Woche für Woche gebaut",
+    intro:
+      "Für eine Organisation in Deutschland bauen und betreuen wir das SharePoint-Intranet. Seit fast einem Jahr, in wöchentlichen Sprints.",
+    titleBlock: [
+      { label: "Kunde", value: "Eine Organisation in Deutschland" },
+      { label: "Projekt", value: "SharePoint-Intranet" },
+      { label: "Zeitraum", value: "Fast ein Jahr · wöchentliche Sprints" },
+    ],
+    footer: ["Kunde anonym", "Abbildung beispielhaft"],
+    factsLabel: "Aus dem Projekt",
+    facts: [
+      { value: "ca. 38", text: "Webparts für eine Organisation" },
+      { value: "5–10 Std.", text: "für einen neuen Webpart, meist 1–2 Tage" },
+      { value: "10–14 Std.", text: "für die erste Version einer internen App" },
+      { value: "≤ 2 Std.", text: "für die meisten Änderungswünsche" },
+    ],
+    built: [
+      {
+        title: "Webparts",
+        text: "Bausteine, aus denen sich die Seiten des Intranets zusammensetzen.",
+        items: ["News & Kommunikation", "Navigation & Suche", "Personen & Organigramm", "Seitenaufbau", "Medien & Umfragen"],
+      },
+      {
+        title: "Interne Apps",
+        text: "Eigenständige Apps im Intranet – für die Redaktion und für neue Kolleginnen und Kollegen.",
+        items: ["News-Editor", "Redaktionsplan", "Onboarding"],
+      },
+    ],
+    /** Our own drawing of an intranet home page built from web parts. */
+    page: {
+      example: "Beispiel",
+      caption: "Beispiel: eine Intranet-Startseite aus Webparts. Eigene Darstellung, keine Kundendaten.",
+      parts: {
+        nav: "Hauptnavigation",
+        news: "News Center",
+        links: "Quick Links",
+        people: "Jubiläen",
+        events: "Kalender",
+      },
+    },
+    moreTitle: "Weitere Projekte",
+    /**
+     * Real projects, public/work/thumbs/<slug>.webp. `line` says only what the
+     * screenshot shows.
+     * TODO(team): NVRMiss — stack, public link and status (live or beta) are
+     * not written down anywhere. Add them once confirmed.
+     * TODO(team): Nile Atelier — docs/00-CONTEXT.md calls it a "partner portal"
+     * (partner onboarding, document routing), but the screenshot is a fashion
+     * label's website. Confirm which, plus stack and public link.
+     */
+    projects: [
+      {
+        slug: "nvrmiss",
+        name: "NVRMiss",
+        kind: "Produktseite",
+        line: "Produktseite für eine B2B-Software für Servicebetriebe: Funktionen, Ablauf, Preise, FAQ.",
+        alt: "Startseite von NVRMiss",
+      },
+      {
+        slug: "nile-atelier",
+        name: "Nile Atelier",
+        kind: "Website",
+        line: "Website für eine ägyptische Modemarke, mit Kollektion und Journal.",
+        alt: "Startseite von Nile Atelier",
       },
     ],
   },

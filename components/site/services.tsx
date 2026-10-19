@@ -31,7 +31,7 @@ export function Services({ locale }: { locale: Locale }) {
   const demos = [
     <Catalogue key="catalogue" s={s} />,
     <AppDemo key="app" s={s} />,
-    <Projects key="projects" s={s} href={`#${t.anchors.reference}`} />,
+    <Projects key="projects" projects={t.referenceSection.projects} href={`#${t.anchors.reference}`} />,
     <Changelog key="changelog" s={s} />,
   ];
 
@@ -156,10 +156,10 @@ function AppDemo({ s }: { s: S }) {
 }
 
 /** Detail 03: two real projects, linking to the reference section. */
-function Projects({ s, href }: { s: S; href: string }) {
+function Projects({ projects, href }: { projects: Messages["referenceSection"]["projects"]; href: string }) {
   return (
     <ul className="grid gap-4 sm:grid-cols-2">
-      {s.projects.map((project) => (
+      {projects.map((project) => (
         <li key={project.slug}>
           <a
             href={href}

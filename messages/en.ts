@@ -171,10 +171,6 @@ const en: Messages = {
         { label: "Team", hint: "Choice · group", value: "Counselling" },
       ],
     },
-    projects: [
-      { slug: "nvrmiss", name: "NVRMiss", line: "Product site for B2B software for service businesses" },
-      { slug: "nile-atelier", name: "Nile Atelier", line: "Website for an Egyptian fashion label" },
-    ],
     changelog: {
       label: "Change log",
       from: "Change",
@@ -238,6 +234,66 @@ const en: Messages = {
       {
         title: "Go live & maintenance",
         text: "When everything fits, the app goes live. After that we stay on hand for changes and maintenance when you need them.",
+      },
+    ],
+  },
+
+  referenceSection: {
+    title: "One intranet, built week by week",
+    intro:
+      "For an organisation in Germany we build and maintain its SharePoint intranet. For almost a year, in weekly sprints.",
+    titleBlock: [
+      { label: "Client", value: "An organisation in Germany" },
+      { label: "Project", value: "SharePoint intranet" },
+      { label: "Period", value: "Almost a year · weekly sprints" },
+    ],
+    footer: ["Client anonymous", "Illustration only"],
+    factsLabel: "From the project",
+    facts: [
+      { value: "~38", text: "web parts for one organisation" },
+      { value: "5–10 h", text: "for a new web part, mostly 1–2 days" },
+      { value: "10–14 h", text: "for the first version of an internal app" },
+      { value: "≤ 2 h", text: "for most change requests" },
+    ],
+    built: [
+      {
+        title: "Web parts",
+        text: "The building blocks the intranet's pages are made of.",
+        items: ["News & communication", "Navigation & search", "People & org chart", "Page layout", "Media & polls"],
+      },
+      {
+        title: "Internal apps",
+        text: "Standalone apps inside the intranet — for the editorial team and for new colleagues.",
+        items: ["News editor", "Editorial calendar", "Onboarding"],
+      },
+    ],
+    page: {
+      example: "Example",
+      caption: "Example: an intranet home page made of web parts. Our own drawing, no client data.",
+      parts: {
+        nav: "Main navigation",
+        news: "News center",
+        links: "Quick links",
+        people: "Anniversaries",
+        events: "Calendar",
+      },
+    },
+    moreTitle: "More projects",
+    // TODO(team): see messages/de.ts — NVRMiss and Nile Atelier details to confirm.
+    projects: [
+      {
+        slug: "nvrmiss",
+        name: "NVRMiss",
+        kind: "Product site",
+        line: "Product site for B2B software for service businesses: features, how it works, pricing, FAQ.",
+        alt: "NVRMiss home page",
+      },
+      {
+        slug: "nile-atelier",
+        name: "Nile Atelier",
+        kind: "Website",
+        line: "Website for an Egyptian fashion label, with collection and journal.",
+        alt: "Nile Atelier home page",
       },
     ],
   },
