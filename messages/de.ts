@@ -60,24 +60,13 @@ const de = {
     switchTo: "English",
   },
 
-  /** Names only; the section text lives with the section. */
-  services: [
-    "SharePoint & SPFx-Webparts",
-    "Interne Apps",
-    "Websites & Frontend",
-  ],
-
   /** Hero. ENTWURF — Adam überarbeitet den Text. */
   hero: {
     label: "SharePoint · Interne Apps",
     /** The blue period is added by the component. */
     title: "Von der Skizze zur fertigen Software",
     lead: "Wir bauen Software für soziale Organisationen, Vereine und den Mittelstand. Aus Ihrer Skizze wird eine App, die im Alltag funktioniert. Jeden Schritt sehen Sie auf einem gemeinsamen Board.",
-    cta: {
-      label: "Projekt anfragen",
-      subject: "Projektanfrage",
-      body: "Hallo Coditu,\n\nunsere Idee in ein paar Sätzen:\n\n\nGern hängen wir auch ein Foto unserer Skizze an.\n",
-    },
+    cta: "Projekt anfragen",
     secondary: "So arbeiten wir",
     /**
      * The hero picture: a request in words becomes the app. `[Words]` turn
@@ -118,10 +107,10 @@ const de = {
       /** Blocks the production deploy until public/team/<slug>.jpg exist for everyone. */
       photos: "[PLACEHOLDER: Teamfotos]",
       members: [
-        { slug: "mohamed-tamer", name: "Mohamed Tamer", role: "Frontend Lead" },
-        { slug: "abdelrahman-elkhateeb", name: "Abdelrahman Elkhateeb", role: "Frontend Engineer" },
-        { slug: "ahmed-yehia", name: "Ahmed Yehia", role: "Backend & DevOps" },
-        { slug: "adam-nafie", name: "Adam Nafie", role: "Kundenbetreuung & Partnerschaften" },
+        { slug: "mohamed-tamer", hub: "cairo" as const, name: "Mohamed Tamer", role: "Frontend Lead" },
+        { slug: "abdelrahman-elkhateeb", hub: "cairo" as const, name: "Abdelrahman Elkhateeb", role: "Frontend Engineer" },
+        { slug: "ahmed-yehia", hub: "cairo" as const, name: "Ahmed Yehia", role: "Backend & DevOps" },
+        { slug: "adam-nafie", hub: "berlin" as const, name: "Adam Nafie", role: "Kundenbetreuung & Partnerschaften" },
       ],
     },
   },
@@ -453,9 +442,39 @@ const de = {
     ],
   },
 
+  /**
+   * Contact: the last section. No form — there is no backend to send it to.
+   * TODO(team): the reply time is not written down anywhere. Confirm it or
+   * delete the line.
+   */
+  contactSection: {
+    title: "Schicken Sie uns Ihre Anfrage",
+    intro: "Ein paar Sätze reichen. Haben Sie eine Skizze oder Dateien, hängen Sie sie gern an.",
+    email: {
+      label: "E-Mail schreiben",
+      subject: "Projektanfrage",
+      body: "Hallo Coditu,\n\nunsere Idee in ein paar Sätzen:\n\n\nGern hängen wir auch ein Foto unserer Skizze an.\n",
+      or: "Oder direkt an",
+    },
+    booking: "20-Minuten-Gespräch buchen",
+    reply: "[TODO: bestätigen] Antwort in der Regel innerhalb von 1 Werktag.",
+    contactTitle: "Ihr Ansprechpartner in Berlin",
+    contactText: "Vom ersten Gespräch bis zum Livegang sprechen Sie mit derselben Person.",
+    teamTitle: "Ihr Team in Kairo",
+  },
+
   footer: {
-    slogan: "Von der Skizze zur fertigen Software.",
-    servicesTitle: "Leistungen",
+    description: "SharePoint-Webparts, interne Apps und Websites. Ein Team von der Skizze bis zum Betrieb.",
+    sectionsTitle: "Übersicht",
+    sections: [
+      { section: "services" as const, label: "Leistungen" },
+      { section: "process" as const, label: "Arbeitsweise" },
+      { section: "reference" as const, label: "Referenz" },
+      { section: "security" as const, label: "Sicherheit & Daten" },
+      { section: "faq" as const, label: "Häufige Fragen" },
+      { section: "contact" as const, label: "Kontakt" },
+    ],
+    locations: "Berlin · Kairo",
     legalTitle: "Rechtliches",
     imprint: "Impressum",
     privacy: "Datenschutz",

@@ -3,7 +3,6 @@ import { join } from "node:path";
 
 import { ButtonLink } from "@/components/ui/button";
 import { getMessages, type Locale } from "@/lib/i18n";
-import { CONTACT_EMAIL } from "@/lib/site-config";
 
 import { Container } from "./container";
 import { RequestToApp } from "./request-to-app.client";
@@ -17,9 +16,6 @@ import { RequestToApp } from "./request-to-app.client";
 export function Hero({ locale }: { locale: Locale }) {
   const t = getMessages(locale);
   const h = t.hero;
-  const mailto =
-    `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(h.cta.subject)}` +
-    `&body=${encodeURIComponent(h.cta.body)}`;
 
   return (
     <section aria-labelledby="hero-title">
@@ -33,8 +29,8 @@ export function Hero({ locale }: { locale: Locale }) {
             </h1>
             <p className="mt-6 max-w-[52ch] text-lead text-pretty text-ink-muted">{h.lead}</p>
             <div className="mt-9 flex flex-wrap gap-4">
-              <ButtonLink href={mailto} variant="cta" size="lg">
-                {h.cta.label}
+              <ButtonLink href={`#${t.anchors.contact}`} variant="cta" size="lg">
+                {h.cta}
               </ButtonLink>
               <ButtonLink href={`#${t.anchors.process}`} variant="outline" size="lg">
                 {h.secondary}
@@ -72,7 +68,7 @@ export function Hero({ locale }: { locale: Locale }) {
  * it exists: the drawing placeholder from the team-card spec, which must not
  * reach production (`hero.team.photos` holds the deploy).
  */
-function TeamTile({ slug, name, role }: { slug: string; name: string; role: string }) {
+export function TeamTile({ slug, name, role }: { slug: string; name: string; role: string }) {
   const tooltip = `${name} · ${role}`;
   if (existsSync(join(process.cwd(), "public", "team", `${slug}.jpg`))) {
     return (
