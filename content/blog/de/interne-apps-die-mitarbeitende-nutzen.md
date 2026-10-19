@@ -7,7 +7,6 @@ updated: 2026-10-19
 readingTime: 4
 tags: [Interne Apps, SharePoint, Intranet]
 service: 1
-review: "needs Adam"
 ---
 
 Mitarbeitende nutzen interne Apps, die einen Ablauf einfacher machen, den es schon gibt. Eine App, die einen neuen Ablauf erfindet, muss sich ihren Platz erst erkämpfen.

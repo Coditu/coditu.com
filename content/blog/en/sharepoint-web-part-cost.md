@@ -8,7 +8,6 @@ updated: 2026-10-19
 readingTime: 4
 tags: [SharePoint, SPFx, Cost]
 service: 0
-review: "needs Adam"
 ---
 
 A SharePoint web part costs as much as the hours it takes to build. For a new web part that is usually 5 to 10 hours for us, or 1 to 2 working days.
@@ -84,4 +83,4 @@ If a standard web part meets your requirement, you don't need a custom one. We'l
 
 We're also not the right fit if you mainly want pages created and content maintained. That doesn't need development.
 
-And if you're putting a complete intranet out to tender at a fixed price, our model doesn't fit: we work in weekly sprints and bill by effort. [TODO: bestätigen, dass wir keine Festpreise anbieten.]
+And if you're putting a complete intranet out to tender at a fixed price, our model doesn't fit: we work in weekly sprints and bill by effort.
