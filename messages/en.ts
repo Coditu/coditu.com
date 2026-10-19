@@ -20,6 +20,7 @@ const en: Messages = {
     services: "services",
     process: "how-we-work",
     reference: "reference",
+    security: "security",
     team: "team",
     faq: "faq",
     contact: "contact",
@@ -296,6 +297,43 @@ const en: Messages = {
         alt: "Nile Atelier home page",
       },
     ],
+  },
+
+  // TODO(team): see messages/de.ts — none of the five points is confirmed yet.
+  securitySection: {
+    title: "What happens to your data",
+    intro: "How we handle your data, your access and your code.",
+    points: [
+      {
+        title: "Your data stays in your system",
+        text: "[TODO: confirm] Where possible, we build inside your own Microsoft 365 and SharePoint. Your data does not move to our servers.",
+      },
+      {
+        title: "Access only as needed",
+        text: "[TODO: confirm] We use the access you give us, and only for the work. You can remove it at any time.",
+      },
+      {
+        title: "GDPR and a DPA",
+        text: "[TODO: confirm] We work under the GDPR. When it is needed, we sign a data processing agreement (DPA) with you.",
+      },
+      {
+        title: "A clean handover",
+        text: "[TODO: confirm] You get the code, the documentation and full control. There is no lock-in.",
+      },
+      {
+        title: "No passwords in code",
+        text: "[TODO: confirm] Keys and passwords live in a proper secret store — never in code and never in chat.",
+      },
+    ],
+    tenant: {
+      example: "Example",
+      tenant: "Your Microsoft 365",
+      site: "SharePoint Online",
+      parts: ["Web parts", "Internal apps"],
+      us: "Coditu",
+      build: "Build",
+      caption: "Example: web parts and apps run in your SharePoint. Our own drawing.",
+    },
   },
 
   footer: {
