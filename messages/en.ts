@@ -50,21 +50,11 @@ const en: Messages = {
     switchTo: "Deutsch",
   },
 
-  services: [
-    "SharePoint & SPFx web parts",
-    "Internal apps",
-    "Websites & frontend",
-  ],
-
   hero: {
     label: "SharePoint · Internal apps",
     title: "From sketch to finished software",
     lead: "We build software for social organisations, associations and mid-sized companies. Your sketch becomes an app that works in your day-to-day. You see every step on a shared board.",
-    cta: {
-      label: "Request a project",
-      subject: "Project request",
-      body: "Hello Coditu,\n\nOur idea in a few sentences:\n\n\nWe are happy to attach a photo of our sketch.\n",
-    },
+    cta: "Request a project",
     secondary: "How we work",
     request: {
       request: "Request by email",
@@ -99,10 +89,10 @@ const en: Messages = {
       line: "Your team · Berlin · Cairo",
       photos: "[PLACEHOLDER: team photos]",
       members: [
-        { slug: "mohamed-tamer", name: "Mohamed Tamer", role: "Frontend Lead" },
-        { slug: "abdelrahman-elkhateeb", name: "Abdelrahman Elkhateeb", role: "Frontend Engineer" },
-        { slug: "ahmed-yehia", name: "Ahmed Yehia", role: "Backend & DevOps" },
-        { slug: "adam-nafie", name: "Adam Nafie", role: "Client partnerships" },
+        { slug: "mohamed-tamer", hub: "cairo", name: "Mohamed Tamer", role: "Frontend Lead" },
+        { slug: "abdelrahman-elkhateeb", hub: "cairo", name: "Abdelrahman Elkhateeb", role: "Frontend Engineer" },
+        { slug: "ahmed-yehia", hub: "cairo", name: "Ahmed Yehia", role: "Backend & DevOps" },
+        { slug: "adam-nafie", hub: "berlin", name: "Adam Nafie", role: "Client partnerships" },
       ],
     },
   },
@@ -382,9 +372,35 @@ const en: Messages = {
     ],
   },
 
+  // TODO(team): see messages/de.ts — the reply time is not confirmed.
+  contactSection: {
+    title: "Send us your request",
+    intro: "A few sentences are enough. If you have a sketch or files, attach them.",
+    email: {
+      label: "Write an email",
+      subject: "Project request",
+      body: "Hello Coditu,\n\nOur idea in a few sentences:\n\n\nWe are happy to attach a photo of our sketch.\n",
+      or: "Or straight to",
+    },
+    booking: "Book a 20-minute call",
+    reply: "[TODO: confirm] We usually reply within 1 working day.",
+    contactTitle: "Your contact in Berlin",
+    contactText: "From the first call to go-live, you talk to the same person.",
+    teamTitle: "Your team in Cairo",
+  },
+
   footer: {
-    slogan: "From sketch to finished software.",
-    servicesTitle: "Services",
+    description: "SharePoint web parts, internal apps and websites. One team from sketch to operation.",
+    sectionsTitle: "Overview",
+    sections: [
+      { section: "services", label: "Services" },
+      { section: "process", label: "How we work" },
+      { section: "reference", label: "Reference" },
+      { section: "security", label: "Security & data" },
+      { section: "faq", label: "Common questions" },
+      { section: "contact", label: "Contact" },
+    ],
+    locations: "Berlin · Cairo",
     legalTitle: "Legal",
     imprint: "Legal notice",
     privacy: "Privacy policy",

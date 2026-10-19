@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { RevealScope } from "@/components/motion/reveal-scope.client";
+import { Contact } from "@/components/site/contact";
 import { Faq } from "@/components/site/faq";
 import { Hero } from "@/components/site/hero";
 import { Process } from "@/components/site/process";
@@ -31,6 +32,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
       <Reference locale={lang} />
       <Security locale={lang} />
       <Faq locale={lang} />
+      <Contact locale={lang} />
       {/* One observer for every [data-reveal-on-view] on the page. */}
       <RevealScope />
     </>
