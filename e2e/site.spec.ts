@@ -191,6 +191,23 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(section.locator("h3")).toHaveCount(5);
     });
 
+    test("faq: follows security, all closed, opens by keyboard, JSON-LD says the same", async ({ page }) => {
+      await page.goto(home);
+      const section = page.locator('section[aria-labelledby="faq-title"]');
+      await expect(page.locator('section[aria-labelledby="security-title"] + section')).toHaveId("faq");
+      await expect(section.locator("details[open]")).toHaveCount(0);
+
+      const first = section.locator("details").first();
+      await first.locator("summary").focus();
+      await page.keyboard.press("Enter");
+      await expect(first).toHaveAttribute("open", "");
+
+      const ld = JSON.parse((await section.locator('script[type="application/ld+json"]').textContent())!);
+      expect(ld["@type"]).toBe("FAQPage");
+      const questions = (await section.locator("summary").allInnerTexts()).map((q) => q.trim());
+      expect(ld.mainEntity.map((q: { name: string }) => q.name)).toEqual(questions);
+    });
+
     test("no horizontal scroll from 320 to 2560", async ({ page }) => {
       await page.goto(home);
       for (const width of [320, 360, 390, 430, 640, 744, 834, 1024, 1280, 1440, 1728, 1920, 2560]) {
