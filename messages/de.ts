@@ -396,6 +396,63 @@ const de = {
     },
   },
 
+  /**
+   * FAQ. Every answer repeats what Services, How we work and Security already
+   * say — no new promises. Also the FAQPage JSON-LD, so plain text only.
+   * TODO(team): no prices or hourly rate anywhere in docs/, so the cost answer
+   * names none. Add a range here once the team decides to publish one.
+   * TODO(team): „Wem gehört der Code?“ is Security point 4 — confirm both together.
+   * TODO(team): taking over an existing project is not written down anywhere.
+   * Confirm the answer or delete the question.
+   */
+  faqSection: {
+    title: "Häufige Fragen",
+    intro: "Kurze Antworten zu Kosten, Tempo, Zusammenarbeit und Ihrem Code.",
+    items: [
+      {
+        question: "Was kostet ein Projekt?",
+        answer:
+          "Wir rechnen nach Aufwand ab. Vor dem Start bekommen Sie von uns eine Schätzung. Kleine Änderungen brauchen meist unter 2 Stunden.",
+      },
+      {
+        question: "Wie schnell gibt es eine erste Version?",
+        answer:
+          "Ein neuer Webpart braucht meist 1–2 Tage. Die erste Version einer internen App steht in wenigen Tagen.",
+      },
+      {
+        question: "Arbeiten Sie nur mit SharePoint und Microsoft 365?",
+        answer:
+          "Nein. Wir bauen SharePoint-Webparts, interne Apps, Websites und Frontends – und betreuen sie nach dem Start.",
+      },
+      {
+        question: "Wie läuft die Zusammenarbeit ab?",
+        answer:
+          "Wir arbeiten in wöchentlichen Sprints. Jede Woche zeigen wir, was fertig ist, und Sie sagen, was sich ändern soll. Dabei haben Sie einen festen Ansprechpartner.",
+        link: { section: "process" as const, label: "So arbeiten wir" },
+      },
+      {
+        question: "Sie sitzen in Berlin und Kairo. Wie funktioniert das?",
+        answer:
+          "Ihr fester Ansprechpartner ist Adam Nafie in Berlin. Zwischen Berlin und Kairo liegt höchstens eine Stunde Zeitunterschied. Gespräche führen wir auf Deutsch oder Englisch.",
+      },
+      {
+        question: "Wem gehört der Code?",
+        answer:
+          "[TODO: bestätigen] Ihnen. Sie bekommen den Code, die Dokumentation und die volle Kontrolle. Sie sind nicht an uns gebunden.",
+      },
+      {
+        question: "Übernehmen Sie auch ein bestehendes Projekt?",
+        answer:
+          "[TODO: bestätigen] Das klären wir im Einzelfall. Zuerst sehen wir uns den bestehenden Code an. Dann sagen wir Ihnen, ob wir ihn übernehmen können und mit welchem Aufwand.",
+      },
+      {
+        question: "Was passiert nach dem Livegang?",
+        answer:
+          "Wir bleiben ansprechbar – für Änderungen und Wartung, wenn Sie sie brauchen. Abgerechnet wird pro Anfrage.",
+      },
+    ],
+  },
+
   footer: {
     slogan: "Von der Skizze zur fertigen Software.",
     servicesTitle: "Leistungen",
