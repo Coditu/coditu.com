@@ -1,19 +1,28 @@
 import type { Metadata } from "next";
 
-import { getMessages, pages, type Locale, type PageKey } from "@/lib/i18n";
+import { getMessages, type Locale } from "@/lib/i18n";
 import { SITE_NAME } from "@/lib/site-config";
 
 const OG_IMAGE = "/og.png";
 
 /**
  * Title, description, canonical, hreflang (de, en, x-default → German) and the
- * social card for one page in one language. URLs are relative and resolve
- * against `metadataBase` in the root layout.
+ * social card for one page in one language. `paths` is the page in every
+ * language it exists in (`pages.home`, or a blog post in one language). URLs
+ * are relative and resolve against `metadataBase` in the root layout.
  */
 export function pageMetadata(
   locale: Locale,
-  page: PageKey,
-  { title, description }: { title: Metadata["title"]; description: string }
+  paths: Partial<Record<Locale, string>>,
+  {
+    title,
+    description,
+    article,
+  }: {
+    title: Metadata["title"];
+    description: string;
+    article?: { publishedTime: string; modifiedTime: string };
+  }
 ): Metadata {
   const t = getMessages(locale);
   const ogTitle = typeof title === "object" && title && "absolute" in title ? title.absolute : `${title} | ${SITE_NAME}`;
@@ -22,15 +31,15 @@ export function pageMetadata(
     title,
     description,
     alternates: {
-      canonical: pages[page][locale],
-      languages: { de: pages[page].de, en: pages[page].en, "x-default": pages[page].de },
+      canonical: paths[locale],
+      languages: { ...paths, "x-default": paths.de ?? paths[locale] },
     },
     openGraph: {
       title: ogTitle,
       description,
-      url: pages[page][locale],
+      url: paths[locale],
       siteName: SITE_NAME,
-      type: "website",
+      ...(article ? { type: "article", ...article } : { type: "website" }),
       locale: t.locale.replace("-", "_"),
       images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: t.meta.ogAlt }],
     },

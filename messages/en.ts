@@ -38,6 +38,7 @@ const en: Messages = {
       { section: "team", label: "Team" },
       { section: "contact", label: "Contact" },
     ],
+    blog: "Blog",
     booking: "Book a call",
     menuOpen: "Open menu",
     menuClose: "Close menu",
@@ -387,6 +388,26 @@ const en: Messages = {
     contactTitle: "Your contact in Berlin",
     contactText: "From the first call to go-live, you talk to the same person.",
     teamTitle: "Your team in Cairo",
+  },
+
+  blog: {
+    title: "Blog",
+    description: "Answers to the questions clients ask us about SharePoint, SPFx web parts, Power Apps and internal apps.",
+    intro: "Short answers to the questions that come before a project: SharePoint, web parts and internal apps.",
+    all: "All articles",
+    updated: "Updated",
+    readingTime: "{minutes} min read",
+    draft: "Draft",
+    draftNote: "Visible on previews only, not live. Open: {review}.",
+    tableLabel: "Table, scrolls sideways",
+    end: {
+      title: "Does this fit your project?",
+      text: "Send us a few sentences or a sketch. Before we start, you get an estimate from us.",
+      cta: "Send a request",
+      service: "Service: {service}",
+      reference: "Our reference",
+    },
+    prices: { webPart: "from {price}", change: "{price} per hour", onRequest: "Price on request" },
   },
 
   footer: {
