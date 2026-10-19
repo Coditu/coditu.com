@@ -19,7 +19,15 @@ function Column({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-export function SiteFooter({ locale, hashMap }: { locale: Locale; hashMap: Record<string, string> }) {
+export function SiteFooter({
+  locale,
+  hashMap,
+  pathMap,
+}: {
+  locale: Locale;
+  hashMap: Record<string, string>;
+  pathMap: Record<string, string>;
+}) {
   const t = getMessages(locale);
 
   return (
@@ -70,7 +78,7 @@ export function SiteFooter({ locale, hashMap }: { locale: Locale; hashMap: Recor
               {CONTACT_EMAIL}
             </a>
             <p className="text-[14px] text-ink-muted">{t.footer.locations}</p>
-            <LanguageSwitch locale={locale} label={t.footer.languageTitle} switchTo={t.language.switchTo} hashMap={hashMap} />
+            <LanguageSwitch locale={locale} label={t.footer.languageTitle} switchTo={t.language.switchTo} hashMap={hashMap} pathMap={pathMap} />
           </Column>
         </div>
 

@@ -7,7 +7,8 @@ import { locales, pages, type Locale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 /**
- * DE / EN. The other language's link points at the same page in that language,
+ * DE / EN. The other language's link points at the same page in that language
+ * (`pathMap`, this language's paths → the other's; home if a path is missing),
  * and on click also at the section currently in view (`hashMap` maps this
  * language's section ids to the other's). Without JS it still lands on the
  * right page.
@@ -17,14 +18,15 @@ export function LanguageSwitch({
   label,
   switchTo,
   hashMap,
+  pathMap,
 }: {
   locale: Locale;
   label: string;
   switchTo: string;
   hashMap: Record<string, string>;
+  pathMap: Record<string, string>;
 }) {
   const pathname = usePathname();
-  const page = Object.values(pages).find((p) => p[locale] === pathname) ?? pages.home;
 
   const keepSection = (event: MouseEvent<HTMLAnchorElement>) => {
     const inView = Array.from(document.querySelectorAll<HTMLElement>("main section[id]"))
@@ -49,7 +51,7 @@ export function LanguageSwitch({
             </span>
           ) : (
             <a
-              href={page[lang]}
+              href={pathMap[pathname] ?? pages.home[lang]}
               hrefLang={lang}
               lang={lang}
               aria-label={switchTo}

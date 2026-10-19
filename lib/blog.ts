@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { marked } from "marked";
 
-import { getMessages, type Locale } from "@/lib/i18n";
+import { getMessages, locales, pages, type Locale } from "@/lib/i18n";
 import { PRICES, SHOW_PRICES } from "@/lib/site-config";
 
 /**
@@ -24,6 +24,8 @@ export type Post = {
   tags: string[];
   /** Index into `servicesSection.rows`: the service the end box links to. */
   service: number;
+  /** The German slug this post translates (set on the English version). */
+  translationOf?: string;
   /** Set (e.g. „needs Adam“) while the post waits for review. Never shown in production. */
   review?: string;
   /** Markdown. */
@@ -67,6 +69,7 @@ export function parsePost(source: string): Post {
     readingTime: Number(data.readingTime),
     tags: Array.isArray(data.tags) ? data.tags : [],
     service: Number(data.service),
+    translationOf: data.translationOf ? String(data.translationOf) : undefined,
     review: data.review ? String(data.review) : undefined,
     body: match[2],
   };
@@ -94,6 +97,37 @@ export function getPosts(locale: Locale): Post[] {
 export const getPost = (locale: Locale, slug: string) => getPosts(locale).find((post) => post.slug === slug);
 
 export const blogPath = (locale: Locale, slug?: string) => `/${locale}/blog${slug ? `/${slug}` : ""}`;
+
+const otherLocale = (locale: Locale): Locale => (locale === "de" ? "en" : "de");
+
+/** The same post in the other language, if it is visible there. */
+export function getTranslation(locale: Locale, post: Post) {
+  return getPosts(otherLocale(locale)).find((p) => p.slug === post.translationOf || p.translationOf === post.slug);
+}
+
+/** The post in every language it exists in, for hreflang and the sitemap. */
+export function postPaths(locale: Locale, post: Post): Partial<Record<Locale, string>> {
+  const translation = getTranslation(locale, post);
+  return { [locale]: blogPath(locale, post.slug), ...(translation && { [otherLocale(locale)]: blogPath(otherLocale(locale), translation.slug) }) };
+}
+
+/** The blog index in every language that has posts. */
+export const blogIndexPaths = (): Partial<Record<Locale, string>> =>
+  Object.fromEntries(locales.filter((l) => getPosts(l).length > 0).map((l) => [l, blogPath(l)]));
+
+/**
+ * Every path in this language → the same page in the other, for the language
+ * switch. A post without a translation goes to the other blog, or its home
+ * page if that language has no posts.
+ */
+export function switchPaths(locale: Locale): Record<string, string> {
+  const other = otherLocale(locale);
+  const otherBlog = getPosts(other).length > 0 ? blogPath(other) : pages.home[other];
+  const map: Record<string, string> = Object.fromEntries(Object.values(pages).map((p) => [p[locale], p[other]]));
+  map[blogPath(locale)] = otherBlog;
+  for (const post of getPosts(locale)) map[blogPath(locale, post.slug)] = postPaths(locale, post)[other] ?? otherBlog;
+  return map;
+}
 
 /** `2026-10-19` → „19. Oktober 2026“ / "October 19, 2026", whatever the server's time zone. */
 export function formatDate(locale: Locale, date: string) {

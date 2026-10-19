@@ -73,6 +73,10 @@ describe("blog", () => {
         expect(post.body.match(/^\|---/gm)).toHaveLength(1);
         expect(post.body).toMatch(/^## (Wann wir nicht die richtige Wahl sind|When we are not the right choice)$/m);
         expect(post.body).not.toMatch(/EVIM/i);
+        if (post.translationOf) {
+          const other = resolve(import.meta.dirname, "../content/blog", locale === "de" ? "en" : "de", `${post.translationOf}.md`);
+          expect(parsePost(readFileSync(other, "utf8")).date).toBe(post.date);
+        }
         for (const [, slug] of post.body.matchAll(new RegExp(`\\]\\(/${locale}/blog/([^)]+)\\)`, "g"))) {
           expect(slugs).toContain(slug);
         }

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteNav } from "@/components/site/site-nav";
+import { switchPaths } from "@/lib/blog";
 import { fontVariables } from "@/lib/fonts";
 import { getMessages, hasLocale, locales, sectionMap } from "@/lib/i18n";
 import { SITE_NAME } from "@/lib/site-config";
@@ -59,6 +60,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
   if (!hasLocale(lang)) notFound();
   const t = getMessages(lang);
   const hashMap = sectionMap(lang);
+  const pathMap = switchPaths(lang);
 
   return (
     // The script below sets `data-theme` before hydration.
@@ -75,11 +77,11 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
         >
           {t.skipLink}
         </a>
-        <SiteNav locale={lang} hashMap={hashMap} />
+        <SiteNav locale={lang} hashMap={hashMap} pathMap={pathMap} />
         <main id="inhalt" tabIndex={-1} className="outline-none">
           {children}
         </main>
-        <SiteFooter locale={lang} hashMap={hashMap} />
+        <SiteFooter locale={lang} hashMap={hashMap} pathMap={pathMap} />
       </body>
     </html>
   );
