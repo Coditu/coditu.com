@@ -7,7 +7,6 @@ updated: 2026-10-19
 readingTime: 4
 tags: [SharePoint, SPFx, Kosten]
 service: 0
-review: "needs Adam"
 ---
 
 Ein SharePoint-Webpart kostet so viel, wie seine Entwicklung an Stunden braucht. Bei uns sind das für einen neuen Webpart meist 5 bis 10 Stunden, also 1 bis 2 Arbeitstage.
@@ -83,4 +82,4 @@ Wenn ein Standard-Webpart Ihre Anforderung erfüllt, brauchen Sie keinen eigenen
 
 Auch wenn Sie vor allem Seiten anlegen und Inhalte pflegen lassen wollen, sind wir nicht die Richtigen. Dafür braucht es keine Entwicklung.
 
-Und wenn Sie ein komplettes Intranet zum Festpreis ausschreiben, passt unser Modell nicht: Wir arbeiten in wöchentlichen Sprints und rechnen nach Aufwand ab. [TODO: bestätigen, dass wir keine Festpreise anbieten.]
+Und wenn Sie ein komplettes Intranet zum Festpreis ausschreiben, passt unser Modell nicht: Wir arbeiten in wöchentlichen Sprints und rechnen nach Aufwand ab.

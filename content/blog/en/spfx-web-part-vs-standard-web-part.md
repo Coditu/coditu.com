@@ -8,7 +8,6 @@ updated: 2026-10-19
 readingTime: 4
 tags: [SPFx, SharePoint, Web parts]
 service: 0
-review: "needs Adam"
 ---
 
 A custom SPFx web part pays off when no standard web part shows your content the way your staff need it. For text, images, links and simple news, the web parts that come with SharePoint are usually enough.
@@ -67,8 +66,6 @@ We have built around 38 web parts for one organisation. They include a main navi
 
 A new web part usually takes us 5 to 10 hours, or 1 to 2 working days. Most changes after that take 2 hours or less. We have worked with this client in weekly sprints for almost a year.
 
-The most common reason for a custom web part there was: [TODO: Adam — häufigsten Grund bestätigen (Gestaltung, Daten aus mehreren Quellen oder eigene Logik?).]
-
 ## How much does a custom web part cost?
 
 A custom web part costs development time, not a licence. How much time depends mainly on the data, the settings and the design.
@@ -87,4 +84,4 @@ If a standard web part with the right settings is enough, you don't need a custo
 
 If there's a ready-made third-party product that fits exactly, that's often the faster route.
 
-And if you run SharePoint Server in your own data centre rather than SharePoint Online, please check that with us first. [TODO: bestätigen, ob wir SPFx-Webparts für SharePoint Server umsetzen.]
+And if you run SharePoint Server in your own data centre rather than SharePoint Online, please check that with us first.

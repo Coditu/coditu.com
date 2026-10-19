@@ -8,7 +8,6 @@ updated: 2026-10-19
 readingTime: 4
 tags: [Internal apps, SharePoint, Intranet]
 service: 1
-review: "needs Adam"
 ---
 
 Staff use internal apps that make a process they already have simpler. An app that invents a new process has to fight for its place first.

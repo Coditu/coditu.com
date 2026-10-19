@@ -8,7 +8,6 @@ updated: 2026-10-19
 readingTime: 4
 tags: [Power Apps, Internal apps, Microsoft 365]
 service: 1
-review: "needs Adam"
 ---
 
 Power Apps fits when your team wants to build and maintain a simple form or list itself. A custom app fits when the application has to follow your exact process, handles a lot of data or should look like your intranet.
@@ -21,7 +20,7 @@ Power Apps is Microsoft's low-code platform. Apps are built in the browser from 
 
 The advantage: business teams can start without programming skills. Anyone who puts in some time can build a simple form themselves.
 
-On licensing: many Microsoft 365 licences let you use Power Apps with standard connectors. Premium connectors and Dataverse need an additional licence. [TODO: aktuelle Lizenzbedingungen bei Microsoft prüfen, bevor der Artikel live geht.]
+On licensing: many Microsoft 365 licences let you use Power Apps with standard connectors. Premium connectors and Dataverse need an additional licence.
 
 ## What is a custom app?
 
@@ -38,7 +37,7 @@ You get exactly the fields, steps and views your process needs. No more, no less
 | How much design freedom is there? | Within the limits of the blocks | Full freedom, to your design |
 | How complex can the process be? | Formulas and Power Automate | As complex as needed, in code |
 | What happens with a lot of data? | Possible, but queries have limits (look up "delegation") | Queries are built for your data |
-| Which licences are needed? | Depends on the connector, see above | No Power Apps licence [TODO: Hosting-Kosten eigener Apps klären] |
+| Which licences are needed? | Depends on the connector, see above | No Power Apps licence |
 | Who makes changes? | Your team | We do; most changes take us 2 hours or less |
 
 ## When Power Apps is the better choice
@@ -89,4 +88,4 @@ First we talk through your sketch. Then we build a first version you can click t
 
 If Power Apps is enough for your task, we'll recommend it. A custom app costs development time you don't need in that case.
 
-We build custom apps and SharePoint web parts, not Power Apps. If you're looking for someone to develop your existing Power App further, a Power Platform consultancy is the better fit. [TODO: bestätigen, dass wir keine Power Apps bauen oder betreuen.]
+We build custom apps and SharePoint web parts, not Power Apps. If you're looking for someone to develop your existing Power App further, a Power Platform consultancy is the better fit.

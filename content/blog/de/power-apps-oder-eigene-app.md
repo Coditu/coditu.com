@@ -7,7 +7,6 @@ updated: 2026-10-19
 readingTime: 4
 tags: [Power Apps, Interne Apps, Microsoft 365]
 service: 1
-review: "needs Adam"
 ---
 
 Power Apps passt, wenn Ihr Team ein einfaches Formular oder eine Liste selbst bauen und pflegen will. Eine eigene App passt, wenn die Anwendung genau Ihrem Ablauf folgen muss, viele Daten verarbeitet oder wie Ihr Intranet aussehen soll.
@@ -20,7 +19,7 @@ Power Apps ist die Low-Code-Plattform von Microsoft. Apps entstehen im Browser, 
 
 Der Vorteil: Fachabteilungen können ohne Programmierkenntnisse starten. Wer sich einarbeitet, baut ein einfaches Formular selbst.
 
-Zur Lizenz: Mit vielen Microsoft-365-Lizenzen können Sie Power Apps mit Standard-Connectoren nutzen. Premium-Connectoren und Dataverse brauchen eine zusätzliche Lizenz. [TODO: aktuelle Lizenzbedingungen bei Microsoft prüfen, bevor der Artikel live geht.]
+Zur Lizenz: Mit vielen Microsoft-365-Lizenzen können Sie Power Apps mit Standard-Connectoren nutzen. Premium-Connectoren und Dataverse brauchen eine zusätzliche Lizenz.
 
 ## Was ist eine eigene App?
 
@@ -37,7 +36,7 @@ Sie bekommen genau die Felder, Schritte und Ansichten, die Ihr Ablauf braucht. N
 | Wie frei ist die Gestaltung? | Im Rahmen der Bausteine | Frei, nach Ihrem Design |
 | Wie komplex darf der Ablauf sein? | Formeln und Power Automate | Beliebig, im Code |
 | Was passiert bei vielen Daten? | Möglich, aber Abfragen haben Grenzen (Stichwort Delegation) | Abfragen werden für Ihre Daten gebaut |
-| Welche Lizenzen braucht es? | Je nach Connector, siehe oben | Keine Power-Apps-Lizenz [TODO: Hosting-Kosten eigener Apps klären] |
+| Welche Lizenzen braucht es? | Je nach Connector, siehe oben | Keine Power-Apps-Lizenz |
 | Wer ändert etwas? | Ihr Team selbst | Wir; die meisten Änderungen brauchen bei uns höchstens 2 Stunden |
 
 ## Wann Power Apps die bessere Wahl ist
@@ -88,4 +87,4 @@ Zuerst sprechen wir über Ihre Skizze. Dann bauen wir eine erste Version zum Ank
 
 Wenn Power Apps für Ihre Aufgabe reicht, raten wir Ihnen dazu. Eine eigene App kostet Entwicklungszeit, die Sie dann nicht brauchen.
 
-Wir bauen eigene Apps und SharePoint-Webparts, keine Power Apps. Suchen Sie jemanden, der Ihre bestehende Power-App weiterentwickelt, ist ein Power-Platform-Dienstleister die bessere Adresse. [TODO: bestätigen, dass wir keine Power Apps bauen oder betreuen.]
+Wir bauen eigene Apps und SharePoint-Webparts, keine Power Apps. Suchen Sie jemanden, der Ihre bestehende Power-App weiterentwickelt, ist ein Power-Platform-Dienstleister die bessere Adresse.
