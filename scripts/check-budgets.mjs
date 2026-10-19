@@ -93,7 +93,8 @@ try {
 // go red: the page still renders, it just quietly starts running React for
 // every visitor. A prerendered route leaves its HTML on disk; a dynamic one
 // does not.
-for (const route of ["de", "en", "de/impressum", "de/datenschutz", "en/legal-notice", "en/privacy"]) {
+// `de/blog` assumes posts under review are visible, as they are outside production.
+for (const route of ["de", "en", "de/impressum", "de/datenschutz", "en/legal-notice", "en/privacy", "de/blog"]) {
   const prerendered = `.next/server/app/${route}.html`;
   if (existsSync(prerendered)) {
     console.log(`ok    /${route} is prerendered`);
