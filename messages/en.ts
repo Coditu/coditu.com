@@ -336,6 +336,52 @@ const en: Messages = {
     },
   },
 
+  // TODO(team): see messages/de.ts — prices, code ownership and takeover are open.
+  faqSection: {
+    title: "Common questions",
+    intro: "Short answers on cost, speed, working together and your code.",
+    items: [
+      {
+        question: "What does a project cost?",
+        answer:
+          "We bill by effort. Before we start, you get an estimate from us. Small changes usually take under 2 hours.",
+      },
+      {
+        question: "How soon is there a first version?",
+        answer: "A new web part usually takes 1–2 days. The first version of an internal app is ready in a few days.",
+      },
+      {
+        question: "Do you only work with SharePoint and Microsoft 365?",
+        answer: "No. We build SharePoint web parts, internal apps, websites and frontends — and look after them after launch.",
+      },
+      {
+        question: "What does working together look like?",
+        answer:
+          "We work in weekly sprints. Every week we show what is done and you tell us what should change. You have one fixed contact.",
+        link: { section: "process" as const, label: "How we work" },
+      },
+      {
+        question: "You are in Berlin and Cairo. How does that work?",
+        answer:
+          "Your fixed contact is Adam Nafie in Berlin. Berlin and Cairo are at most one hour apart. We talk with you in German or English.",
+      },
+      {
+        question: "Who owns the code?",
+        answer:
+          "[TODO: confirm] You do. You get the code, the documentation and full control. There is no lock-in.",
+      },
+      {
+        question: "Can you take over an existing project?",
+        answer:
+          "[TODO: confirm] We decide that case by case. First we look at the existing code. Then we tell you whether we can take it over, and with how much effort.",
+      },
+      {
+        question: "What happens after go-live?",
+        answer: "We stay on hand for changes and maintenance when you need them. Billed per request.",
+      },
+    ],
+  },
+
   footer: {
     slogan: "From sketch to finished software.",
     servicesTitle: "Services",
