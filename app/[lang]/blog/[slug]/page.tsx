@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { SheetLabel } from "@/components/blueprint/sheet-label";
 import { Container } from "@/components/site/container";
 import { ButtonLink } from "@/components/ui/button";
-import { blogPath, formatDate, getPost, getPosts, renderPost } from "@/lib/blog";
+import { blogPath, formatDate, getPost, getPosts, postPaths, renderPost } from "@/lib/blog";
 import { getMessages, hasLocale, sectionHref, type Locale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/metadata";
 import { SITE_NAME } from "@/lib/site-config";
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/blog/[slug
   const { lang, post } = await resolve(params);
   return pageMetadata(
     lang,
-    { [lang]: blogPath(lang, post.slug) },
+    postPaths(lang, post),
     {
       title: post.title,
       description: post.description,

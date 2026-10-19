@@ -9,7 +9,15 @@ import { LanguageSwitch } from "./language-switch.client";
 import { MobileMenu } from "./mobile-menu.client";
 import { ThemeToggle } from "./theme-toggle.client";
 
-export function SiteNav({ locale, hashMap }: { locale: Locale; hashMap: Record<string, string> }) {
+export function SiteNav({
+  locale,
+  hashMap,
+  pathMap,
+}: {
+  locale: Locale;
+  hashMap: Record<string, string>;
+  pathMap: Record<string, string>;
+}) {
   const t = getMessages(locale);
   const links = t.nav.links.map((link) => ({ href: sectionHref(locale, link.section), label: link.label }));
   // Before „Kontakt“, and only in a language that has posts.
@@ -39,7 +47,7 @@ export function SiteNav({ locale, hashMap }: { locale: Locale; hashMap: Record<s
         </nav>
 
         <div className="flex items-center gap-4">
-          <LanguageSwitch locale={locale} label={t.language.groupLabel} switchTo={t.language.switchTo} hashMap={hashMap} />
+          <LanguageSwitch locale={locale} label={t.language.groupLabel} switchTo={t.language.switchTo} hashMap={hashMap} pathMap={pathMap} />
           <ThemeToggle label={t.nav.themeToggle} />
           <ButtonLink href={booking} variant="outline" size="sm" className="hidden lg:inline-flex">
             {t.nav.booking}

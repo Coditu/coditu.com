@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { SheetLabel } from "@/components/blueprint/sheet-label";
 import { Container } from "@/components/site/container";
-import { blogPath, formatDate, getPosts } from "@/lib/blog";
+import { blogIndexPaths, blogPath, formatDate, getPosts } from "@/lib/blog";
 import { getMessages, hasLocale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/metadata";
 
@@ -18,7 +18,7 @@ async function resolve(params: PageProps<"/[lang]/blog">["params"]) {
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/blog">): Promise<Metadata> {
   const { lang, t } = await resolve(params);
-  return pageMetadata(lang, { [lang]: blogPath(lang) }, { title: t.title, description: t.description });
+  return pageMetadata(lang, blogIndexPaths(), { title: t.title, description: t.description });
 }
 
 export default async function BlogIndex({ params }: PageProps<"/[lang]/blog">) {
