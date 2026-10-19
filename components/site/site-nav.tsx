@@ -1,5 +1,6 @@
 import { CoditusLockup } from "@/components/coditu/coditus-mark";
 import { ButtonLink } from "@/components/ui/button";
+import { blogPath, getPosts } from "@/lib/blog";
 import { getMessages, pages, sectionHref, type Locale } from "@/lib/i18n";
 import { BOOKING_URL } from "@/lib/site-config";
 
@@ -11,6 +12,8 @@ import { ThemeToggle } from "./theme-toggle.client";
 export function SiteNav({ locale, hashMap }: { locale: Locale; hashMap: Record<string, string> }) {
   const t = getMessages(locale);
   const links = t.nav.links.map((link) => ({ href: sectionHref(locale, link.section), label: link.label }));
+  // Before „Kontakt“, and only in a language that has posts.
+  if (getPosts(locale).length > 0) links.splice(-1, 0, { href: blogPath(locale), label: t.nav.blog });
   const booking = BOOKING_URL ?? sectionHref(locale, "contact");
 
   return (

@@ -9,14 +9,14 @@ import { Process } from "@/components/site/process";
 import { Reference } from "@/components/site/reference";
 import { Security } from "@/components/site/security";
 import { Services } from "@/components/site/services";
-import { getMessages, hasLocale } from "@/lib/i18n";
+import { getMessages, hasLocale, pages } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/metadata";
 
 export async function generateMetadata({ params }: PageProps<"/[lang]">): Promise<Metadata> {
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
   const t = getMessages(lang);
-  return pageMetadata(lang, "home", { title: { absolute: t.meta.title }, description: t.meta.description });
+  return pageMetadata(lang, pages.home, { title: { absolute: t.meta.title }, description: t.meta.description });
 }
 
 /** Sections are added one by one in page order (Phase 2). */

@@ -25,7 +25,7 @@ async function resolve(params: PageProps<"/[lang]/[legal]">["params"]) {
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/[legal]">): Promise<Metadata> {
   const { lang, page, content } = await resolve(params);
-  return pageMetadata(lang, page, { title: content.title, description: content.description });
+  return pageMetadata(lang, pages[page], { title: content.title, description: content.description });
 }
 
 export default async function LegalPage({ params }: PageProps<"/[lang]/[legal]">) {

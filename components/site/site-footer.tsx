@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { CoditusLockup } from "@/components/coditu/coditus-mark";
+import { blogPath, getPosts } from "@/lib/blog";
 import { getMessages, pages, sectionHref, type Locale } from "@/lib/i18n";
 import { CONTACT_EMAIL } from "@/lib/site-config";
 
@@ -39,6 +40,13 @@ export function SiteFooter({ locale, hashMap }: { locale: Locale; hashMap: Recor
                   </a>
                 </li>
               ))}
+              {getPosts(locale).length > 0 && (
+                <li>
+                  <a href={blogPath(locale)} className={link}>
+                    {t.nav.blog}
+                  </a>
+                </li>
+              )}
             </ul>
           </Column>
 

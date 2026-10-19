@@ -47,6 +47,7 @@ const de = {
       { section: "team" as const, label: "Team" },
       { section: "contact" as const, label: "Kontakt" },
     ],
+    blog: "Blog",
     booking: "Gespräch buchen",
     menuOpen: "Menü öffnen",
     menuClose: "Menü schließen",
@@ -461,6 +462,33 @@ const de = {
     contactTitle: "Ihr Ansprechpartner in Berlin",
     contactText: "Vom ersten Gespräch bis zum Livegang sprechen Sie mit derselben Person.",
     teamTitle: "Ihr Team in Kairo",
+  },
+
+  /**
+   * The blog: index, article page and the box at the end of each post. The
+   * posts themselves are Markdown files in content/blog/de/.
+   */
+  blog: {
+    title: "Blog",
+    description:
+      "Antworten auf Fragen, die uns Kunden zu SharePoint, SPFx-Webparts, Power Apps und internen Apps stellen.",
+    intro: "Kurze Antworten auf die Fragen, die vor einem Projekt kommen: zu SharePoint, Webparts und internen Apps.",
+    all: "Alle Artikel",
+    updated: "Aktualisiert",
+    readingTime: "{minutes} Min. Lesezeit",
+    draft: "Entwurf",
+    /** Only on previews: production never shows a post under review. */
+    draftNote: "Nur in der Vorschau sichtbar, nicht live. Offen: {review}.",
+    tableLabel: "Tabelle, seitlich scrollbar",
+    end: {
+      title: "Passt das zu Ihrem Vorhaben?",
+      text: "Schicken Sie uns ein paar Sätze oder eine Skizze. Vor dem Start bekommen Sie von uns eine Schätzung.",
+      cta: "Anfrage senden",
+      service: "Leistung: {service}",
+      reference: "Unsere Referenz",
+    },
+    /** `{{price:…}}` in a post. The amounts and the switch are in lib/site-config.ts. */
+    prices: { webPart: "ab {price}", change: "{price} pro Stunde", onRequest: "Preis auf Anfrage" },
   },
 
   footer: {

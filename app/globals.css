@@ -417,3 +417,59 @@
     animation-play-state: running !important;
   }
 }
+
+/* --- Blog post body (app/[lang]/blog/[slug]/page.tsx) ----------------------
+   The body is Markdown rendered to HTML, so its elements are styled here.
+   The first paragraph answers the title's question: it is set as the lead. */
+.article {
+  @apply text-body text-ink;
+}
+.article > * + * {
+  @apply mt-6;
+}
+.article > p:first-child {
+  @apply text-lead;
+}
+.article h2 {
+  @apply mt-16 text-h2;
+}
+.article h3 {
+  @apply mt-12 text-h3;
+}
+.article :is(h2, h3) + * {
+  @apply mt-4;
+}
+.article ul {
+  @apply flex list-disc flex-col gap-2 pl-6;
+}
+.article ol {
+  @apply flex list-decimal flex-col gap-2 pl-6;
+}
+.article li::marker {
+  @apply text-blueprint;
+}
+.article strong {
+  @apply font-semibold;
+}
+.article a {
+  @apply font-semibold text-blueprint underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-blueprint-hover hover:decoration-2;
+}
+/* Tables scroll sideways on phones; the wrapper is focusable for the keyboard. */
+.article .table-scroll {
+  @apply mt-8 overflow-x-auto rounded-ui border border-ink bg-surface;
+}
+.article table {
+  @apply w-full min-w-[34rem] border-collapse text-small;
+}
+.article th {
+  @apply border-b border-ink px-4 py-3 text-left align-bottom font-mono text-label text-ink-muted uppercase;
+}
+.article td {
+  @apply border-b border-line px-4 py-3 align-top;
+}
+.article tr:last-child td {
+  @apply border-b-0;
+}
+.article td:first-child {
+  @apply font-semibold;
+}
