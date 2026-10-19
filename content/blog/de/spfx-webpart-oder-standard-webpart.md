@@ -7,7 +7,6 @@ updated: 2026-10-19
 readingTime: 4
 tags: [SPFx, SharePoint, Webparts]
 service: 0
-review: "needs Adam"
 ---
 
 Ein eigener SPFx-Webpart lohnt sich, wenn kein Standard-Webpart Ihre Inhalte so zeigt, wie Ihre Mitarbeitenden sie brauchen. Für Text, Bilder, Links und einfache News reichen die Webparts, die SharePoint mitbringt, meist aus.
@@ -66,8 +65,6 @@ Für eine Organisation haben wir rund 38 Webparts gebaut. Darunter sind eine Hau
 
 Ein neuer Webpart braucht bei uns meist 5 bis 10 Stunden, also 1 bis 2 Arbeitstage. Die meisten Änderungen danach brauchen höchstens 2 Stunden. Wir arbeiten mit diesem Kunden seit fast einem Jahr in wöchentlichen Sprints.
 
-Der häufigste Grund für einen eigenen Webpart war dort: [TODO: Adam — häufigsten Grund bestätigen (Gestaltung, Daten aus mehreren Quellen oder eigene Logik?).]
-
 ## Was kostet ein eigener Webpart?
 
 Ein eigener Webpart kostet Entwicklungszeit, keine Lizenz. Wie viel Zeit, hängt vor allem von den Daten, den Einstellungen und der Gestaltung ab.
@@ -86,4 +83,4 @@ Wenn ein Standard-Webpart mit den richtigen Einstellungen reicht, brauchen Sie k
 
 Wenn es ein fertiges Produkt eines Drittanbieters gibt, das genau passt, ist das oft der schnellere Weg.
 
-Und wenn Sie SharePoint Server im eigenen Rechenzentrum betreiben statt SharePoint Online, klären Sie das bitte zuerst mit uns. [TODO: bestätigen, ob wir SPFx-Webparts für SharePoint Server umsetzen.]
+Und wenn Sie SharePoint Server im eigenen Rechenzentrum betreiben statt SharePoint Online, klären Sie das bitte zuerst mit uns.
