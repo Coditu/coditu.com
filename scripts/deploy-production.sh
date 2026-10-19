@@ -40,9 +40,10 @@ release_script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 release_repo_root=$(CDPATH= cd -- "$release_script_dir/.." && pwd)
 
 # Impressum and Datenschutz are legally required and still carry fields only
-# the team can fill. Never ship them unfilled.
-if grep -rnF '[PLACEHOLDER' "$release_repo_root/messages"; then
-  fail "messages/ still contains [PLACEHOLDER: …] fields — fill them before deploying to production"
+# the team can fill; [TODO: …] marks claims the team has not confirmed yet.
+# Never ship either.
+if grep -rnF -e '[PLACEHOLDER' -e '[TODO' "$release_repo_root/messages"; then
+  fail "messages/ still contains [PLACEHOLDER: …] or [TODO: …] — resolve them before deploying to production"
 fi
 release_health_file=$release_repo_root/public/build-health.json
 [ -f "$release_health_file" ] || fail "public/build-health.json was not written before the deploy"

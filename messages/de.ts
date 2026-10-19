@@ -29,6 +29,7 @@ const de = {
     services: "leistungen",
     process: "arbeitsweise",
     reference: "referenz",
+    security: "sicherheit",
     team: "team",
     faq: "faq",
     contact: "kontakt",
@@ -344,6 +345,55 @@ const de = {
         alt: "Startseite von Nile Atelier",
       },
     ],
+  },
+
+  /**
+   * Security & data: five points and our own drawing of where the work lives.
+   * TODO(team): none of the five points is written down in docs/ yet, so each
+   * one carries a visible „[TODO: bestätigen]“ and production refuses to deploy
+   * while any is left (scripts/deploy-production.sh). Confirm a point, then
+   * delete its marker — or delete the point. Do not soften the wording instead.
+   *  1. No client data on Coditu servers — true for every project, not only SPFx?
+   *  2. Access only through accounts the client grants, revocable at any time.
+   *  3. GDPR, and an AVV signed on request — who signs, which template?
+   *  4. Code, docs and full control handed over; no lock-in — in every contract?
+   *  5. Keys and passwords in a secret store, never in code or chat — which one?
+   */
+  securitySection: {
+    title: "Was mit Ihren Daten passiert",
+    intro: "Wie wir mit Ihren Daten, Ihren Zugängen und Ihrem Code umgehen.",
+    points: [
+      {
+        title: "Ihre Daten bleiben in Ihrem System",
+        text: "[TODO: bestätigen] Wo es geht, bauen wir direkt in Ihrem Microsoft 365 und SharePoint. Ihre Daten wandern nicht auf unsere Server.",
+      },
+      {
+        title: "Zugriff nur, wo nötig",
+        text: "[TODO: bestätigen] Wir nutzen die Zugänge, die Sie uns geben, und nur für die Arbeit. Sie können sie jederzeit wieder entziehen.",
+      },
+      {
+        title: "DSGVO und AVV",
+        text: "[TODO: bestätigen] Wir arbeiten nach der DSGVO. Wenn nötig, schließen wir mit Ihnen einen Auftragsverarbeitungsvertrag (AVV).",
+      },
+      {
+        title: "Saubere Übergabe",
+        text: "[TODO: bestätigen] Sie bekommen den Code, die Dokumentation und die volle Kontrolle. Sie sind nicht an uns gebunden.",
+      },
+      {
+        title: "Keine Passwörter im Code",
+        text: "[TODO: bestätigen] Schlüssel und Passwörter liegen in einem geschützten Speicher dafür – nie im Code und nie im Chat.",
+      },
+    ],
+    /** Our own drawing: the web parts and apps sit inside the client's tenant. */
+    tenant: {
+      example: "Beispiel",
+      tenant: "Ihr Microsoft 365",
+      site: "SharePoint Online",
+      parts: ["Webparts", "Interne Apps"],
+      us: "Coditu",
+      build: "Umsetzung",
+      caption: "Beispiel: Webparts und Apps laufen in Ihrem SharePoint. Eigene Darstellung.",
+    },
   },
 
   footer: {

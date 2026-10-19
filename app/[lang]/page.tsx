@@ -5,6 +5,7 @@ import { RevealScope } from "@/components/motion/reveal-scope.client";
 import { Hero } from "@/components/site/hero";
 import { Process } from "@/components/site/process";
 import { Reference } from "@/components/site/reference";
+import { Security } from "@/components/site/security";
 import { Services } from "@/components/site/services";
 import { getMessages, hasLocale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/metadata";
@@ -27,6 +28,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
       <Services locale={lang} />
       <Process locale={lang} />
       <Reference locale={lang} />
+      <Security locale={lang} />
       {/* One observer for every [data-reveal-on-view] on the page. */}
       <RevealScope />
     </>
