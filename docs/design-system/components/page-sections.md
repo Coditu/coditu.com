@@ -49,11 +49,11 @@ The only place for `text-display` and the page's orange CTA.
 | Stage | `<HeroStage>` (`components/site/hero-stage/`), plays by itself — the visitor types nothing. See *Hero stage* below. |
 | Headline | the slogan „Von der Skizze zur fertigen Software“ + a blue period `<span class="text-blueprint">.</span>` |
 | Facts row | `mt-12 grid sm:grid-cols-3 gap-4 border-t border-ink`, each a 15 px semibold fact (no T.01 ids shown). Facts must be true (see `docs/00-CONTEXT.md`). |
-| Mobile | stage below copy; sketch and app are one card; arrow hidden |
+| Mobile | stage below copy; sketch and web part are one card; arrow and placeholder web parts hidden |
 
 Reference: canvas artboard *Hero – Test des Designsystems*.
 
-### Hero stage — e-mail → sketch → app
+### Hero stage — e-mail → sketch → web part
 
 A **sketch → live** pair ([`../blueprint-motifs.md`](../blueprint-motifs.md) §7) told as a story.
 One timer-driven phase machine (`use-sequence.ts`), no animation library. Per scenario in
@@ -63,16 +63,17 @@ One timer-driven phase machine (`use-sequence.ts`), no animation library. Per sc
 |---|---|---|
 | 1 | E-mail | Card „Anfrage per E-Mail“; the request types itself out with a caret, then its `[key words]` are underlined in blue one by one. |
 | 2 | Sketch | The underlined words fly onto a sheet of ruled paper: the first lands as the handwritten title, the rest as field labels. The pen draws a wobbly box under each label, then the button, then a red margin note (`hero.request.note`). |
-| 3 | App | „wird zu →“ draws (lg+ only) and the app builds beside the paper: same title and fields, styled with `controlClasses` / `buttonClasses` from `components/ui` — spans, not inputs. The last field is a choice (chevron on paper, select look in the app). |
+| 3 | Build | „wird zu →“ draws (lg+ only) and a neutral intranet page (`intranet-frame.tsx`) appears beside the paper: a top bar with a plain grid icon and „Intranet“, a page title, greyed placeholder web parts (lg+). The new web part assembles in it: header with the first word as title, then a small „new item“ form with the sketched fields, styled with `controlClasses` / `buttonClasses` from `components/ui` — spans, not inputs. The last field is a choice (chevron on paper, select look in the web part). No product logos, no real client UI. |
 | 4 | Fill | Each field fills with `values[i]` at typing speed, with a caret; the same value appears in handwriting in the sketch box. The active pair is lit in both. |
-| 5 | Send | A pointer glides to the button, presses it, „Wird gesendet …“ (~900 ms); then a big red tick and „Fertig!“ on paper, and the app shows a check, `success`, a `<dl>` of the values and the „Live“ pill. |
+| 5 | Send | A pointer glides to the button, presses it, „Wird gesendet …“ (~900 ms); then the item lands in the web part as real content (`web-parts/*.tsx`, chosen by `result.kind`): a checklist card with its tasks (`checklist`), a new row between the planned ones (`calendar`), a news card at the top of the feed with its approval pill (`news`). On paper a big red tick and „Fertig!“; then the „Live“ pill in the web part header. |
 | 6 | Out | Holds ~3 s, fades, next scenario. Pauses off screen or in a hidden tab. |
 
-- **Layout.** Fixed stage height (`h-[440px] lg:h-[460px]`), so nothing jumps between phases or scenarios. lg+: the e-mail spans the width; from phase 2 paper left, arrow, app right. Below lg: paper and app share one slot — the sketch draws, then crossfades into the app.
-- **Long values** truncate with „…“ on paper and in the app.
+- **Layout.** Fixed stage height (`h-[440px] lg:h-[460px]`), so nothing jumps between phases or scenarios. lg+: the e-mail spans the width; from phase 2 paper left (~40 %), arrow, intranet page right (~60 %). Below lg: paper and web part share one slot — the sketch draws, then crossfades into the web part; the placeholder web parts are hidden.
+- **Long values** truncate with „…“ on paper and in the web part.
+- **Example data.** Each scenario's `result` holds the rows already in its web part (tasks, planned topics, older news) — example data, marked by the „Beispiel“ tag; nothing about real clients.
 - **Color.** Blue is the pen; red (`text-pen-red`) only for the margin note and the tick. Handwriting is Caveat (`.cd-hand`, `--font-caveat`), self-hosted by next/font, not preloaded.
 - **Accessibility.** The stage is `aria-hidden` with one sr-only sentence (`hero.request.summary`); nothing in it is focusable. Marked „Beispiel“.
-- **Reduced motion.** No typing, drawing, flying or pointer: three still frames — e-mail, sketch + filled app, sent — switched every few seconds.
+- **Reduced motion.** No typing, drawing, flying or pointer: three still frames — e-mail, sketch + filled web part, the item in the web part — switched every few seconds.
 - **No flash.** The server renders the first request fully typed.
 
 ## Feature / benefit item

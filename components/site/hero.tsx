@@ -9,7 +9,8 @@ import { HeroStage } from "./hero-stage/stage.client";
 
 /**
  * Hero: the text on the left, and beside it the one picture of what we do:
- * a client's request by e-mail becomes a sketch, then the app (<HeroStage>).
+ * a client's request by e-mail becomes a sketch, then a web part on their
+ * intranet page (<HeroStage>).
  * On phones the stage comes after the text. Spec:
  * docs/design-system/components/page-sections.md → Hero.
  */

@@ -6,9 +6,15 @@ export type Scenario = {
   /** One example value per field, in order. */
   values: string[];
   button: string;
-  /** The app's title once it is sent. */
-  success: string;
+  /** What the sent item becomes inside its web part (web-parts/*.tsx). */
+  result: Result;
 };
+
+/** Example rows already in the web part; the sent item lands among them. */
+export type Result =
+  | { kind: "checklist"; heading: string; tasks: string[] }
+  | { kind: "calendar"; before: string[][]; after: string[][] }
+  | { kind: "news"; older: string[] };
 
 export type Segment = { text: string; key: number | null; start: number };
 
@@ -26,7 +32,7 @@ export function parse(request: string): Segment[] {
   return out;
 }
 
-/** In order: the e-mail types itself, words are marked, fly onto paper, the pen draws, the app builds and fills itself, is sent. */
+/** In order: the e-mail types itself, words are marked, fly onto paper, the pen draws, the web part builds on the intranet page, fills itself, is sent. */
 export const PHASES = ["type", "mark", "fly", "draw", "build", "fill", "point", "press", "send", "done", "out"] as const;
 export type Phase = (typeof PHASES)[number];
 
@@ -55,7 +61,7 @@ export const reached = (phase: Phase, step: Phase) => PHASES.indexOf(phase) >= P
 /**
  * One tick of the machine: how long to hold `s`, and what comes after.
  * Reduced motion skips typing, drawing and flying: three still frames
- * (e-mail · sketch and filled app · sent), switched slowly.
+ * (e-mail · sketch and filled web part · sent), switched slowly.
  */
 export function advance(s: State, scenarios: Scenario[], reduced: boolean): [ms: number, next: State] {
   const scenario = scenarios[s.index];
@@ -83,7 +89,7 @@ export function advance(s: State, scenarios: Scenario[], reduced: boolean): [ms:
       // The pen: one row per field, then the button and the margin note (see sketch.tsx).
       return to(220 * (fields + 2) + 700, { phase: "build" });
     case "build":
-      return to(1100, { phase: "fill", field: 0, chars: 0 });
+      return to(1500, { phase: "fill", field: 0, chars: 0 });
     case "fill":
       if (s.chars < scenario.values[s.field].length) return to(TYPE_MS * 1.5, { chars: s.chars + 1 });
       if (s.field < fields - 1) return to(350, { field: s.field + 1, chars: 0 });
