@@ -1,7 +1,7 @@
 import { Pill } from "./form";
 
 /** An image not drawn yet: the drawing placeholder (a box with a thin cross). */
-function ImageBox() {
+export function ImageBox() {
   return (
     <span className="block size-12 flex-none border border-line bg-surface-sunk text-line-input">
       <svg viewBox="0 0 48 48" className="size-full">

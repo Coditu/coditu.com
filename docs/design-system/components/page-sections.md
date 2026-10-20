@@ -75,6 +75,7 @@ One timer-driven phase machine (`use-sequence.ts`), no animation library. Per sc
 - **Accessibility.** The stage is `aria-hidden` with one sr-only sentence (`hero.request.summary`); nothing in it is focusable. Marked „Beispiel“.
 - **Reduced motion.** No typing, drawing, flying or pointer: three still frames — e-mail, sketch + filled web part, the item in the web part — switched every few seconds.
 - **No flash.** The server renders the first request fully typed.
+- **Still frames.** `frame.tsx` renders each frame statically (`frame="email" | "sketch" | "webpart" | "filled" | "result"`); review at `/dev/hero-frames` (dev only), PNGs and open questions in [`../hero-frames/`](../hero-frames/README.md).
 
 ## Feature / benefit item
 
