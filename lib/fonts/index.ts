@@ -1,4 +1,4 @@
-import { Geist, JetBrains_Mono } from "next/font/google";
+import { Caveat, Geist, JetBrains_Mono } from "next/font/google";
 
 /** Geist — headings and running text. */
 export const geist = Geist({
@@ -20,5 +20,18 @@ export const jetbrainsMono = JetBrains_Mono({
   fallback: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
 });
 
+/**
+ * Caveat — handwriting, only in the hero's paper sketch (`.cd-hand`). One
+ * variable latin file, self-hosted by next/font. Not preloaded: the sketch
+ * appears seconds after load, so it never competes with the headline.
+ */
+export const caveat = Caveat({
+  variable: "--font-caveat",
+  display: "swap",
+  subsets: ["latin"],
+  preload: false,
+  fallback: ["Segoe Print", "Bradley Hand", "cursive"],
+});
+
 /** Convenience for the root layout. */
-export const fontVariables = `${geist.variable} ${jetbrainsMono.variable}`;
+export const fontVariables = `${geist.variable} ${jetbrainsMono.variable} ${caveat.variable}`;

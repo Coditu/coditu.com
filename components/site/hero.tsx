@@ -5,12 +5,12 @@ import { ButtonLink } from "@/components/ui/button";
 import { getMessages, type Locale } from "@/lib/i18n";
 
 import { Container } from "./container";
-import { RequestToApp } from "./request-to-app.client";
+import { HeroStage } from "./hero-stage/stage.client";
 
 /**
  * Hero: the text on the left, and beside it the one picture of what we do:
- * a client's request in words turns into the app (<RequestToApp>). On phones
- * the card comes after the text. Spec:
+ * a client's request by e-mail becomes a sketch, then the app (<HeroStage>).
+ * On phones the stage comes after the text. Spec:
  * docs/design-system/components/page-sections.md → Hero.
  */
 export function Hero({ locale }: { locale: Locale }) {
@@ -55,7 +55,7 @@ export function Hero({ locale }: { locale: Locale }) {
             </div>
           </div>
           <div className="lg:col-span-6">
-            <RequestToApp scenarios={h.request.scenarios} labels={h.request} />
+            <HeroStage scenarios={h.request.scenarios} labels={h.request} />
           </div>
         </div>
       </Container>

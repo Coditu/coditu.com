@@ -48,6 +48,9 @@
   --error:   #b3382c;  --error-bg:   #f7e5e2;
   --info:    #1f6e8c;  --info-bg:    #e2f0f5;
 
+  /* the red pen: hero sketch margin note and tick only. Not a status. */
+  --pen-red: #b3382c;
+
   /* elevation */
   --shadow-sm: 0 1px 0 rgb(20 23 28 / 0.06);
   --shadow-lift: 0 12px 24px -16px rgb(20 23 28 / 0.3);
@@ -104,6 +107,8 @@
   --warning: #e7b04e;  --warning-bg: rgb(231 176 78 / 0.12);
   --error:   #f08a7e;  --error-bg:   rgb(240 138 126 / 0.12);
   --info:    #6cc0de;  --info-bg:    rgb(108 192 222 / 0.12);
+
+  --pen-red: #f08a7e;
 
   --shadow-sm: 0 1px 0 rgb(0 0 0 / 0.3);
   --shadow-lift: 0 12px 24px -16px rgb(0 0 0 / 0.6);
@@ -185,6 +190,7 @@
   --color-error-bg: var(--error-bg);
   --color-info: var(--info);
   --color-info-bg: var(--info-bg);
+  --color-pen-red: var(--pen-red);
 
   --shadow-sm: var(--shadow-sm);
   --shadow-lift: var(--shadow-lift);
