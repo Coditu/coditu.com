@@ -101,7 +101,7 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(html).toHaveAttribute("data-theme", "light");
     });
 
-    test("hero: one h1, CTA to the contact section, the request turns into the app", async ({ page }) => {
+    test("hero: one h1, CTA to the contact section, the e-mail becomes a sketch, then the app", async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto(home);
       await expect(page.locator("h1")).toHaveCount(1);
@@ -112,20 +112,43 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       expect(box.x).toBeGreaterThan(h1.x + h1.width / 2);
       expect(box.y).toBeLessThan(900);
 
-      // The card is decoration with one sentence for screen readers; its app goes live.
-      const card = page.locator('section[aria-labelledby="hero-title"] div[aria-hidden="true"]').first();
-      await expect(card).toBeVisible();
+      // The stage is decoration with one sentence for screen readers, and nothing in it takes focus.
+      const stage = page.locator('section[aria-labelledby="hero-title"] div[aria-hidden="true"]').first();
+      await expect(stage).toBeVisible();
       await expect(page.locator('section[aria-labelledby="hero-title"] .sr-only')).toHaveCount(1);
-      await expect(card.getByText(/^Live$/)).toBeVisible({ timeout: 8000 });
+      await expect(stage.locator("input, select, textarea, button, a, [tabindex]")).toHaveCount(0);
+
+      // The pen draws the sketch, the app fills itself in, the sketch mirrors it, and the app goes live.
+      await expect(stage.locator("[data-draw] svg text").first()).toBeVisible({ timeout: 6000 });
+      await expect(stage.locator("svg").getByText(lang === "de" ? "03.11.2026" : "03 Nov 2026")).toBeAttached({ timeout: 12000 });
+      await expect(stage.getByText(/^Live$/)).toBeVisible({ timeout: 15000 });
+      // Paper and app side by side, the paper on the left.
+      const paper = (await stage.locator("svg").first().boundingBox())!;
+      const live = (await stage.getByText(/^Live$/).boundingBox())!;
+      expect(paper.x + paper.width).toBeLessThan(live.x);
     });
 
-    test("hero: reduced motion skips the typing and still shows the app", async ({ page }) => {
+    test("hero: below lg, the stage follows the text and fits the screen", async ({ page }) => {
+      await page.setViewportSize({ width: 375, height: 800 });
+      await page.goto(home);
+      const h1 = (await page.locator("h1").boundingBox())!;
+      const stage = page.locator('section[aria-labelledby="hero-title"] div[aria-hidden="true"]').first();
+      const box = (await stage.boundingBox())!;
+      expect(box.y).toBeGreaterThan(h1.y + h1.height);
+      expect(box.x + box.width).toBeLessThanOrEqual(375);
+      // It plays only while on screen.
+      await stage.scrollIntoViewIfNeeded();
+      await expect(stage.getByText(/^Live$/)).toBeVisible({ timeout: 15000 });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+    });
+
+    test("hero: reduced motion skips the typing, drawing and pointer and still shows the app", async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto(home);
       await expect(page.locator(".cd-caret")).toHaveCount(0);
-      const card = page.locator('section[aria-labelledby="hero-title"] div[aria-hidden="true"]').first();
-      await expect(card.getByText(/^Live$/)).toBeVisible({ timeout: 8000 });
+      const stage = page.locator('section[aria-labelledby="hero-title"] div[aria-hidden="true"]').first();
+      await expect(stage.getByText(/^Live$/)).toBeVisible({ timeout: 12000 });
     });
 
     test("services: tabs under the showcase, by mouse and keyboard", async ({ page }) => {

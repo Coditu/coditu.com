@@ -70,30 +70,39 @@ const de = {
     cta: "Projekt anfragen",
     secondary: "So arbeiten wir",
     /**
-     * The hero picture: a request in words becomes the app. `[Words]` turn
-     * into the app — the first is its title, the rest its fields, one value
-     * each. Example data, marked „Beispiel“. Apps of the kinds we really built.
+     * The hero picture: a request by e-mail becomes a sketch on paper, then
+     * the app. `[Words]` turn into the app — the first is its title, the rest
+     * its fields, one value each; `success` is the app's title once sent.
+     * Example data, marked „Beispiel“. Apps of the kinds we really built.
      */
     request: {
       request: "Anfrage per E-Mail",
       example: "Beispiel",
       live: "Live",
-      summary: "Beispiel: Aus einer Anfrage in ein paar Sätzen wird eine fertige App.",
+      summary: "Beispiel: Aus einer Anfrage per E-Mail wird eine Skizze und daraus eine fertige App.",
+      becomes: "wird zu",
+      sending: "Wird gesendet …",
+      /** The red-pen note beside the sketched button, one entry per line. */
+      note: ["groß &", "blau!"],
+      done: "Fertig!",
       scenarios: [
         {
           request: "Neue Kolleginnen sollen eine [Onboarding-Checkliste] bekommen – mit [Startdatum], [Team] und [Ansprechpartner].",
           values: ["03.11.2026", "Beratung", "Sarah Weber"],
           button: "Anlegen",
+          success: "Checkliste angelegt",
         },
         {
           request: "Unsere Intranet-Themen planen wir per E-Mail. Wir brauchen einen [Redaktionsplan] mit [Thema], [Datum] und [Zuständigkeit].",
           values: ["Neue Kantine", "14.11.2026", "Team Kommunikation"],
           button: "Einplanen",
+          success: "Thema eingeplant",
         },
         {
           request: "Alle sollen [Intranet-News] schreiben können – mit [Titel], [Bild] und [Freigabe] durch die Kommunikation.",
           values: ["Sommerfest am 12. Juni", "sommerfest.jpg", "Freigegeben"],
           button: "Veröffentlichen",
+          success: "News veröffentlicht",
         },
       ],
     },

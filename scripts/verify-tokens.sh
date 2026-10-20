@@ -68,6 +68,7 @@ need "draw-on"             "cd-draw"
 need "on-view pause gate"  "[data-reveal-on-view]"
 need "reduced motion"      "prefers-reduced-motion"
 need "hero caret"          "cd-caret"
+need "hero pen"            "[data-draw] .cd-pen"
 need "sketch draw-in"      "cd-sketch-in"
 need "services panel"      "cd-svc-panel"
 

@@ -21,7 +21,8 @@ import { gzipSync } from "node:zlib";
 
 const BASE = process.env.E2E_PROD_URL ?? "http://localhost:3000";
 const BRIEF_KB = 130;
-const GATE_KB = 170;
+// 170 → 172 with the hero stage (e-mail → sketch → app, ~2.5 KB gz of its own); measured 170.0.
+const GATE_KB = 172;
 
 const kb = (bytes) => bytes / 1024;
 

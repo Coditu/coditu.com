@@ -34,6 +34,12 @@ reference. Contrast ratios were computed (WCAG formula), not eyeballed.
 
 Status colors mean status. Never decoration. Always pair with a word or icon — color is never the only signal.
 
+### Red pen
+
+| Token | Tailwind | Light | Dark | Use |
+|---|---|---|---|---|
+| `--pen-red` | `text-pen-red` | `#B3382C` (4.9:1 on paper) | `#F08A7E` | the hero sketch only: its margin note and the tick on a sent form. Same hues as `error`, but a separate token: it is a pen on paper, not a status. |
+
 ## Color — dark (`prefers-color-scheme: dark`)
 
 | Token | Hex | Contrast on paper `#0F1216` |
