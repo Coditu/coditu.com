@@ -4,9 +4,13 @@ import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, typ
 
 import { cn } from "@/lib/utils";
 
-import { AppForm, AppSuccess, Caret } from "./app-form";
+import { IntranetFrame } from "./intranet-frame";
 import { Sketch } from "./sketch";
 import { FLY_MS, parse, reached, useSequence, type Scenario } from "./use-sequence";
+import { Calendar } from "./web-parts/calendar";
+import { Checklist } from "./web-parts/checklist";
+import { Caret, WebPartForm } from "./web-parts/form";
+import { News } from "./web-parts/news";
 
 type Labels = {
   request: string;
@@ -14,6 +18,8 @@ type Labels = {
   live: string;
   summary: string;
   becomes: string;
+  intranet: string;
+  page: string;
   sending: string;
   note: string[];
   done: string;
@@ -33,11 +39,12 @@ type Clone = { text: string; left: number; top: number; height: number; dx: numb
 /**
  * The hero's picture, playing by itself: a request by e-mail types itself out
  * and its key words are underlined; they fly onto a sheet of paper where a pen
- * sketches the form; the real app builds beside it, fills itself in while the
- * sketch mirrors every value, and is sent. Then the next scenario.
+ * sketches the form; a web part builds on an intranet page beside it, fills
+ * itself in while the sketch mirrors every value, and is sent: the item lands
+ * in the web part as real content. Then the next scenario.
  *
- * From lg the paper and the app sit side by side; below lg they are one card,
- * the sketch crossfading into the app. Runs only while on screen and the tab
+ * From lg the paper and the intranet page sit side by side; below lg they are
+ * one card, the sketch crossfading into the web part. Runs only while on screen and the tab
  * is visible. Decoration: `aria-hidden`, one sr-only sentence says what it
  * shows. Reduced motion: three still frames, switched slowly. The server
  * renders the first request fully typed, so there is no flash.
@@ -196,7 +203,7 @@ export function HeroStage({ scenarios, labels }: { scenarios: Scenario[]; labels
             </p>
           </div>
 
-          <div className="absolute inset-0 grid grid-rows-[minmax(0,1fr)] gap-2 lg:grid-cols-[minmax(0,1fr)_56px_minmax(0,1.25fr)]">
+          <div className="absolute inset-0 grid grid-rows-[minmax(0,1fr)] gap-2 lg:grid-cols-[minmax(0,2fr)_48px_minmax(0,3fr)]">
             {/* 2 · The sketch */}
             <div
               data-draw={reached(phase, "draw") || undefined}
@@ -231,26 +238,23 @@ export function HeroStage({ scenarios, labels }: { scenarios: Scenario[]; labels
               <span className="cd-hand cd-write text-[20px] leading-none" style={{ "--row": 1 } as CSSProperties}>
                 {labels.becomes}
               </span>
-              <svg viewBox="0 0 56 32" className="w-14" focusable="false">
+              <svg viewBox="0 0 56 32" className="w-12" focusable="false">
                 <path d="M3 20 C16 6 34 8 50 18" pathLength={1} className="cd-pen" />
                 <path d="M40 10 L51 18 L39 25" pathLength={1} className="cd-pen" style={{ "--row": 1 } as CSSProperties} />
               </svg>
             </div>
 
-            {/* 3 · The app */}
+            {/* 3 · The web part on its intranet page */}
             <div
               className={cn(
-                "col-start-1 row-start-1 flex min-h-0 items-center transition-opacity duration-500 lg:col-start-3",
+                "col-start-1 row-start-1 min-h-0 py-2 transition-opacity duration-500 lg:col-start-3",
                 !built && "opacity-0"
               )}
             >
-              <div className="w-full rounded-ui border border-line bg-surface p-4 shadow-lift sm:p-6 lg:p-4 xl:p-5">
-                {built &&
-                  (done ? (
-                    <AppSuccess title={scenario.success} labels={fields} values={scenario.values} live={labels.live} />
-                  ) : (
-                    <AppForm
-                      title={words[0]}
+              {built && (
+                <IntranetFrame intranet={labels.intranet} page={labels.page} title={words[0]} live={done ? labels.live : null}>
+                  {!done ? (
+                    <WebPartForm
                       labels={fields}
                       values={values}
                       active={filling ? s.field : -1}
@@ -261,8 +265,15 @@ export function HeroStage({ scenarios, labels }: { scenarios: Scenario[]; labels
                       sendingLabel={labels.sending}
                       buttonRef={button}
                     />
-                  ))}
-              </div>
+                  ) : scenario.result.kind === "checklist" ? (
+                    <Checklist {...scenario.result} labels={fields} values={scenario.values} />
+                  ) : scenario.result.kind === "calendar" ? (
+                    <Calendar {...scenario.result} values={scenario.values} />
+                  ) : (
+                    <News {...scenario.result} values={scenario.values} />
+                  )}
+                </IntranetFrame>
+              )}
             </div>
           </div>
 

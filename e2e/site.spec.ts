@@ -101,7 +101,7 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(html).toHaveAttribute("data-theme", "light");
     });
 
-    test("hero: one h1, CTA to the contact section, the e-mail becomes a sketch, then the app", async ({ page }) => {
+    test("hero: one h1, CTA to the contact section, the e-mail becomes a sketch, then a web part on the intranet page", async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto(home);
       await expect(page.locator("h1")).toHaveCount(1);
@@ -118,11 +118,13 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(page.locator('section[aria-labelledby="hero-title"] .sr-only')).toHaveCount(1);
       await expect(stage.locator("input, select, textarea, button, a, [tabindex]")).toHaveCount(0);
 
-      // The pen draws the sketch, the app fills itself in, the sketch mirrors it, and the app goes live.
+      // The pen draws the sketch, the web part fills itself in, the sketch mirrors it, and the item lands in it.
       await expect(stage.locator("[data-draw] svg text").first()).toBeVisible({ timeout: 6000 });
       await expect(stage.locator("svg").getByText(lang === "de" ? "03.11.2026" : "03 Nov 2026")).toBeAttached({ timeout: 12000 });
       await expect(stage.getByText(/^Live$/)).toBeVisible({ timeout: 15000 });
-      // Paper and app side by side, the paper on the left.
+      await expect(stage.getByText(lang === "de" ? "Laptop bestellen" : "Order laptop")).toBeVisible();
+      await expect(stage.getByText(/^Intranet$/)).toBeVisible();
+      // Paper and intranet page side by side, the paper on the left.
       const paper = (await stage.locator("svg").first().boundingBox())!;
       const live = (await stage.getByText(/^Live$/).boundingBox())!;
       expect(paper.x + paper.width).toBeLessThan(live.x);
@@ -142,7 +144,7 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
     });
 
-    test("hero: reduced motion skips the typing, drawing and pointer and still shows the app", async ({ page }) => {
+    test("hero: reduced motion skips the typing, drawing and pointer and still shows the web part", async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto(home);

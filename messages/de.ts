@@ -79,8 +79,11 @@ const de = {
       request: "Anfrage per E-Mail",
       example: "Beispiel",
       live: "Live",
-      summary: "Beispiel: Aus einer Anfrage per E-Mail wird eine Skizze und daraus eine fertige App.",
+      summary: "Beispiel: Aus einer Anfrage per E-Mail wird eine Skizze und daraus ein Webpart, das auf einer Intranet-Seite läuft.",
       becomes: "wird zu",
+      /** The neutral intranet page the web part lands on: its top bar and page title. */
+      intranet: "Intranet",
+      page: "Startseite",
       sending: "Wird gesendet …",
       /** The red-pen note beside the sketched button, one entry per line. */
       note: ["groß &", "blau!"],
@@ -90,19 +93,27 @@ const de = {
           request: "Neue Kolleginnen sollen eine [Onboarding-Checkliste] bekommen – mit [Startdatum], [Team] und [Ansprechpartner].",
           values: ["03.11.2026", "Beratung", "Sarah Weber"],
           button: "Anlegen",
-          success: "Checkliste angelegt",
+          result: {
+            kind: "checklist" as const,
+            heading: "Neue Kollegin",
+            tasks: ["Laptop bestellen", "Zugänge anlegen", "Willkommensmail senden", "Erste Woche planen"],
+          },
         },
         {
           request: "Unsere Intranet-Themen planen wir per E-Mail. Wir brauchen einen [Redaktionsplan] mit [Thema], [Datum] und [Zuständigkeit].",
           values: ["Neue Kantine", "14.11.2026", "Team Kommunikation"],
           button: "Einplanen",
-          success: "Thema eingeplant",
+          result: {
+            kind: "calendar" as const,
+            before: [["Betriebsausflug", "07.11.2026", "Personal"]],
+            after: [["IT-Sicherheit kurz erklärt", "21.11.2026", "IT"]],
+          },
         },
         {
           request: "Alle sollen [Intranet-News] schreiben können – mit [Titel], [Bild] und [Freigabe] durch die Kommunikation.",
           values: ["Sommerfest am 12. Juni", "sommerfest.jpg", "Freigegeben"],
           button: "Veröffentlichen",
-          success: "News veröffentlicht",
+          result: { kind: "news" as const, older: ["Neue Parkregeln ab Oktober", "IT-Wartung am Samstag"] },
         },
       ],
     },
