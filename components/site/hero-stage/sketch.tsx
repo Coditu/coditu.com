@@ -94,8 +94,8 @@ export function Sketch({
   doneWord: string;
   /** The flown-in words are written (they land at the end of the flight). */
   showWords: boolean;
-  /** The title and field names, for the words to fly to. */
-  targets: (el: SVGTextElement | null, i: number) => void;
+  /** The title and field names, for the words to fly to. Leave out in a still frame (a Server Component takes no refs). */
+  targets?: (el: SVGTextElement | null, i: number) => void;
 }) {
   const buttonY = FIELD_Y + labels.length * FIELD_STEP - 8;
   const words = showWords ? "" : "opacity-0";
@@ -116,7 +116,7 @@ export function Sketch({
       </g>
 
       <g className={words}>
-        <Hand x={20} y={44} size={28} turn={-2} ref={(el) => targets(el, 0)}>
+        <Hand x={20} y={44} size={28} turn={-2} ref={targets && ((el) => targets(el, 0))}>
           {short(title, 22)}
         </Hand>
       </g>
@@ -128,7 +128,7 @@ export function Sketch({
         return (
           <g key={label} className="cd-sketch-part" data-active={active === i || undefined}>
             <g className={words}>
-              <Hand x={22} y={y} ref={(el) => targets(el, i + 1)}>
+              <Hand x={22} y={y} ref={targets && ((el) => targets(el, i + 1))}>
                 {label}
               </Hand>
             </g>
