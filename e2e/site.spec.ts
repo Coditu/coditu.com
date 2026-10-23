@@ -173,61 +173,41 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(stage.getByText(/^Live$/)).toBeVisible({ timeout: 6000 });
     });
 
-    test("services: tabs under the showcase, by mouse and keyboard", async ({ page }) => {
+    test("services: three cards, mockup and text side by side, alternating", async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto(home);
-      const tabs = page.locator('section[aria-labelledby="services-title"] [role="tab"]');
-      await expect(tabs).toHaveCount(4);
-      await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
-      await expect(page.locator("#svc-panel-0")).toBeVisible();
-      await expect(page.locator("#svc-panel-1")).toBeHidden();
-
-      // The tabs sit under the showcase and do not move when the panel changes.
-      // Scroll first: boxes are viewport-relative and the click would scroll.
-      await tabs.nth(0).scrollIntoViewIfNeeded();
-      const panel = (await page.locator("#svc-panel-0").boundingBox())!;
-      const before = (await tabs.nth(0).boundingBox())!;
-      expect(before.y).toBeGreaterThanOrEqual(panel.y + panel.height - 1);
-
-      await tabs.nth(1).click();
-      await expect(tabs.nth(1)).toHaveAttribute("aria-selected", "true");
-      await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "false");
-      await expect(page.locator("#svc-panel-1")).toBeVisible();
-      await expect(page.locator("#svc-panel-0")).toBeHidden();
-      expect((await tabs.nth(0).boundingBox())!.y).toBeCloseTo(before.y, 0);
-
-      await page.keyboard.press("ArrowRight");
-      await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "true");
-      await expect(tabs.nth(2)).toBeFocused();
-      await page.keyboard.press("End");
-      await expect(tabs.nth(3)).toHaveAttribute("aria-selected", "true");
-      await page.keyboard.press("ArrowRight");
-      await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
-      await expect(page.locator("#svc-panel-0")).toBeVisible();
+      const cards = page.locator('section[aria-labelledby="services-title"] article');
+      await expect(cards).toHaveCount(3);
+      for (let i = 0; i < 3; i++) {
+        const card = cards.nth(i);
+        await card.scrollIntoViewIfNeeded();
+        // A picture with callouts, named for screen readers by its caption.
+        await expect(card.locator('figure > [aria-hidden="true"] [data-pin]')).toHaveCount(3);
+        await expect(card.locator("figcaption .sr-only")).not.toBeEmpty();
+        const figure = (await card.locator("figure").boundingBox())!;
+        const text = (await card.locator("h3").boundingBox())!;
+        if (i % 2 === 0) expect(text.x).toBeGreaterThan(figure.x + figure.width - 1);
+        else expect(text.x + text.width).toBeLessThan(figure.x + 1);
+      }
     });
 
-    test("services: on a phone the tabs sit above the showcase", async ({ page }) => {
-      await page.setViewportSize({ width: 390, height: 844 });
+    test("services: on a phone the mockup sits above the text and fits", async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 800 });
       await page.goto(home);
-      const tabs = page.locator('section[aria-labelledby="services-title"] [role="tab"]');
-      await tabs.nth(2).click();
-      const panel = page.locator("#svc-panel-2");
-      await expect(panel).toBeVisible();
-      const tab = (await tabs.nth(3).boundingBox())!;
-      expect((await panel.boundingBox())!.y).toBeGreaterThanOrEqual(tab.y + tab.height - 1);
+      const cards = page.locator('section[aria-labelledby="services-title"] article');
+      for (let i = 0; i < 3; i++) {
+        const card = cards.nth(i);
+        await card.scrollIntoViewIfNeeded();
+        const figure = (await card.locator("figure").boundingBox())!;
+        expect((await card.locator("h3").boundingBox())!.y).toBeGreaterThanOrEqual(figure.y + figure.height - 1);
+        expect(figure.x + figure.width).toBeLessThanOrEqual(320);
+      }
     });
 
-    test("reference: the Services project cards land on the case study", async ({ page }) => {
-      await page.setViewportSize({ width: 1440, height: 900 });
+    test("reference: the section has its language's id", async ({ page }) => {
       await page.goto(home);
-      const section = page.locator('section[aria-labelledby="reference-title"]');
-      const id = await section.getAttribute("id");
+      const id = await page.locator('section[aria-labelledby="reference-title"]').getAttribute("id");
       expect(id).toBe(lang === "de" ? "referenz" : "reference");
-
-      await page.locator('section[aria-labelledby="services-title"] [role="tab"]').nth(2).click();
-      await page.locator(`#svc-panel-2 a[href="#${id}"]`).first().click();
-      await expect(page).toHaveURL(new RegExp(`#${id}$`));
-      await expect(page.locator("#reference-title")).toBeInViewport();
     });
 
     test("security: follows the case study, five points", async ({ page }) => {
@@ -298,10 +278,11 @@ for (const { lang, home, imprint, privacy } of LANGS) {
 test.describe("without JS", () => {
   test.use({ javaScriptEnabled: false });
 
-  test("services: every panel is shown, no tab bar", async ({ page }) => {
+  test("services: every card is shown", async ({ page }) => {
     await page.goto("/de");
-    for (let i = 0; i < 4; i++) await expect(page.locator(`#svc-panel-${i}`)).toBeVisible();
-    await expect(page.locator('[role="tablist"]')).toBeHidden();
+    const cards = page.locator('section[aria-labelledby="services-title"] article');
+    await expect(cards).toHaveCount(3);
+    for (let i = 0; i < 3; i++) await expect(cards.nth(i)).toBeVisible();
   });
 });
 

@@ -24,7 +24,7 @@ and **Hero – Test des Designsystems**. Where the canvas and these docs disagre
 | an input, select, date range, form | [`components/forms.md`](./components/forms.md) |
 | a card, tag, status pill, avatar, stat tile, progress bar | [`components/data-display.md`](./components/data-display.md) |
 | a kanban board or task card | [`components/kanban.md`](./components/kanban.md) |
-| nav bar, section header, footer, team card, feature item, hero | [`components/page-sections.md`](./components/page-sections.md) |
+| nav bar, section header, footer, team card, feature item, hero, services | [`components/page-sections.md`](./components/page-sections.md) |
 | a review of finished work | [`rules.md`](./rules.md) (do / don't + checklist) |
 | moving the live site onto this system | [`migration.md`](./migration.md) |
 
