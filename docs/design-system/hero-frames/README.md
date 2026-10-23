@@ -7,7 +7,7 @@ result state of *Onboarding-Checkliste* and *Redaktionsplan*.
 | Frame | What it shows |
 |---|---|
 | `f1-email` | Card „Anfrage per E-Mail“, request fully typed, key words underlined in blue |
-| `f2-sketch` | Ruled paper: title, field labels, a wobbly box each, the button, one red margin note; „wird zu →“ |
+| `f2-sketch` | Ruled paper: title, field labels, a wobbly box each, the button, one red margin note; „wird zu →“; the page faint, its web-part slot empty |
 | `f3-webpart` | The intranet page (top bar „Intranet“, grid icon, page title, 2 greyed web parts) with the new, empty web part |
 | `f4-filled` | Values in the form and in handwriting on paper; the last field is the active pair |
 | `f5-result` | Red tick + „Fertig!“ on paper; the news card on top of the feed; „Live“ pill |
@@ -25,6 +25,66 @@ light and dark. From F4 on, the phone card is shown from both sides (`-paper`, `
   not in `lib/i18n.ts` → `pages`, so not in the sitemap.
 - Regenerate the PNGs: `npm run dev`, then `npm run hero-frames`.
 - The live hero (`<HeroStage>`) is unchanged.
+
+## Motion direction (planned, not built)
+
+The frames are drawn for this; nothing moves yet.
+
+- **Restraint.** One thing in focus per moment, big type, lots of space. Animate `transform` and
+  `opacity` only; the two exceptions are named below.
+- **One easing:** `--ease-entrance` (`cubic-bezier(0.16, 1, 0.3, 1)`, already in
+  `app/globals.css`), for every move.
+- **A camera, not cuts.** From F2 on every frame is the same composition — paper, arrow, page — and
+  only the contents change. A transition scales and translates one wrapper around the stage (the
+  camera) and swaps the contents under it; the layout never changes between frames. That is why the
+  page is already on F2, faint (`opacity-40`), with an empty dashed slot where the web part goes.
+  It is out of shot while the camera is on the paper. (Answers open question 2.)
+- **Hooks.** `data-frame` on the stage; `data-part` on what moves: `email`, `paper`, `arrow`,
+  `page`, `slot` (F2 only), `webpart`, `result`.
+
+### Per frame
+
+Camera = scale of the wrapper and its `transform-origin` (in % of the stage). The layout is fixed
+(stage height, `2fr 40px 3fr` grid), so the origins are constants, not measured.
+
+| Frame | In focus | Camera | Moves in | Moves out |
+|---|---|---|---|---|
+| F1 `email` | the request text, key words underlined | 1, centre | the e-mail card (opacity 0 → 1, scale 0.96 → 1) | — |
+| F2 `sketch` | the paper | ~1.6 on the paper (origin ≈ 20 % 50 %) | paper (blur → sharp), the pen strokes | e-mail card (scale up past the lens + fade) |
+| F3 `webpart` | the new web part on the full page | pull back to 1, centre | page to full opacity; web part in the slot (clip-path wipe, top → bottom); arrow | slot outline (under the web part) |
+| F4 `filled` | the last field pair — paper box and form field | 1 (wide); narrow: on the web part side | values (opacity), active outline | — |
+| F5 `result` | the result card | slight push in, ~1.1 on the web part (origin ≈ 70 % 40 %) | result card lands (translateY −12 px → 0, opacity); tick and „Fertig!“; „Live“ pill | the form (opacity) |
+
+Narrow (one card): no camera pan across, the card turns from paper (F2) to web part (F3–F5);
+the same scale + blur → sharp on the card.
+
+### Hero loop
+
+8–10 s per scenario, calm: ~1.5 s per frame plus ~0.4 s transitions, a ~2 s hold on F5, then F1 of
+the next scenario. Transition = outgoing scale 1 → 1.04 + opacity → 0; incoming scale 0.96 → 1 +
+blur 6 px → 0 + opacity → 1, 500–700 ms. Pauses off screen and in a hidden tab, as now.
+
+### Section „Von der E-Mail zur App“ (under the hero)
+
+Same five frames, scroll-driven: a tall section (~5 × 100 vh) with a sticky stage; CSS
+`animation-timeline: view()` on the section (`scroll()` not needed), `animation-range` splits it into
+five ranges. No library, no JS on the scroll path. Beats: zoom into the paper on F2, pull back to the
+full intranet page on F3, web part revealed with a clip-path wipe, result card lands on F5. One
+big-type caption per frame beside the stage (copy in `messages/*.ts`, to be written; none yet).
+
+**Fallback** — `@supports not (animation-timeline: view())` or `prefers-reduced-motion: reduce`:
+the five `<HeroFrame>`s stacked as stills, each with its caption, no sticky. That is the default
+markup; the scroll version is the enhancement on top.
+
+### Known limits
+
+- **`filter: blur()` and `clip-path` are not transform/opacity.** Both repaint in some engines.
+  Kept small: blur only on the incoming layer, ≤ 6 px, only during the transition; the wipe only on
+  the web part box. If either janks on a mid phone, drop the blur first (scale + opacity alone).
+- **Redaktionsplan's new row** is a `display: contents` wrapper around grid cells, so it has no
+  box to transform and no `data-part`; it lands by opacity only. A real row element fixes it if needed.
+- `prefers-reduced-motion` already caps all animations at 120 ms (`app/globals.css`); the scroll
+  section must use the stacked fallback instead, not a fast scroll animation.
 
 ## Decisions taken here
 
@@ -47,8 +107,8 @@ light and dark. From F4 on, the phone card is shown from both sides (`-paper`, `
 1. **The paper is small on desktop.** At 40 % of a 528 px stage the 3:4 sheet is ~200 px wide and
    ~260 px tall in a 460 px stage; the handwriting renders at ~12–13 px and there is empty space
    above and below. A taller sheet (more ruled lines) or 45/55 would read better. Keep 40 %?
-2. **F2's right side is empty** on desktop: the arrow points at nothing until F3. Show a faint
-   dashed outline of the page to come, or keep the empty space as the pause before the build?
+2. ~~**F2's right side is empty**~~ — taken: the page is there, faint, with an empty slot (see
+   *Motion direction*). The camera needs it for the pull-back on F3.
 3. **Phone, „one card“:** read here as one slot that shows the paper (F2) and then the web part
    (F3–F5), like the two sides of a card. If it meant paper and web part stacked in one card,
    the 440 px height does not fit both at 13 px.
