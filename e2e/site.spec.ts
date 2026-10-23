@@ -101,12 +101,26 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(html).toHaveAttribute("data-theme", "light");
     });
 
-    test("hero: one h1, CTA to the contact section, the mail's key words build the app", async ({ page }) => {
+    test("hero: one h1, the free-task mail and booking CTAs, the mail's key words build the app", async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto(home);
       await expect(page.locator("h1")).toHaveCount(1);
       await expect(page.locator("h1")).toHaveText(lang === "de" ? "Von der Mail zur App." : "From mail to app.");
-      await expect(page.locator(`#hero-title ~ * a[href="#${lang === "de" ? "kontakt" : "contact"}"]`)).toHaveCount(1);
+      // Primary: a mail whose subject sets free-task requests apart from project requests.
+      const subject = encodeURIComponent(lang === "de" ? "Kleine Aufgabe gratis" : "Free small task");
+      const freeTask = page.locator(`#hero-title ~ * a[href^="mailto:contact@coditu.com?subject=${subject}&"]`);
+      await expect(freeTask).toHaveText(lang === "de" ? "Kleine Aufgabe gratis testen" : "Try us free with a small task");
+      // Secondary: no booking tool yet (BOOKING_URL is null), so it goes to the contact section.
+      await expect(page.locator(`#hero-title ~ * a[href="#${lang === "de" ? "kontakt" : "contact"}"]`)).toHaveText(
+        lang === "de" ? "Termin buchen" : "Book a call",
+      );
+      await expect(
+        page.getByText(
+          lang === "de"
+            ? "1 Aufgabe pro Kunde · ein Screen oder eine Funktion · in bis zu 3 Tagen"
+            : "1 task per client · one screen or one feature · in up to 3 days",
+        ),
+      ).toBeVisible();
       // Text on the left, the stage beside it on the right, both above the fold.
       const stage = page.locator("[data-hero-stage]");
       const h1 = (await page.locator("h1").boundingBox())!;

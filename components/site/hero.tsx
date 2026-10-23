@@ -3,6 +3,7 @@ import { join } from "node:path";
 
 import { ButtonLink } from "@/components/ui/button";
 import { getMessages, type Locale } from "@/lib/i18n";
+import { BOOKING_URL, CONTACT_EMAIL } from "@/lib/site-config";
 
 import { Container } from "./container";
 import { HeroStage } from "./hero-stage/stage.client";
@@ -16,6 +17,9 @@ import { HeroStage } from "./hero-stage/stage.client";
 export function Hero({ locale }: { locale: Locale }) {
   const t = getMessages(locale);
   const h = t.hero;
+  const freeTaskMailto =
+    `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(h.freeTask.subject)}` +
+    `&body=${encodeURIComponent(h.freeTask.body)}`;
 
   return (
     <section aria-labelledby="hero-title">
@@ -29,13 +33,15 @@ export function Hero({ locale }: { locale: Locale }) {
             </h1>
             <p className="mt-6 max-w-[52ch] text-lead text-pretty text-ink-muted">{h.lead}</p>
             <div className="mt-9 flex flex-wrap gap-4">
-              <ButtonLink href={`#${t.anchors.contact}`} variant="cta" size="lg">
+              <ButtonLink href={freeTaskMailto} variant="cta" size="lg">
                 {h.cta}
               </ButtonLink>
-              <ButtonLink href={`#${t.anchors.process}`} variant="outline" size="lg">
-                {h.secondary}
+              <ButtonLink href={BOOKING_URL ?? `#${t.anchors.contact}`} variant="outline" size="lg">
+                {h.booking}
               </ButtonLink>
             </div>
+            <p className="mt-5 max-w-[52ch] text-[15px] text-ink-muted">{h.freeTask.line}</p>
+            <p className="mt-2 font-mono text-label text-ink-muted uppercase">{h.freeTask.fine}</p>
             <ul className="mt-12 grid gap-4 border-t border-ink pt-5 sm:grid-cols-3">
               {h.facts.map((fact) => (
                 <li key={fact.id} className="text-[15px] leading-snug font-semibold">

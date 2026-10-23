@@ -55,8 +55,14 @@ const en: Messages = {
     label: "SharePoint · Internal apps",
     title: "From mail to app",
     lead: "We build software for social organisations, associations and mid-sized companies. Your email becomes an app that works in your day-to-day. You see every step on a shared board.",
-    cta: "Request a project",
-    secondary: "How we work",
+    cta: "Try us free with a small task",
+    freeTask: {
+      line: "Send us a small request, we'll build it for free.",
+      fine: "1 task per client · one screen or one feature · in up to 3 days",
+      subject: "Free small task",
+      body: "Hello Coditu,\n\nOur small task (one screen or one feature):\n\n\nWhere it should run (e.g. SharePoint):\n",
+    },
+    booking: "Book a call",
     request: {
       example: "Example",
       summary: "Example: a request by email becomes a booking app – with a dashboard, bookings, a calendar and a login.",
