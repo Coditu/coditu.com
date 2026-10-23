@@ -101,56 +101,62 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(html).toHaveAttribute("data-theme", "light");
     });
 
-    test("hero: one h1, CTA to the contact section, the e-mail becomes a sketch, then a web part on the intranet page", async ({ page }) => {
+    test("hero: one h1, CTA to the contact section, the mail's key words build the app", async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto(home);
       await expect(page.locator("h1")).toHaveCount(1);
+      await expect(page.locator("h1")).toHaveText(lang === "de" ? "Von der Mail zur App." : "From mail to app.");
       await expect(page.locator(`#hero-title ~ * a[href="#${lang === "de" ? "kontakt" : "contact"}"]`)).toHaveCount(1);
-      // Text on the left, the card beside it on the right, both above the fold.
+      // Text on the left, the stage beside it on the right, both above the fold.
+      const stage = page.locator("[data-hero-stage]");
       const h1 = (await page.locator("h1").boundingBox())!;
-      const box = (await page.locator('section[aria-labelledby="hero-title"] div[aria-hidden="true"]').first().boundingBox())!;
+      const box = (await stage.boundingBox())!;
       expect(box.x).toBeGreaterThan(h1.x + h1.width / 2);
       expect(box.y).toBeLessThan(900);
 
       // The stage is decoration with one sentence for screen readers, and nothing in it takes focus.
-      const stage = page.locator('section[aria-labelledby="hero-title"] div[aria-hidden="true"]').first();
-      await expect(stage).toBeVisible();
+      await expect(stage).toHaveAttribute("aria-hidden", "true");
       await expect(page.locator('section[aria-labelledby="hero-title"] .sr-only')).toHaveCount(1);
       await expect(stage.locator("input, select, textarea, button, a, [tabindex]")).toHaveCount(0);
 
-      // The pen draws the sketch, the web part fills itself in, the sketch mirrors it, and the item lands in it.
-      await expect(stage.locator("[data-draw] svg text").first()).toBeVisible({ timeout: 6000 });
-      await expect(stage.locator("svg").getByText(lang === "de" ? "03.11.2026" : "03 Nov 2026")).toBeAttached({ timeout: 12000 });
-      await expect(stage.getByText(/^Live$/)).toBeVisible({ timeout: 15000 });
-      await expect(stage.getByText(lang === "de" ? "Laptop bestellen" : "Order laptop")).toBeVisible();
-      await expect(stage.getByText(/^Intranet$/)).toBeVisible();
-      // Paper and intranet page side by side, the paper on the left.
-      const paper = (await stage.locator("svg").first().boundingBox())!;
-      const live = (await stage.getByText(/^Live$/).boundingBox())!;
-      expect(paper.x + paper.width).toBeLessThan(live.x);
+      // A mail app: the inbox list beside the open mail; its four key words light up.
+      const mail = stage.locator('[data-part="mail"]');
+      await expect(mail.getByText(lang === "de" ? "IT-Support" : "IT support")).toBeVisible();
+      await expect(mail.locator(".underline")).toHaveCount(4, { timeout: 5000 });
+
+      // They land in the app: title, bookings table, calendar card, sign-in. Then it goes live.
+      const app = stage.locator('[data-part="app"]');
+      await expect(app.getByText(/^Live$/)).toBeVisible({ timeout: 10000 });
+      for (const word of lang === "de" ? ["Dashboard", "Buchungen", "Kalender", "Login"] : ["dashboard", "bookings", "calendar", "login"]) {
+        await expect(app.getByText(word, { exact: true })).toBeVisible();
+      }
+      await expect(app.getByText(lang === "de" ? "Raum 1" : "Room 1")).toBeVisible();
+      await expect(mail).toHaveCSS("opacity", "0");
     });
 
     test("hero: below lg, the stage follows the text and fits the screen", async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 800 });
       await page.goto(home);
       const h1 = (await page.locator("h1").boundingBox())!;
-      const stage = page.locator('section[aria-labelledby="hero-title"] div[aria-hidden="true"]').first();
+      const stage = page.locator("[data-hero-stage]");
       const box = (await stage.boundingBox())!;
       expect(box.y).toBeGreaterThan(h1.y + h1.height);
       expect(box.x + box.width).toBeLessThanOrEqual(375);
+      // Narrow: the open mail only, no inbox list.
+      await expect(stage.getByText(lang === "de" ? "IT-Support" : "IT support")).toBeHidden();
       // It plays only while on screen.
       await stage.scrollIntoViewIfNeeded();
-      await expect(stage.getByText(/^Live$/)).toBeVisible({ timeout: 15000 });
+      await expect(stage.getByText(/^Live$/)).toBeVisible({ timeout: 12000 });
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
     });
 
-    test("hero: reduced motion skips the typing, drawing and pointer and still shows the web part", async ({ page }) => {
+    test("hero: reduced motion shows the mail with its words lit, then the app, without flying", async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto(home);
-      await expect(page.locator(".cd-caret")).toHaveCount(0);
-      const stage = page.locator('section[aria-labelledby="hero-title"] div[aria-hidden="true"]').first();
-      await expect(stage.getByText(/^Live$/)).toBeVisible({ timeout: 12000 });
+      const stage = page.locator("[data-hero-stage]");
+      await expect(stage.locator('[data-part="mail"] .underline')).toHaveCount(4);
+      await expect(stage.getByText(/^Live$/)).toBeVisible({ timeout: 6000 });
     });
 
     test("services: tabs under the showcase, by mouse and keyboard", async ({ page }) => {
