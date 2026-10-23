@@ -60,7 +60,9 @@
   --dur-section: 520ms;
 }
 
-:root[data-theme="dark"] {
+/* Not `:root` only: the hero-frames review page themes one column dark. On the
+   site the attribute is only ever on <html>. */
+[data-theme="dark"] {
   color-scheme: dark;
 
   --paper: #0f1216;
@@ -365,6 +367,22 @@
 [data-draw] .cd-write {
   animation: cd-fade 400ms ease-out both;
   animation-delay: calc(var(--row, 0) * 220ms + 150ms);
+}
+
+/* Paper stays paper: the sketch keeps its light values in dark mode. */
+[data-theme="dark"] .cd-paper {
+  --surface: #ffffff;
+  --line: #d9d7d0;
+  --blueprint: #1f4fd8;
+  --pen-red: #b3382c;
+}
+
+/* A still frame (components/site/hero-stage/frame.tsx): already drawn. */
+[data-static] .cd-pen {
+  stroke-dashoffset: 0;
+}
+[data-static] .cd-write {
+  opacity: 1;
 }
 
 /* The field being filled in the app is lit on paper too. */
