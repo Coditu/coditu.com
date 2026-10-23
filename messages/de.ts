@@ -67,8 +67,19 @@ const de = {
     /** The blue period is added by the component. */
     title: "Von der Mail zur App",
     lead: "Wir bauen Software für soziale Organisationen, Vereine und den Mittelstand. Aus Ihrer E-Mail wird eine App, die im Alltag funktioniert. Jeden Schritt sehen Sie auf einem gemeinsamen Board.",
-    cta: "Projekt anfragen",
-    secondary: "So arbeiten wir",
+    /**
+     * The free small task: one per client, one screen or one feature, in up to
+     * 3 days. Not a demo: we build what they ask for. The CTA opens a mail
+     * whose subject sets these requests apart from „Projektanfrage“.
+     */
+    cta: "Kleine Aufgabe gratis testen",
+    freeTask: {
+      line: "Schicken Sie uns eine kleine Anfrage, wir setzen sie kostenlos um.",
+      fine: "1 Aufgabe pro Kunde · ein Screen oder eine Funktion · in bis zu 3 Tagen",
+      subject: "Kleine Aufgabe gratis",
+      body: "Hallo Coditu,\n\nunsere kleine Aufgabe (ein Screen oder eine Funktion):\n\n\nWo sie laufen soll (z. B. SharePoint):\n",
+    },
+    booking: "Termin buchen",
     /**
      * The hero picture: a request by e-mail becomes a booking app. Example
      * data, marked „Beispiel“; close to a kind of app we really built (NVRMiss:

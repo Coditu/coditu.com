@@ -45,7 +45,7 @@ The only place for `text-display` and the page's orange CTA.
 | Part | Spec |
 |---|---|
 | Section | `grid lg:grid-cols-12 lg:items-center`: text `lg:col-span-6` left, stage `lg:col-span-6` right; on phones the stage follows the text. No sheet meta line. |
-| Copy | blue label → `<h1 class="text-display mt-5">` → `text-lead text-ink-muted mt-6 max-w-[56ch]` → buttons `mt-9` (`cta lg` + `outline lg`) → facts row → team |
+| Copy | blue label → `<h1 class="text-display mt-5">` → `text-lead text-ink-muted mt-6 max-w-[56ch]` → buttons `mt-9` (`cta lg` „Kleine Aufgabe gratis testen“ → mailto with its own subject, `outline lg` „Termin buchen“ → `BOOKING_URL`, else the contact section) → offer line `mt-5 text-[15px] text-ink-muted` → fine print `mt-2 font-mono text-label text-ink-muted uppercase` → facts row → team |
 | Stage | `<HeroStage>` (`components/site/hero-stage/`), plays by itself — the visitor types nothing. See *Hero stage* below. |
 | Headline | the slogan „Von der Mail zur App“ / "From mail to app" + a blue period `<span class="text-blueprint">.</span>` |
 | Facts row | `mt-12 grid sm:grid-cols-3 gap-4 border-t border-ink`, each a 15 px semibold fact (no T.01 ids shown). Facts must be true (see `docs/00-CONTEXT.md`). |
