@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import withBundleAnalyzer from "@next/bundle-analyzer";
 
 const nextConfig: NextConfig = {
   // German is the primary language. A redirect rule, not a page, so nothing
@@ -16,5 +15,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-/** `npm run analyze` opens the treemap; every other build is untouched. */
-export default withBundleAnalyzer({ enabled: process.env.ANALYZE === "1" })(nextConfig);
+export default nextConfig;

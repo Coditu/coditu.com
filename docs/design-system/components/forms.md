@@ -1,6 +1,6 @@
 # Forms
 
-Files: `components/ui/input.tsx`, `select.tsx`, `field.tsx` (label + control + helper/error).
+No form ships yet, so there are no component files; build them from this page when one does.
 Every form element exists in two looks: **live** (real control) and **sketch** (picture of a
 control, see [`../blueprint-motifs.md`](../blueprint-motifs.md) §7).
 

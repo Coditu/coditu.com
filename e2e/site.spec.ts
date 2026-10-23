@@ -310,16 +310,21 @@ test.describe("without JS", () => {
   });
 });
 
-test("the mobile menu opens, closes on Escape, and says so", async ({ page }) => {
+// A native popover: the browser announces the button's expanded state, which
+// Playwright cannot read, so this checks the sheet itself.
+test("the mobile menu opens, closes on Escape and on a link", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 });
   await page.goto("/de");
-  const button = page.locator('button[aria-controls="mobile-menu"]');
-  await expect(button).toHaveAttribute("aria-expanded", "false");
+  const button = page.locator('button[popovertarget="mobile-menu"]');
+  const menu = page.locator("#mobile-menu");
+  await expect(menu).toBeHidden();
   await button.click();
-  await expect(button).toHaveAttribute("aria-expanded", "true");
-  await expect(page.locator("#mobile-menu")).toBeVisible();
+  await expect(menu).toBeVisible();
   await page.keyboard.press("Escape");
-  await expect(page.locator("#mobile-menu")).toBeHidden();
+  await expect(menu).toBeHidden();
+  await button.click();
+  await menu.getByRole("link").first().click();
+  await expect(menu).toBeHidden();
 });
 
 test("sitemap lists both languages; unknown routes are 404", async ({ page }) => {

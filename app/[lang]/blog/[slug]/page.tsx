@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { SheetLabel } from "@/components/blueprint/sheet-label";
 import { Container } from "@/components/site/container";
-import { ButtonLink } from "@/components/ui/button";
+import { ButtonLink, textLink } from "@/components/ui/button";
 import { blogPath, formatDate, getPost, getPosts, postPaths, renderPost } from "@/lib/blog";
 import { getMessages, hasLocale, sectionHref, type Locale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/metadata";
@@ -34,9 +34,6 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/blog/[slug
     }
   );
 }
-
-const textLink =
-  "inline-flex min-h-11 items-center text-[15px] font-semibold text-blueprint underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-blueprint-hover hover:decoration-2";
 
 /**
  * One post: the question as the title, the answer in the first paragraph

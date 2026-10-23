@@ -5,7 +5,7 @@
  */
 export const locales = ["de", "en"] as const;
 export type Locale = (typeof locales)[number];
-export const defaultLocale: Locale = "de";
+export const otherLocale = (locale: Locale): Locale => (locale === "de" ? "en" : "de");
 
 export const hasLocale = (value: string): value is Locale =>
   (locales as readonly string[]).includes(value);
@@ -19,5 +19,3 @@ export const pages = {
   imprint: { de: "/de/impressum", en: "/en/legal-notice" },
   privacy: { de: "/de/datenschutz", en: "/en/privacy" },
 } as const satisfies Record<string, Record<Locale, string>>;
-
-export type PageKey = keyof typeof pages;

@@ -1,4 +1,4 @@
-import { ButtonLink } from "@/components/ui/button";
+import { ButtonLink, textLink } from "@/components/ui/button";
 import { getMessages, type Locale } from "@/lib/i18n";
 import { BOOKING_URL, CONTACT_EMAIL } from "@/lib/site-config";
 
@@ -37,10 +37,7 @@ export function Contact({ locale }: { locale: Locale }) {
             </div>
             <p className="mt-5 text-[15px] text-ink-muted">
               {s.email.or}{" "}
-              <a
-                href={`mailto:${CONTACT_EMAIL}`}
-                className="inline-flex min-h-11 items-center font-semibold text-blueprint underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-blueprint-hover hover:decoration-2"
-              >
+              <a href={`mailto:${CONTACT_EMAIL}`} className={textLink}>
                 {CONTACT_EMAIL}
               </a>
             </p>

@@ -1,6 +1,8 @@
 import { Plus } from "lucide-react";
 
+import { textLink } from "@/components/ui/button";
 import { getMessages, type Locale } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 import { Container } from "./container";
 import { SectionHeader } from "./section-header";
@@ -61,10 +63,7 @@ export function Faq({ locale }: { locale: Locale }) {
                   <div className="pb-6 sm:pr-12">
                     <p className="max-w-[64ch] text-[15px] leading-normal text-ink-muted">{item.answer}</p>
                     {item.link && (
-                      <a
-                        href={`#${t.anchors[item.link.section]}`}
-                        className="mt-1 inline-flex min-h-11 items-center text-[15px] font-semibold text-blueprint underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-blueprint-hover hover:decoration-2"
-                      >
+                      <a href={`#${t.anchors[item.link.section]}`} className={cn(textLink, "mt-1")}>
                         {item.link.label}
                       </a>
                     )}

@@ -27,7 +27,12 @@ const sizes = {
   lg: "h-[54px] px-6 text-[16px]",
 };
 
-type Style = { variant?: keyof typeof variants; size?: keyof typeof sizes };
+/** A standalone text link (not inside running text) with a 44 px hit area. Wraps, unlike `variant: "link"`. */
+export const textLink =
+  "inline-flex min-h-11 items-center text-[15px] font-semibold text-blueprint underline decoration-1 underline-offset-4 " +
+  "transition-colors duration-150 hover:text-blueprint-hover hover:decoration-2";
+
+type Style ={ variant?: keyof typeof variants; size?: keyof typeof sizes };
 
 export function buttonClasses({ variant = "app", size = "md" }: Style, className?: string) {
   return cn(base, variants[variant], variant !== "link" && sizes[size], className);

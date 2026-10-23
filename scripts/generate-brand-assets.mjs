@@ -165,7 +165,7 @@ async function main() {
       .toBuffer()
   );
 
-  const { chromium } = await import("playwright-core");
+  const { chromium } = await import("@playwright/test");
   const browser = await chromium.launch({ args: ["--no-sandbox"] });
   try {
     for (const spec of [
