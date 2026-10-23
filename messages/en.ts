@@ -13,7 +13,7 @@ const en: Messages = {
     title: "Coditu — SharePoint web parts and internal apps",
     description:
       "Coditu builds SharePoint and SPFx web parts and internal apps for organisations in Germany. One team from sketch to operation.",
-    ogAlt: "Coditu — From sketch to finished software",
+    ogAlt: "Coditu — From mail to app",
   },
 
   anchors: {
@@ -53,52 +53,49 @@ const en: Messages = {
 
   hero: {
     label: "SharePoint · Internal apps",
-    title: "From sketch to finished software",
-    lead: "We build software for social organisations, associations and mid-sized companies. Your sketch becomes an app that works in your day-to-day. You see every step on a shared board.",
+    title: "From mail to app",
+    lead: "We build software for social organisations, associations and mid-sized companies. Your email becomes an app that works in your day-to-day. You see every step on a shared board.",
     cta: "Request a project",
     secondary: "How we work",
     request: {
-      request: "Request by email",
       example: "Example",
-      live: "Live",
-      summary: "Example: a request by email becomes a sketch, and the sketch a web part running on an intranet page.",
-      becomes: "becomes",
-      intranet: "Intranet",
-      page: "Home",
-      sending: "Sending …",
-      note: ["big &", "blue!"],
-      done: "Done!",
-      scenarios: [
-        {
-          request: "New colleagues should get an [Onboarding checklist] – with [Start date], [Team] and [Contact person].",
-          values: ["03 Nov 2026", "Consulting", "Sarah Weber"],
-          button: "Create",
-          result: {
-            kind: "checklist",
-            heading: "New colleague",
-            tasks: ["Order laptop", "Set up accounts", "Send welcome email", "Plan the first week"],
-          },
-        },
-        {
-          request: "We plan our intranet topics by email. We need an [Editorial calendar] with [Topic], [Date] and [Owner].",
-          values: ["New canteen", "14 Nov 2026", "Communications team"],
-          button: "Schedule",
-          result: {
-            kind: "calendar",
-            before: [["Company outing", "07 Nov 2026", "HR"]],
-            after: [["IT security explained", "21 Nov 2026", "IT"]],
-          },
-        },
-        {
-          request: "Everyone should be able to write [Intranet news] – with [Title], [Image] and [Approval] by communications.",
-          values: ["Summer party on 12 June", "summer-party.jpg", "Approved"],
-          button: "Publish",
-          result: { kind: "news", older: ["New parking rules from October", "IT maintenance on Saturday"] },
-        },
-      ],
+      summary: "Example: a request by email becomes a booking app – with a dashboard, bookings, a calendar and a login.",
+      mail: {
+        inbox: "Inbox",
+        to: "to Coditu",
+        from: "Julia Brandt",
+        initials: "JB",
+        time: "09:41",
+        subject: "Room booking without Excel?",
+        body: "Hi Coditu team, we still book our rooms through Excel and email. We'd like a [dashboard] with all [bookings], a [calendar] for the week and a [login] for the team.",
+        signoff: "Best, Julia",
+        others: [
+          { from: "IT support", subject: "Maintenance on Saturday", time: "08:15" },
+          { from: "HR", subject: "New holiday rules", time: "Yesterday" },
+        ],
+      },
+      app: {
+        name: "Room booking",
+        live: "Live",
+        nav: ["Overview", "Rooms", "Team"],
+        newBooking: "New booking",
+        stats: [
+          { label: "Today", value: "6" },
+          { label: "Free rooms", value: "3" },
+        ],
+        days: ["Mon", "Tue", "Wed", "Thu", "Fri"],
+        columns: ["Room", "Time", "Status"],
+        confirmed: "Confirmed",
+        pending: "Pending",
+        rows: [
+          { room: "Room 1", time: "09:00", pending: false },
+          { room: "Room 2", time: "11:30", pending: false },
+          { room: "Hall", time: "14:00", pending: true },
+        ],
+      },
     },
     facts: [
-      { id: "T.01", text: "From sketch to app in a few days" },
+      { id: "T.01", text: "From mail to app in a few days" },
       { id: "T.02", text: "You see every step on the board" },
       { id: "T.03", text: "Runs in your Microsoft 365" },
     ],

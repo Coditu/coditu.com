@@ -21,7 +21,7 @@ const de = {
     title: "Coditu — SharePoint-Webparts und interne Apps",
     description:
       "Coditu entwickelt SharePoint- und SPFx-Webparts und interne Apps für Organisationen in Deutschland. Ein Team von der Skizze bis zum Betrieb.",
-    ogAlt: "Coditu — Von der Skizze zur fertigen Software",
+    ogAlt: "Coditu — Von der Mail zur App",
   },
 
   /** Section ids on the home page. Language-specific, so URLs stay German. */
@@ -65,60 +65,60 @@ const de = {
   hero: {
     label: "SharePoint · Interne Apps",
     /** The blue period is added by the component. */
-    title: "Von der Skizze zur fertigen Software",
-    lead: "Wir bauen Software für soziale Organisationen, Vereine und den Mittelstand. Aus Ihrer Skizze wird eine App, die im Alltag funktioniert. Jeden Schritt sehen Sie auf einem gemeinsamen Board.",
+    title: "Von der Mail zur App",
+    lead: "Wir bauen Software für soziale Organisationen, Vereine und den Mittelstand. Aus Ihrer E-Mail wird eine App, die im Alltag funktioniert. Jeden Schritt sehen Sie auf einem gemeinsamen Board.",
     cta: "Projekt anfragen",
     secondary: "So arbeiten wir",
     /**
-     * The hero picture: a request by e-mail becomes a sketch on paper, then
-     * the app. `[Words]` turn into the app — the first is its title, the rest
-     * its fields, one value each; `success` is the app's title once sent.
-     * Example data, marked „Beispiel“. Apps of the kinds we really built.
+     * The hero picture: a request by e-mail becomes a booking app. Example
+     * data, marked „Beispiel“; close to a kind of app we really built (NVRMiss:
+     * booking and calendar).
      */
     request: {
-      request: "Anfrage per E-Mail",
       example: "Beispiel",
-      live: "Live",
-      summary: "Beispiel: Aus einer Anfrage per E-Mail wird eine Skizze und daraus ein Webpart, das auf einer Intranet-Seite läuft.",
-      becomes: "wird zu",
-      /** The neutral intranet page the web part lands on: its top bar and page title. */
-      intranet: "Intranet",
-      page: "Startseite",
-      sending: "Wird gesendet …",
-      /** The red-pen note beside the sketched button, one entry per line. */
-      note: ["groß &", "blau!"],
-      done: "Fertig!",
-      scenarios: [
-        {
-          request: "Neue Kolleginnen sollen eine [Onboarding-Checkliste] bekommen – mit [Startdatum], [Team] und [Ansprechpartner].",
-          values: ["03.11.2026", "Beratung", "Sarah Weber"],
-          button: "Anlegen",
-          result: {
-            kind: "checklist" as const,
-            heading: "Neue Kollegin",
-            tasks: ["Laptop bestellen", "Zugänge anlegen", "Willkommensmail senden", "Erste Woche planen"],
-          },
-        },
-        {
-          request: "Unsere Intranet-Themen planen wir per E-Mail. Wir brauchen einen [Redaktionsplan] mit [Thema], [Datum] und [Zuständigkeit].",
-          values: ["Neue Kantine", "14.11.2026", "Team Kommunikation"],
-          button: "Einplanen",
-          result: {
-            kind: "calendar" as const,
-            before: [["Betriebsausflug", "07.11.2026", "Personal"]],
-            after: [["IT-Sicherheit kurz erklärt", "21.11.2026", "IT"]],
-          },
-        },
-        {
-          request: "Alle sollen [Intranet-News] schreiben können – mit [Titel], [Bild] und [Freigabe] durch die Kommunikation.",
-          values: ["Sommerfest am 12. Juni", "sommerfest.jpg", "Freigegeben"],
-          button: "Veröffentlichen",
-          result: { kind: "news" as const, older: ["Neue Parkregeln ab Oktober", "IT-Wartung am Samstag"] },
-        },
-      ],
+      summary: "Beispiel: Aus einer Anfrage per E-Mail wird eine Buchungs-App – mit Dashboard, Buchungen, Kalender und Login.",
+      mail: {
+        inbox: "Posteingang",
+        to: "an Coditu",
+        from: "Julia Brandt",
+        initials: "JB",
+        time: "09:41",
+        subject: "Raumbuchung ohne Excel?",
+        /**
+         * `[Words]` are picked up and land in the app, in this order: its page
+         * title, the bookings table, the calendar card, the sign-in. Exactly four.
+         */
+        body: "Hallo Coditu-Team, unsere Räume buchen wir noch über Excel und E-Mail. Wir wünschen uns ein [Dashboard] mit allen [Buchungen], einen [Kalender] für die Woche und einen [Login] fürs Team.",
+        signoff: "Viele Grüße, Julia",
+        /** The other mails in the inbox list (wide stage only). */
+        others: [
+          { from: "IT-Support", subject: "Wartung am Samstag", time: "08:15" },
+          { from: "Personal", subject: "Neue Urlaubsregeln", time: "Gestern" },
+        ],
+      },
+      app: {
+        name: "Raumbuchung",
+        live: "Live",
+        nav: ["Übersicht", "Räume", "Team"],
+        newBooking: "Neue Buchung",
+        stats: [
+          { label: "Heute", value: "6" },
+          { label: "Freie Räume", value: "3" },
+        ],
+        /** Monday to Friday; the calendar card marks Thursday as today. */
+        days: ["Mo", "Di", "Mi", "Do", "Fr"],
+        columns: ["Raum", "Zeit", "Status"],
+        confirmed: "Bestätigt",
+        pending: "Offen",
+        rows: [
+          { room: "Raum 1", time: "09:00", pending: false },
+          { room: "Raum 2", time: "11:30", pending: false },
+          { room: "Saal", time: "14:00", pending: true },
+        ],
+      },
     },
     facts: [
-      { id: "T.01", text: "Von der Skizze zur App in wenigen Tagen" },
+      { id: "T.01", text: "Von der Mail zur App in wenigen Tagen" },
       { id: "T.02", text: "Sie sehen jeden Schritt im Board" },
       { id: "T.03", text: "Läuft in Ihrem Microsoft 365" },
     ],

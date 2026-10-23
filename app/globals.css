@@ -47,9 +47,6 @@
   --error:   #b3382c;  --error-bg:   #f7e5e2;
   --info:    #1f6e8c;  --info-bg:    #e2f0f5;
 
-  /* the red pen: the hero sketch's margin note and tick only. Not a status. */
-  --pen-red: #b3382c;      /*  4.9:1 on paper */
-
   /* elevation */
   --shadow-sm: 0 1px 0 rgb(20 23 28 / 0.06);
   --shadow-lift: 0 12px 24px -16px rgb(20 23 28 / 0.3);
@@ -60,8 +57,8 @@
   --dur-section: 520ms;
 }
 
-/* Not `:root` only: the hero-frames review page themes one column dark. On the
-   site the attribute is only ever on <html>. */
+/* Not `:root` only, so a subtree can be themed dark. On the site the attribute
+   is only ever on <html>. */
 [data-theme="dark"] {
   color-scheme: dark;
 
@@ -90,8 +87,6 @@
   --warning: #e7b04e;  --warning-bg: rgb(231 176 78 / 0.12);
   --error:   #f08a7e;  --error-bg:   rgb(240 138 126 / 0.12);
   --info:    #6cc0de;  --info-bg:    rgb(108 192 222 / 0.12);
-
-  --pen-red: #f08a7e;
 
   --shadow-sm: 0 1px 0 rgb(0 0 0 / 0.3);
   --shadow-lift: 0 12px 24px -16px rgb(0 0 0 / 0.6);
@@ -173,7 +168,6 @@
   --color-error-bg: var(--error-bg);
   --color-info: var(--info);
   --color-info-bg: var(--info-bg);
-  --color-pen-red: var(--pen-red);
 
   --shadow-sm: var(--shadow-sm);
   --shadow-lift: var(--shadow-lift);
@@ -315,81 +309,6 @@
   animation-play-state: running;
 }
 
-/* --- Hero stage (components/site/hero-stage/) ------------------------------
-   The phases run in JS. CSS blinks the typing caret and moves the pen: every
-   `.cd-pen` stroke is hidden until its sketch carries `data-draw`, then draws,
-   `--row` × 220 ms late; `.cd-write` handwriting fades in with its row. */
-.cd-caret {
-  animation: cd-caret 1s steps(1) infinite;
-}
-
-@keyframes cd-caret {
-  50% {
-    opacity: 0;
-  }
-}
-
-.cd-pen {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-}
-
-.cd-pen-bold {
-  stroke-width: 6;
-}
-
-[data-draw] .cd-pen {
-  animation: cd-pen 600ms var(--ease-entrance) both;
-  animation-delay: calc(var(--row, 0) * 220ms);
-}
-
-@keyframes cd-pen {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-.cd-hand {
-  fill: currentColor;
-  font-family: var(--font-caveat), cursive;
-  font-weight: 600;
-}
-
-.cd-write {
-  opacity: 0;
-}
-
-[data-draw] .cd-write {
-  animation: cd-fade 400ms ease-out both;
-  animation-delay: calc(var(--row, 0) * 220ms + 150ms);
-}
-
-/* Paper stays paper: the sketch keeps its light values in dark mode. */
-[data-theme="dark"] .cd-paper {
-  --surface: #ffffff;
-  --line: #d9d7d0;
-  --blueprint: #1f4fd8;
-  --pen-red: #b3382c;
-}
-
-/* A still frame (components/site/hero-stage/frame.tsx): already drawn. */
-[data-static] .cd-pen {
-  stroke-dashoffset: 0;
-}
-[data-static] .cd-write {
-  opacity: 1;
-}
-
-/* The field being filled in the app is lit on paper too. */
-.cd-sketch-part[data-active] .cd-pen {
-  stroke-width: 3;
-}
-
 @keyframes cd-sketch-in {
   from {
     clip-path: inset(0 100% 0 0);
@@ -450,18 +369,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* No typing caret blink, no sketch reveal. */
-  .cd-caret,
+  /* No sketch reveal. */
   .cd-sketch-in > * {
     animation: none !important;
-  }
-
-  /* The hero sketch is shown drawn. */
-  .cd-pen,
-  .cd-write {
-    animation: none !important;
-    stroke-dashoffset: 0 !important;
-    opacity: 1 !important;
   }
 
   /* The services panel swaps instantly. */

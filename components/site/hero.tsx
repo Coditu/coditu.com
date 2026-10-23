@@ -9,8 +9,7 @@ import { HeroStage } from "./hero-stage/stage.client";
 
 /**
  * Hero: the text on the left, and beside it the one picture of what we do:
- * a client's request by e-mail becomes a sketch, then a web part on their
- * intranet page (<HeroStage>).
+ * a client's request by e-mail becomes the app it asks for (<HeroStage>).
  * On phones the stage comes after the text. Spec:
  * docs/design-system/components/page-sections.md → Hero.
  */
@@ -56,7 +55,7 @@ export function Hero({ locale }: { locale: Locale }) {
             </div>
           </div>
           <div className="lg:col-span-6">
-            <HeroStage scenarios={h.request.scenarios} labels={h.request} />
+            <HeroStage labels={h.request} />
           </div>
         </div>
       </Container>
