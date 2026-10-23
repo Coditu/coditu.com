@@ -15,8 +15,7 @@
     "budgets": "./scripts/with-prod-server.sh node scripts/check-budgets.mjs",
     "lighthouse": "./scripts/with-prod-server.sh node scripts/lighthouse.mjs",
     "analyze": "ANALYZE=1 next build",
-    "gate": "./scripts/gate.sh",
-    "hero-frames": "node scripts/shoot-hero-frames.mjs"
+    "gate": "./scripts/gate.sh"
   },
   "dependencies": {
     "clsx": "^2.1.1",
