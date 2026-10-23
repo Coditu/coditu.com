@@ -204,6 +204,30 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       }
     });
 
+    test("intranet: follows services, the slider works by keyboard, the CTA is the free task marked Intranet", async ({ page }) => {
+      await page.goto(home);
+      const section = page.locator('section[aria-labelledby="intranet-title"]');
+      await expect(page.locator('section[aria-labelledby="services-title"] + section')).toHaveId("intranet");
+
+      // Before/after: a native range input, pictures hidden from screen readers.
+      const slider = section.getByRole("slider");
+      await expect(slider).toHaveValue("50");
+      await slider.focus();
+      await page.keyboard.press("ArrowRight");
+      await expect(slider).toHaveValue("51");
+      await expect(section.locator("figure [aria-hidden] input, figure [aria-hidden] a, figure [aria-hidden] button")).toHaveCount(0);
+
+      // The published post shows on the live intranet.
+      await section.locator("figure").nth(1).scrollIntoViewIfNeeded();
+      await expect(section.getByText(lang === "de" ? "Grippeimpfung im Haus ab 3. November" : "Flu jabs on site from 3 November")).toHaveCount(2);
+
+      // One offer: the hero's free-task subject, marked Intranet.
+      const subject = encodeURIComponent(lang === "de" ? "Kleine Aufgabe gratis – Intranet" : "Free small task – Intranet");
+      await expect(section.locator(`a[href^="mailto:contact@coditu.com?subject=${subject}&"]`)).toHaveText(
+        lang === "de" ? "Webpart kostenlos neu gestalten lassen" : "Get one web part redesigned free",
+      );
+    });
+
     test("reference: the section has its language's id", async ({ page }) => {
       await page.goto(home);
       const id = await page.locator('section[aria-labelledby="reference-title"]').getAttribute("id");

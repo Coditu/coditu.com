@@ -27,6 +27,7 @@ const de = {
   /** Section ids on the home page. Language-specific, so URLs stay German. */
   anchors: {
     services: "leistungen",
+    intranet: "intranet",
     process: "arbeitsweise",
     reference: "referenz",
     security: "sicherheit",
@@ -249,6 +250,111 @@ const de = {
       reminder: { title: "Erinnerung", text: "Wartung Klimaanlage", time: "14:30 – 15:30" },
       sync: { title: "Kalender-Sync", text: "Google · Outlook" },
     },
+  },
+
+  /**
+   * The intranet offer, our flagship: old SharePoint web parts redesigned, an
+   * admin app for news, data stays in the client's Microsoft 365. Mockups are
+   * example data (no client, no real people), modelled on a news web part and
+   * news admin we really built. The CTA is the hero's free small task, with
+   * the same subject plus „Intranet“: one offer, not two.
+   */
+  intranetSection: {
+    title: "Ihr Intranet, neu gedacht",
+    intro: "Viele SharePoint-Intranets wirken veraltet und sind im Alltag mühsam zu bedienen.",
+    caption: "Beispiel · Beispieldaten",
+    /** The three posts on the news page, before and after, and on the live intranet under the new one. */
+    news: [
+      {
+        title: "Neue Kantine in Haus B ab 2. November",
+        area: "Verwaltung",
+        date: "21.10.2026",
+        by: "Kommunikation",
+        teaser: "Mittagessen gibt es dann von 11:30 bis 14:00 Uhr. Die Speisekarte steht jede Woche hier im Intranet.",
+      },
+      {
+        title: "Erste-Hilfe-Kurse: neue Termine",
+        area: "Pflege",
+        date: "19.10.2026",
+        by: "Fortbildung",
+        teaser: "Für November und Dezember gibt es neue Termine. Die Anmeldung läuft über Ihre Leitung.",
+      },
+      {
+        title: "Mobiles Arbeiten: Was sich ändert",
+        area: "Personal",
+        date: "15.10.2026",
+        by: "Personalabteilung",
+        teaser: "Ab Januar gilt eine neue Vereinbarung. Die wichtigsten Punkte haben wir kurz zusammengefasst.",
+      },
+    ],
+    compare: {
+      before: "Vorher",
+      after: "Nachher",
+      control: "Vorher und Nachher vergleichen",
+      hint: "Zum Vergleichen ziehen",
+      summary:
+        "Beispiel: dieselbe News-Seite zweimal. Vorher ein klassisches SharePoint mit grauer Leiste, Linkliste und kleiner Tabelle, nachher unser Design mit Bereichsfilter und großen Karten.",
+    },
+    /** The „before“: generic classic SharePoint, no Microsoft names or marks. */
+    classic: {
+      site: "Intranet",
+      suite: ["Websites", "Dokumente"],
+      tabs: ["Durchsuchen", "Seite"],
+      actions: ["Freigeben", "Folgen", "Bearbeiten"],
+      breadcrumb: "Startseite › Neuigkeiten",
+      nav: ["Startseite", "Neuigkeiten", "Dokumente", "Termine", "Kontakte", "Websiteinhalte"],
+      heading: "Neuigkeiten",
+      add: "Neues Element",
+      columns: ["Titel", "Geändert", "Geändert von"],
+    },
+    modern: {
+      site: "Intranet",
+      nav: ["Start", "Aktuelles", "Termine", "Team"],
+      search: "Suchen",
+      heading: "Aktuelles",
+      filters: ["Alle", "Verwaltung", "Pflege", "Personal"],
+      read: "Weiterlesen",
+      more: "Alle News",
+    },
+    /** Staff publish a post in the admin; it appears on the intranet next to it. */
+    admin: {
+      app: "News-Redaktion",
+      login: "Microsoft",
+      initials: "LK",
+      heading: "Beitrag bearbeiten",
+      draft: "Entwurf",
+      published: "Veröffentlicht",
+      fields: { area: "Bereich", title: "Titel", teaser: "Teaser", date: "Datum" },
+      post: {
+        title: "Grippeimpfung im Haus ab 3. November",
+        area: "Personal",
+        date: "23.10.2026",
+        by: "Personalabteilung",
+        teaser: "Der Betriebsarzt impft an drei Tagen in Haus A. Bitte melden Sie sich bis zum 30. Oktober an.",
+      },
+      save: "Als Entwurf speichern",
+      publish: "Veröffentlichen",
+      done: "Jetzt im Intranet sichtbar",
+      page: "Startseite",
+      fresh: "Neu",
+      summary:
+        "Beispiel: Eine Mitarbeiterin bearbeitet in unserer Redaktions-App einen News-Beitrag und veröffentlicht ihn. Daneben erscheint er oben auf der Startseite des Intranets.",
+    },
+    trust: [
+      { title: "Bleibt in Ihrem Microsoft 365", text: "Beiträge, Termine und Seiten liegen weiter in Ihren SharePoint-Listen." },
+      { title: "Gleicher Login, gleiche Rechte", text: "Ihr Team meldet sich mit dem Microsoft-Konto an. Wer was bearbeiten darf, regeln Ihre Gruppen." },
+      { title: "Keine Migration nötig", text: "Ihre Inhalte bleiben, wo sie sind. Wir erneuern die Oberfläche." },
+    ],
+    stepsTitle: "So läuft es ab",
+    steps: [
+      { title: "Screenshot schicken", text: "Ein Bild von einem alten Webpart genügt für den Anfang." },
+      { title: "Kostenlos neu gestalten", text: "Wir gestalten es neu und zeigen Ihnen das Ergebnis, in bis zu 3 Tagen." },
+      { title: "Den Rest modernisieren", text: "Gefällt es Ihnen, erneuern wir Schritt für Schritt Ihr ganzes Intranet." },
+    ],
+    cta: "Webpart kostenlos neu gestalten lassen",
+    fine: "Ihre kleine Gratis-Aufgabe · 1 pro Kunde · in bis zu 3 Tagen",
+    subject: "Kleine Aufgabe gratis – Intranet",
+    body: "Hallo Coditu,\n\nbitte gestalten Sie dieses Webpart kostenlos neu (Screenshot im Anhang).\n\nWas uns daran stört:\n\n",
   },
 
   /**

@@ -281,6 +281,17 @@
   }
 }
 
+/* A list makes room for a new first row: it starts one row up. Rows are equal
+   height with their gap as padding, so with four rows one row is 25 %. */
+@keyframes cd-push {
+  from {
+    transform: translateY(-25%);
+  }
+  to {
+    transform: none;
+  }
+}
+
 .cd-word {
   display: inline-block;
   animation: cd-word 620ms var(--ease-entrance) both;

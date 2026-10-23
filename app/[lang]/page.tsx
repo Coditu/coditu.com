@@ -5,6 +5,7 @@ import { RevealScope } from "@/components/motion/reveal-scope.client";
 import { Contact } from "@/components/site/contact";
 import { Faq } from "@/components/site/faq";
 import { Hero } from "@/components/site/hero";
+import { Intranet } from "@/components/site/intranet";
 import { Process } from "@/components/site/process";
 import { Reference } from "@/components/site/reference";
 import { Security } from "@/components/site/security";
@@ -28,6 +29,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
     <>
       <Hero locale={lang} />
       <Services locale={lang} />
+      <Intranet locale={lang} />
       <Process locale={lang} />
       <Reference locale={lang} />
       <Security locale={lang} />
