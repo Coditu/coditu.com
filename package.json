@@ -14,7 +14,7 @@
     "brand:assets": "node scripts/generate-brand-assets.mjs",
     "budgets": "./scripts/with-prod-server.sh node scripts/check-budgets.mjs",
     "lighthouse": "./scripts/with-prod-server.sh node scripts/lighthouse.mjs",
-    "analyze": "ANALYZE=1 next build",
+    "analyze": "next experimental-analyze",
     "gate": "./scripts/gate.sh"
   },
   "dependencies": {
@@ -28,7 +28,6 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
-    "@next/bundle-analyzer": "16.3.8",
     "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
@@ -37,7 +36,6 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.8",
     "lighthouse": "^13.4.1",
-    "playwright-core": "^1.62.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.11"

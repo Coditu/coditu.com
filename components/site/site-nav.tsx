@@ -55,7 +55,7 @@ export function SiteNav({
           <MobileMenu
             links={links}
             booking={{ href: booking, label: t.nav.booking }}
-            labels={{ open: t.nav.menuOpen, close: t.nav.menuClose, nav: t.nav.menu }}
+            label={t.nav.menu}
           />
         </div>
       </Container>

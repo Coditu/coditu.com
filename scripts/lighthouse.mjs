@@ -2,7 +2,7 @@
  * Lighthouse on the marketing route, asserting §5's table.
  *
  * Runs against a production build (`scripts/with-prod-server.sh`) in a headless
- * Chromium launched by playwright-core, so CI needs no separate Chrome install.
+ * Chromium launched by Playwright, so CI needs no separate Chrome install.
  *
  * ── Why three runs ─────────────────────────────────────────────────────────
  * Lighthouse's mobile preset uses Lantern, a *simulation* rather than a
@@ -72,7 +72,7 @@ async function measuredLcp(chromium) {
   }
 }
 
-const { chromium } = await import("playwright-core");
+const { chromium } = await import("@playwright/test");
 
 const runs = [];
 for (let i = 0; i < RUNS; i += 1) {

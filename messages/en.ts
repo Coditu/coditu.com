@@ -41,8 +41,6 @@ const en: Messages = {
     ],
     blog: "Blog",
     booking: "Book a call",
-    menuOpen: "Open menu",
-    menuClose: "Close menu",
     themeToggle: "Toggle light / dark mode",
     menu: "Menu",
   },

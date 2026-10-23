@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { marked } from "marked";
 
-import { getMessages, locales, pages, type Locale } from "@/lib/i18n";
+import { getMessages, locales, otherLocale, pages, type Locale } from "@/lib/i18n";
 import { PRICES, SHOW_PRICES } from "@/lib/site-config";
 
 /**
@@ -97,8 +97,6 @@ export function getPosts(locale: Locale): Post[] {
 export const getPost = (locale: Locale, slug: string) => getPosts(locale).find((post) => post.slug === slug);
 
 export const blogPath = (locale: Locale, slug?: string) => `/${locale}/blog${slug ? `/${slug}` : ""}`;
-
-const otherLocale = (locale: Locale): Locale => (locale === "de" ? "en" : "de");
 
 /** The same post in the other language, if it is visible there. */
 export function getTranslation(locale: Locale, post: Post) {

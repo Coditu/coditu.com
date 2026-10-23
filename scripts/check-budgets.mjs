@@ -58,7 +58,7 @@ async function measure(browser) {
   return scripts;
 }
 
-const { chromium } = await import("playwright-core");
+const { chromium } = await import("@playwright/test");
 const browser = await chromium.launch();
 let failed = false;
 

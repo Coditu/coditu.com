@@ -1,46 +1,15 @@
 import { SITE_URL } from "@/lib/site-config";
 
-const LOCALHOST_FALLBACK = "http://localhost:3000";
+/**
+ * The origin for metadata, canonicals, OG images and the sitemap: the env value
+ * if set, else Vercel's production domain (set on previews too), else
+ * coditu.com in a build and localhost in `next dev`.
+ */
+const origin =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`) ||
+  (process.env.NODE_ENV === "production" ? SITE_URL : "http://localhost:3000");
 
-function toUrl(value: string | undefined): URL | null {
-  if (!value) return null;
-
-  const trimmed = value.trim();
-  if (trimmed.length === 0) return null;
-
-  const normalized = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
-
-  try {
-    return new URL(normalized);
-  } catch {
-    return null;
-  }
-}
-
-export function getSiteUrl(): URL {
-  const fromEnv = toUrl(process.env.NEXT_PUBLIC_SITE_URL);
-  if (fromEnv) return fromEnv;
-
-  // Use Vercel-provided deployment URLs when a public site URL isn't explicitly set.
-  // This keeps OG/Twitter URLs aligned with the actual deployed domain.
-  const fromVercelProduction = toUrl(process.env.VERCEL_PROJECT_PRODUCTION_URL);
-  if (fromVercelProduction) return fromVercelProduction;
-
-  const fromVercelDeployment = toUrl(process.env.VERCEL_URL);
-  if (fromVercelDeployment) return fromVercelDeployment;
-
-  if (process.env.NODE_ENV === "production") {
-    const fromContent = toUrl(SITE_URL);
-    if (fromContent) return fromContent;
-  }
-
-  return new URL(LOCALHOST_FALLBACK);
-}
-
-export function getSiteOrigin(): string {
-  return getSiteUrl().origin;
-}
-
-export function getAbsoluteUrl(path: string): string {
-  return new URL(path, getSiteUrl()).toString();
-}
+export const getSiteUrl = () => new URL(origin);
+export const getSiteOrigin = () => getSiteUrl().origin;
+export const getAbsoluteUrl = (path: string) => new URL(path, origin).toString();

@@ -17,7 +17,7 @@ import {
   UserRound,
 } from "lucide-react";
 
-import { buttonClasses } from "@/components/ui/button";
+import { buttonClasses, textLink } from "@/components/ui/button";
 import { getMessages, type Locale } from "@/lib/i18n";
 import { CONTACT_EMAIL } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
@@ -77,10 +77,7 @@ export function Services({ locale }: { locale: Locale }) {
           ))}
         </div>
         <p className="mt-16">
-          <a
-            href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(s.more.subject)}`}
-            className="text-[15px] font-semibold text-blueprint underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-blueprint-hover hover:decoration-2"
-          >
+          <a href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(s.more.subject)}`} className={textLink}>
             {s.more.label}
           </a>
         </p>
