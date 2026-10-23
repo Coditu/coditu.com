@@ -3,6 +3,7 @@
 import { Inbox } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 
+import { Window } from "@/components/site/window";
 import { cn } from "@/lib/utils";
 import type { Messages } from "@/messages/de";
 
@@ -120,11 +121,15 @@ export function HeroStage({ labels }: { labels: Labels }) {
         <div ref={stage} className="@container relative mt-3 h-[440px] lg:h-[460px]">
           {/* 1 · The mail */}
           <div data-part="mail" className={cn(layer, !onMail && "scale-[0.98] opacity-0")}>
-            <div className="flex h-full flex-col overflow-hidden rounded-ui border border-ink bg-surface shadow-lift">
-              <div className="flex h-11 flex-none items-center gap-2 border-b border-line px-3">
-                <Inbox className="size-4 text-blueprint" strokeWidth={1.5} />
-                <span className="text-[14px] font-semibold">{mail.inbox}</span>
-              </div>
+            <Window
+              className="h-full"
+              bar={
+                <>
+                  <Inbox className="size-4 text-blueprint" strokeWidth={1.5} />
+                  <span className="text-[14px] font-semibold">{mail.inbox}</span>
+                </>
+              }
+            >
               <div className="flex min-h-0 flex-1">
                 <div className="hidden w-[38%] flex-none flex-col border-r border-line @min-[26rem]:flex">
                   {[{ from: mail.from, subject: mail.subject, time: mail.time }, ...mail.others].map((item, i) => (
@@ -174,7 +179,7 @@ export function HeroStage({ labels }: { labels: Labels }) {
                   <p className={cn("mt-3", BODY)}>{mail.signoff}</p>
                 </div>
               </div>
-            </div>
+            </Window>
           </div>
 
           {/* 2 · The app it becomes */}

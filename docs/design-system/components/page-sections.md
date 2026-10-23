@@ -1,4 +1,4 @@
-# Page sections — nav, hero, section header, feature, team, footer
+# Page sections — nav, hero, section header, services, feature, team, footer
 
 Page wrapper: `<body>` gets `bg-blueprint-grid` (or the hero section only, if the full-page grid
 is too busy on a given page). Content container:
@@ -77,6 +77,24 @@ in both languages (`tests/hero-sequence.test.ts`). In the app they are capitalis
 - **Accessibility.** The stage is `aria-hidden` (`data-hero-stage`) with one sr-only sentence (`hero.request.summary`); nothing in it is focusable.
 - **Reduced motion.** No flying: two still frames — the mail with its words lit, the finished app — switched every few seconds.
 - **No flash.** The server renders the open mail; hidden app content uses the `opacity-0` class, never an inline `opacity:0` (`scripts/verify-tokens.sh` fails on that).
+
+## Services — what we build
+
+`components/site/services.tsx`. Show, don't list: one card per kind of work, each with a coded
+mockup of a real project (HTML/CSS, not SVG or screenshots), rebuilt with example data.
+
+| Part | Spec |
+|---|---|
+| Cards | `<article>` per `servicesSection.rows[i]`, `grid items-center gap-8 lg:grid-cols-12 lg:gap-12`, `gap-16 lg:gap-24` between. Mockup `lg:col-span-7`, text `lg:col-span-5`; every second card puts the mockup right (`lg:order-last`). Phones: mockup above text. No carousel, no tabs. |
+| Order | 01 SharePoint-Webparts · 02 Interne Apps · 03 Websites & Web-Apps. Blog posts link to `rows[0]` and `rows[1]` by index (`service:` in `content/blog`): keep that order. |
+| Text | `h3.text-h2` title → problem in the client's words (`text-lead font-semibold`) → one sentence on what we build (`text-body text-ink-muted`) → result: `border-t border-ink`, mono `Ergebnis` label + 16 px semibold line. Nothing else. |
+| Frame | `<Window>` (`components/site/window.tsx`), the hero's frame: `border-ink rounded-ui bg-surface shadow-lift`, 44 px title bar. |
+| Mockups | 01 the SPFx calendar web part (area filter, four-week grid with dots, next events, paging) · 02 the editorial planner (Microsoft sign-in, week bar, one row per channel, entry cards with area, status, editor) · 03 the NVRMiss home page (headline, beta CTA, call / reminder / calendar widgets). Narrow is a container query on the mockup (`@min-[26rem]`, `@min-[30rem]`, `@min-[36rem]`, `@min-[42rem]`), not the viewport: the planner shows 1 → 3 → 5 days, the calendar stacks its event list. |
+| Callouts | Three per mockup, `<Pin>`: dashed blue outline round the part, a mono label chip on its edge. Labels are `rows[i].labels`, in the order the component pins them. |
+| Data | Example data only: no client names (no EVIM), no real people, no logos. Caption under each mockup: „Nachbau · Beispieldaten“. |
+| Accessibility | The mockup is `aria-hidden`; the `<figcaption>` carries `rows[i].summary` as sr-only text. Nothing inside a mockup is focusable. |
+| Motion | Each card reveals on scroll (`data-reveal="section" data-reveal-on-view`); reduced motion fades only. Nothing loops. |
+| Colour | Blue for app buttons, active day, callouts; status colours only for statuses, always with a word. No orange. |
 
 ## Feature / benefit item
 

@@ -1,6 +1,7 @@
 import { DoorOpen, LayoutDashboard, Lock, Plus, Users } from "lucide-react";
 
 import { buttonClasses } from "@/components/ui/button";
+import { Window } from "@/components/site/window";
 import { StatusPill } from "@/components/ui/status-pill";
 import { cn } from "@/lib/utils";
 import type { Messages } from "@/messages/de";
@@ -60,26 +61,29 @@ export function AppWindow({
   });
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-ui border border-ink bg-surface shadow-lift">
-      <div className="flex h-11 flex-none items-center gap-2 border-b border-line px-3">
-        <span className="size-3 flex-none rounded-tag bg-blueprint" />
-        <span className="truncate text-[14px] font-semibold">{app.name}</span>
-        {step === "done" && (
-          <span data-reveal="micro">
-            <StatusPill status="live">{app.live}</StatusPill>
-          </span>
-        )}
-        <span className="ml-auto flex flex-none items-center gap-2">
-          <span className="flex items-center gap-1 text-[13px] text-ink-muted">
-            <Lock className="size-3.5" strokeWidth={1.5} />
-            {word(3)}
-          </span>
-          <span className="flex size-7 items-center justify-center rounded-full bg-blueprint text-[11px] font-semibold text-blueprint-ink">
-            {initials}
-          </span>
-        </span>
-      </div>
-
+    <Window
+      className="h-full"
+      bar={
+          <>
+            <span className="size-3 flex-none rounded-tag bg-blueprint" />
+            <span className="truncate text-[14px] font-semibold">{app.name}</span>
+            {step === "done" && (
+              <span data-reveal="micro">
+                <StatusPill status="live">{app.live}</StatusPill>
+              </span>
+            )}
+            <span className="ml-auto flex flex-none items-center gap-2">
+              <span className="flex items-center gap-1 text-[13px] text-ink-muted">
+                <Lock className="size-3.5" strokeWidth={1.5} />
+                {word(3)}
+              </span>
+              <span className="flex size-7 items-center justify-center rounded-full bg-blueprint text-[11px] font-semibold text-blueprint-ink">
+                {initials}
+              </span>
+            </span>
+          </>
+      }
+    >
       <div className="flex min-h-0 flex-1">
         <div className="flex w-11 flex-none flex-col gap-1 border-r border-line p-1.5 @min-[26rem]:w-32 @min-[26rem]:p-2">
           {app.nav.map((label, i) => {
@@ -152,6 +156,6 @@ export function AppWindow({
           </div>
         </div>
       </div>
-    </div>
+    </Window>
   );
 }

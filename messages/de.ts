@@ -148,88 +148,106 @@ const de = {
   },
 
   /**
-   * Services: a showcase with one tab per service. The client's problem in
-   * their words, what we build, proof, tech. Every number here is from real sprint data — add none.
+   * Services: one card per kind of work, each with a coded mockup of a real
+   * project, rebuilt with example data (no client names, no real people).
+   * `rows[0]` and `rows[1]` are linked from blog posts (`service:` in
+   * content/blog) — keep that order. `labels` are the callouts on the mockup,
+   * in the order the component pins them. The one number here is from real
+   * sprint data — add none.
    */
   servicesSection: {
     title: "Was wir bauen – und welches Problem es löst",
-    intro:
-      "Jede Leistung beginnt mit dem Satz, mit dem Kunden zu uns kommen. Darunter: was wir bauen und womit.",
-    facts: "Aus der Praxis",
-    example: "Beispiel",
+    intro: "Drei Beispiele aus echten Projekten, nachgebaut mit Beispieldaten.",
+    caption: "Nachbau · Beispieldaten",
+    result: "Ergebnis",
     more: { label: "Nicht sicher, was passt? Schicken Sie uns Ihre Skizze.", subject: "Projektanfrage" },
     rows: [
       {
         title: "SharePoint-Webparts",
         problem: "„Unser Intranet ist unübersichtlich und veraltet.“",
-        text: "Webparts, die sich in Ihre bestehenden SharePoint-Seiten einfügen.",
-        facts: "Über 35 Webparts für eine Organisation · meist 1–2 Tage pro Webpart",
-        tags: ["SharePoint", "SPFx", "React", "TypeScript", "Fluent UI"],
+        text: "Webparts, die sich in Ihre bestehenden SharePoint-Seiten einfügen und Ihre Listen live zeigen.",
+        result: "Über 35 Webparts für eine Organisation, meist 1–2 Tage pro Webpart.",
+        labels: ["Filter nach Bereich", "Vier Wochen im Blick", "Live aus SharePoint"],
+        summary:
+          "Nachbau eines Kalender-Webparts im Intranet: ein Filter nach Bereich, vier Wochen mit markierten Terminen und daneben die nächsten Termine aus einer SharePoint-Liste.",
       },
       {
         title: "Interne Apps",
         problem: "„Das läuft bei uns noch über Papier, Excel und E-Mail.“",
-        text: "Kleine, fokussierte Apps nach Ihrer Skizze – für Anträge, Onboarding oder den Redaktionsplan. Mit Microsoft-Anmeldung und Rechten nach Gruppen.",
-        facts: "Erste Version in wenigen Tagen",
-        tags: ["React", "Next.js", "Python", "Microsoft Graph"],
+        text: "Kleine, fokussierte Apps nach Ihrer Skizze – für Anträge, Onboarding oder den Redaktionsplan.",
+        result: "Erste Version in wenigen Tagen, mit Microsoft-Anmeldung und Rechten nach Gruppen.",
+        labels: ["Login mit Microsoft", "Daten in SharePoint", "Status auf einen Blick"],
+        summary:
+          "Nachbau eines Redaktionsplans: angemeldet mit Microsoft, eine Woche mit einer Zeile je Kanal, jeder Beitrag mit Bereich, Status und Redakteurin.",
       },
       {
-        title: "Websites & Frontend",
+        title: "Websites & Web-Apps",
         problem: "„Unsere Website ist langsam oder wirkt veraltet.“",
-        text: "Schnelle Websites und Frontends, gebaut, um bei Google gefunden zu werden.",
-        tags: ["Next.js", "React", "Core Web Vitals", "Technisches SEO"],
-      },
-      {
-        title: "Betreuung nach dem Start",
-        problem: "„Und wer kümmert sich danach darum?“",
-        text: "Wartung, wenn Sie sie brauchen – abgerechnet pro Anfrage.",
-        facts: "Kleine Änderungen meist unter 2 Stunden Aufwand",
-        tags: ["Wartung", "Änderungen", "Support"],
+        text: "Schnelle Websites und Produktseiten, gebaut, um bei Google gefunden zu werden.",
+        result: "Eine Seite, die sofort sagt, was Sie anbieten – auf dem Handy wie am Schreibtisch.",
+        labels: ["Klare Botschaft", "Produkt statt Stockfoto", "Ein nächster Schritt"],
+        summary:
+          "Nachbau der Startseite von NVRMiss: eine Überschrift, ein Knopf für den Beta-Zugang und kleine Einblicke ins Produkt – Anrufe, Erinnerungen, Kalender.",
       },
     ],
-    /** Detail 01: web parts we really built. */
-    catalogue: {
-      label: "Katalog · Auswahl",
-      groups: [
-        {
-          name: "Neuigkeiten & Kommunikation",
-          items: ["News Center", "Banner mit News", "Newspart", "Social Corner", "Instagram-/LinkedIn-Feed", "Hinweis-Banner"],
-        },
-        {
-          name: "Navigation & Suche",
-          items: ["Hauptnavigation", "Quick Links", "Link-Karussell", "Link-Kacheln", "Schnellzugriffe", "Finder", "Suchbanner"],
-        },
-        { name: "Menschen", items: ["Organigramm", "Personenverzeichnis", "Jubiläen", "Kontaktkarten"] },
-        {
-          name: "Seitenaufbau",
-          items: ["Tabs", "Tabs mit Karten", "Akkordeon", "Überschrift & Trenner", "Banner", "Prozess & Zeitleiste", "Kennzahlen"],
-        },
-        {
-          name: "Medien & Beteiligung",
-          items: ["Video-Karussell", "Interaktives Video", "Folien", "Umfrage", "Feedback", "Kalender"],
-        },
+    /** Mockup 01: the SPFx calendar web part. Day numbers and dots are in the component. */
+    calendar: {
+      site: "Intranet",
+      page: "Startseite",
+      search: "Suchen",
+      title: "Termine",
+      filterLabel: "Bereich",
+      filter: "Alle Bereiche",
+      range: "Okt. – Nov. 2026",
+      weekdays: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"],
+      place: "Ort",
+      events: [
+        { date: "22.10.", title: "Teamtag Verwaltung", time: "09:00 – 12:00", area: "Verwaltung", place: "Raum 2.14" },
+        { date: "23.10.", title: "Infoabend Ausbildung", time: "17:30 – 19:00", area: "Bildung", place: "Aula" },
+        { date: "27.10.", title: "Erste-Hilfe-Kurs", time: "Ganztägig", area: "Pflege", place: "Haus B" },
       ],
     },
-    /** Detail 02: a small sketch → live pair. `hint` is the sketch, `value` the live example. */
-    app: {
-      sketch: { label: "Anfrage", id: "A-02", caption: "A · Entwurf", button: "Anfrage senden" },
-      live: { title: "Anfrage", login: "Anmeldung mit Microsoft", caption: "B · Ergebnis", button: "Anfrage senden" },
-      fields: [
-        { label: "Betreff", hint: "Text · Pflichtfeld", value: "Laptop für neue Kollegin" },
-        { label: "Team", hint: "Auswahl · Gruppe", value: "Beratung" },
+    /** Mockup 02: the editorial planner. `channel` and `day` index the lists, `status` indexes `statuses`. */
+    planner: {
+      app: "Redaktionsplan",
+      login: "Microsoft",
+      initials: "MB",
+      today: "Heute",
+      range: "19.–23. Okt. 2026",
+      add: "Beitrag planen",
+      days: ["Mo 19.", "Di 20.", "Mi 21.", "Do 22.", "Fr 23."],
+      channels: ["Veranstaltungen", "LinkedIn", "Instagram", "Newsletter"],
+      statuses: ["Geplant", "Entwurf", "Veröffentlicht"],
+      entries: [
+        { channel: 0, day: 0, title: "Tag der offenen Tür", area: "Bildung", status: 2, editor: "Jonas B." },
+        { channel: 0, day: 3, title: "Erste-Hilfe-Kurs", area: "Pflege", status: 0, editor: "Jonas B." },
+        { channel: 1, day: 1, title: "Neue Kita eröffnet", area: "Jugend", status: 2, editor: "Lena K." },
+        { channel: 1, day: 3, title: "Wir suchen Pflegekräfte", area: "Pflege", status: 1, editor: "Mia B." },
+        { channel: 2, day: 0, title: "Ein Tag in Haus B", area: "Pflege", status: 2, editor: "Lena K." },
+        { channel: 2, day: 2, title: "Ausbildung in 60 Sekunden", area: "Bildung", status: 1, editor: "Jonas B." },
+        { channel: 3, day: 4, title: "Newsletter Oktober", area: "Verwaltung", status: 0, editor: "Mia B." },
       ],
     },
-    /** Detail 03 shows `referenceSection.projects`. */
-    /** Detail 04: example tickets, marked „Beispiel“. */
-    changelog: {
-      label: "Änderungsprotokoll",
-      from: "Änderung",
-      to: "Erledigt",
-      tickets: [
-        { id: "Ä-01", text: "Neuen Link in der Hauptnavigation ergänzen" },
-        { id: "Ä-02", text: "Banner auf der Startseite austauschen" },
-        { id: "Ä-03", text: "Feld „Kostenstelle“ im Antrag ergänzen" },
-      ],
+    /** Mockup 03: the NVRMiss home page, in our German rendering. */
+    website: {
+      brand: "NVRMiss",
+      nav: ["Funktionen", "Ablauf", "Preise", "FAQ"],
+      demo: "Demo anfragen",
+      badge: "Bald verfügbar · Beta offen",
+      headline: ["Kein Anruf verpasst.", "Kein Auftrag verpasst."],
+      lead: "Nimmt Anrufe rund um die Uhr an, prüft die Anfrage und bucht den Termin – während Sie arbeiten.",
+      cta: "Beta-Zugang sichern",
+      secondary: "Demo ansehen",
+      fine: "Ohne Kreditkarte · in Minuten eingerichtet",
+      calls: {
+        title: "Anrufe heute",
+        rows: [
+          { text: "Wasserschaden Bad", status: "Gebucht" },
+          { text: "Angebot Heizung", status: "Rückruf" },
+        ],
+      },
+      reminder: { title: "Erinnerung", text: "Wartung Klimaanlage", time: "14:30 – 15:30" },
+      sync: { title: "Kalender-Sync", text: "Google · Outlook" },
     },
   },
 

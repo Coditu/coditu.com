@@ -309,76 +309,7 @@
   animation-play-state: running;
 }
 
-@keyframes cd-sketch-in {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-
-/* Sketch rows (services demo) are revealed left to right, staggered. */
-.cd-sketch-in > * {
-  animation: cd-sketch-in 600ms var(--ease-entrance) both;
-}
-.cd-sketch-in > :nth-child(2) { animation-delay: 80ms; }
-.cd-sketch-in > :nth-child(3) { animation-delay: 160ms; }
-
-/* --- Services showcase (components/site/services.tsx) ---------------------
-   Without JS the tab bar is hidden and every panel shows, one under the
-   other. With JS only the open panel shows. From lg all panels share one
-   grid cell, so the sheet keeps the height of the tallest one and the tabs
-   under it never move; the open one fades in. Below lg the tabs sit above. */
-.cd-svc-tabs {
-  display: none;
-}
-
-.js .cd-svc-tabs {
-  display: grid;
-  order: -1;
-}
-
-.cd-svc-panels {
-  display: grid;
-  gap: 2rem;
-}
-
-.js .cd-svc-panel {
-  transition: opacity 180ms ease-out;
-}
-
-.js .cd-svc-panel:not([data-open]) {
-  display: none;
-}
-
-@media (min-width: 64rem) {
-  .js .cd-svc-tabs {
-    order: 0;
-  }
-
-  .js .cd-svc-panel {
-    grid-area: 1 / 1;
-  }
-
-  .js .cd-svc-panel:not([data-open]) {
-    display: block;
-    visibility: hidden;
-    opacity: 0;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  /* No sketch reveal. */
-  .cd-sketch-in > * {
-    animation: none !important;
-  }
-
-  /* The services panel swaps instantly. */
-  .js .cd-svc-panel {
-    transition: none !important;
-  }
-
   *,
   *::before,
   *::after {
