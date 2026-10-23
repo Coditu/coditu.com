@@ -47,35 +47,36 @@ The only place for `text-display` and the page's orange CTA.
 | Section | `grid lg:grid-cols-12 lg:items-center`: text `lg:col-span-6` left, stage `lg:col-span-6` right; on phones the stage follows the text. No sheet meta line. |
 | Copy | blue label → `<h1 class="text-display mt-5">` → `text-lead text-ink-muted mt-6 max-w-[56ch]` → buttons `mt-9` (`cta lg` + `outline lg`) → facts row → team |
 | Stage | `<HeroStage>` (`components/site/hero-stage/`), plays by itself — the visitor types nothing. See *Hero stage* below. |
-| Headline | the slogan „Von der Skizze zur fertigen Software“ + a blue period `<span class="text-blueprint">.</span>` |
+| Headline | the slogan „Von der Mail zur App“ / "From mail to app" + a blue period `<span class="text-blueprint">.</span>` |
 | Facts row | `mt-12 grid sm:grid-cols-3 gap-4 border-t border-ink`, each a 15 px semibold fact (no T.01 ids shown). Facts must be true (see `docs/00-CONTEXT.md`). |
-| Mobile | stage below copy; sketch and web part are one card; arrow and placeholder web parts hidden |
+| Mobile | stage below copy; the mail without its inbox list, the app with an icon rail and no stat tiles |
 
 Reference: canvas artboard *Hero – Test des Designsystems*.
 
-### Hero stage — e-mail → sketch → web part
+### Hero stage — e-mail → app
 
-A **sketch → live** pair ([`../blueprint-motifs.md`](../blueprint-motifs.md) §7) told as a story.
-One timer-driven phase machine (`use-sequence.ts`), no animation library. Per scenario in
-`hero.request.scenarios`:
+A client's request, open in a mail app, becomes the app it asks for. One timer-driven phase
+machine (`use-sequence.ts`), no animation library; the flying words use the Web Animations API.
+One example, `hero.request` (a room-booking app — close to NVRMiss, booking and calendar).
 
 | # | Phase | What happens |
 |---|---|---|
-| 1 | E-mail | Card „Anfrage per E-Mail“; the request types itself out with a caret, then its `[key words]` are underlined in blue one by one. |
-| 2 | Sketch | The underlined words fly onto a sheet of ruled paper: the first lands as the handwritten title, the rest as field labels. The pen draws a wobbly box under each label, then the button, then a red margin note (`hero.request.note`). |
-| 3 | Build | „wird zu →“ draws (lg+ only) and a neutral intranet page (`intranet-frame.tsx`) appears beside the paper: a top bar with a plain grid icon and „Intranet“, a page title, greyed placeholder web parts (lg+). The new web part assembles in it: header with the first word as title, then a small „new item“ form with the sketched fields, styled with `controlClasses` / `buttonClasses` from `components/ui` — spans, not inputs. The last field is a choice (chevron on paper, select look in the web part). No product logos, no real client UI. |
-| 4 | Fill | Each field fills with `values[i]` at typing speed, with a caret; the same value appears in handwriting in the sketch box. The active pair is lit in both. |
-| 5 | Send | A pointer glides to the button, presses it, „Wird gesendet …“ (~900 ms); then the item lands in the web part as real content (`web-parts/*.tsx`, chosen by `result.kind`): a checklist card with its tasks (`checklist`), a new row between the planned ones (`calendar`), a news card at the top of the feed with its approval pill (`news`). On paper a big red tick and „Fertig!“; then the „Live“ pill in the web part header. |
-| 6 | Out | Holds ~3 s, fades, next scenario. Pauses off screen or in a hidden tab. |
+| 1 | Mail | A mail app (`data-part="mail"`): top bar „Posteingang“, inbox list (the request first, lit, then two other mails), the open request — subject, avatar, sender, „an Coditu“, time, body, sign-off. ~1.2 s. |
+| 2 | Mark | The body's four `[key words]` light up one by one: blue, `bg-blueprint-light`, underlined. |
+| 3 | Fly | The mail fades and shrinks a little; the app (`app-window.tsx`, `data-part="app"`) fades in as a frame: top bar, sidebar, empty cards. The four places the words go are dashed blue outlines. Each lit word lifts out of the mail and flies into its place, scaled to its new size, 80 ms apart. ~1.1 s. |
+| 4 | Build | The words stay lit where they landed; the rest reveals, staggered (`data-reveal="micro"`): the „Neue Buchung“ app button, stat tiles, calendar bars, table rows with status pills. |
+| 5 | Done | The landed words settle to ink; „Live“ pill beside the app name. Holds ~3 s, then the mail again (crossfade). Pauses off screen or in a hidden tab. |
 
-- **Layout.** Fixed stage height (`h-[440px] lg:h-[460px]`), so nothing jumps between phases or scenarios. lg+: the e-mail spans the width; from phase 2 paper left (~40 %), arrow, intranet page right (~60 %). Below lg: paper and web part share one slot — the sketch draws, then crossfades into the web part; the placeholder web parts are hidden.
-- **Long values** truncate with „…“ on paper and in the web part.
-- **Example data.** Each scenario's `result` holds the rows already in its web part (tasks, planned topics, older news) — example data, marked by the „Beispiel“ tag; nothing about real clients.
-- **Color.** Blue is the pen; red (`text-pen-red`) only for the margin note and the tick. Handwriting is Caveat (`.cd-hand`, `--font-caveat`), self-hosted by next/font, not preloaded.
-- **Accessibility.** The stage is `aria-hidden` with one sr-only sentence (`hero.request.summary`); nothing in it is focusable. Marked „Beispiel“.
-- **Reduced motion.** No typing, drawing, flying or pointer: three still frames — e-mail, sketch + filled web part, the item in the web part — switched every few seconds.
-- **No flash.** The server renders the first request fully typed.
-- **Still frames.** `frame.tsx` renders each frame statically (`frame="email" | "sketch" | "webpart" | "filled" | "result"`); review at `/dev/hero-frames` (dev only), PNGs and open questions in [`../hero-frames/`](../hero-frames/README.md).
+The words land in order — **first: page title, second: bookings table title, third: calendar card
+title, fourth: the sign-in in the top bar**. So the body has exactly four `[words]`, in that order,
+in both languages (`tests/hero-sequence.test.ts`). In the app they are capitalised by CSS.
+
+- **Layout.** Fixed stage height (`h-[440px] lg:h-[460px]`); the two windows are layers in it, so nothing jumps. Wide vs narrow is a container query on the stage (`@min-[26rem]`, 416 px), not the viewport. Narrow: no inbox list; the app's sidebar is an icon rail, the stat tiles are left out.
+- **Look.** Both windows are "live" UI: `border-ink rounded-ui bg-surface shadow-lift`, `border-line` inside. Blue for the lit words, avatar, active nav item, app button; status pills with words. No orange — the hero CTA owns it.
+- **Example data.** Sender, rooms, times, counts are examples, marked by the „Beispiel“ tag; nothing about real clients.
+- **Accessibility.** The stage is `aria-hidden` (`data-hero-stage`) with one sr-only sentence (`hero.request.summary`); nothing in it is focusable.
+- **Reduced motion.** No flying: two still frames — the mail with its words lit, the finished app — switched every few seconds.
+- **No flash.** The server renders the open mail; hidden app content uses the `opacity-0` class, never an inline `opacity:0` (`scripts/verify-tokens.sh` fails on that).
 
 ## Feature / benefit item
 

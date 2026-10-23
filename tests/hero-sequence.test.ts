@@ -1,44 +1,58 @@
 import { describe, expect, it } from "vitest";
 
-import { advance, INITIAL, type Phase, type State } from "@/components/site/hero-stage/use-sequence";
+import { advance, INITIAL, parse, type Phase, type State } from "@/components/site/hero-stage/use-sequence";
 import de from "@/messages/de";
 import en from "@/messages/en";
 
-/** Run the machine until it leaves scenario 0; collect the phases and the last state of each. */
+const WORDS = 4;
+
+/** Run the machine for one loop; collect the phases and the total time. */
 function play(reduced: boolean) {
-  const scenarios = de.hero.request.scenarios;
   const seen: Phase[] = [];
-  const last = new Map<Phase, State>();
-  let s = INITIAL;
-  for (let i = 0; i < 5000 && s.index === 0; i++) {
+  let s: State = INITIAL;
+  let ms = 0;
+  do {
     if (seen.at(-1) !== s.phase) seen.push(s.phase);
-    last.set(s.phase, s);
-    s = advance(s, scenarios, reduced)[1];
-  }
-  return { seen, last, after: s };
+    const [hold, next] = advance(s, WORDS, reduced);
+    ms += hold;
+    s = next;
+  } while (s.phase !== "mail" && seen.length < 50);
+  return { seen, ms, after: s };
 }
 
 describe("hero sequence", () => {
-  it("plays e-mail → sketch → app → sent, then the next scenario from an empty e-mail", () => {
-    const { seen, last, after } = play(false);
-    expect(seen).toEqual(["type", "mark", "fly", "draw", "build", "fill", "point", "press", "send", "done", "out"]);
-    // Every field was filled to its full value before sending.
-    const fill = last.get("fill")!;
-    expect(fill.field).toBe(de.hero.request.scenarios[0].values.length - 1);
-    expect(fill.chars).toBe(de.hero.request.scenarios[0].values.at(-1)!.length);
-    expect(after).toMatchObject({ index: 1, phase: "type", typed: 0, marked: 0, field: -1 });
+  it("plays mail → words lit → fly → app builds → holds, then the mail again", () => {
+    const { seen, ms, after } = play(false);
+    expect(seen).toEqual(["mail", "mark", "fly", "build", "done"]);
+    expect(after).toEqual(INITIAL);
+    // Short: one loop in under 10 s.
+    expect(ms).toBeLessThan(10_000);
   });
 
-  it("reduced motion: three still frames, nothing typed", () => {
+  it("lights every key word before they fly", () => {
+    let s: State = { phase: "mark", marked: 0 };
+    while (s.phase === "mark") s = advance(s, WORDS, false)[1];
+    expect(s).toEqual({ phase: "fly", marked: WORDS });
+  });
+
+  it("reduced motion: two still frames, the words already lit", () => {
     const { seen, after } = play(true);
-    expect(seen).toEqual(["type", "fill", "done", "out"]);
-    expect(after.typed).toBe(Number.POSITIVE_INFINITY);
+    expect(seen).toEqual(["mail", "done"]);
+    expect(after).toEqual({ phase: "mail", marked: WORDS });
   });
 
-  it("every scenario has one value per field, in both languages", () => {
-    for (const scenario of [...de.hero.request.scenarios, ...en.hero.request.scenarios]) {
-      const words = scenario.request.match(/\[[^\]]+\]/g) ?? [];
-      expect(scenario.values).toHaveLength(words.length - 1);
+  it("the mail has exactly four key words in both languages — the app has four places for them", () => {
+    for (const t of [de, en]) {
+      expect(parse(t.hero.request.mail.body).filter((x) => x.key !== null)).toHaveLength(WORDS);
     }
+  });
+
+  it("parse keeps the text and numbers the key words", () => {
+    expect(parse("a [b] c [d]")).toEqual([
+      { text: "a ", key: null },
+      { text: "b", key: 0 },
+      { text: " c ", key: null },
+      { text: "d", key: 1 },
+    ]);
   });
 });

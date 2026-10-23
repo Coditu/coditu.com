@@ -1,31 +1,18 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
+import { Inbox } from "lucide-react";
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { cn } from "@/lib/utils";
+import type { Messages } from "@/messages/de";
 
-import { IntranetFrame } from "./intranet-frame";
-import { Sketch } from "./sketch";
-import { FLY_MS, parse, reached, useSequence, type Scenario } from "./use-sequence";
-import { Calendar } from "./web-parts/calendar";
-import { Checklist } from "./web-parts/checklist";
-import { Caret, WebPartForm } from "./web-parts/form";
-import { News } from "./web-parts/news";
+import { AppWindow } from "./app-window";
+import { FLY_MS, parse, reached, useSequence } from "./use-sequence";
 
-type Labels = {
-  request: string;
-  example: string;
-  live: string;
-  summary: string;
-  becomes: string;
-  intranet: string;
-  page: string;
-  sending: string;
-  note: string[];
-  done: string;
-};
+type Labels = Messages["hero"]["request"];
 
 const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
+const BODY = "text-[15px] leading-relaxed";
 
 const REDUCED = "(prefers-reduced-motion: reduce)";
 function subscribeReduced(onChange: () => void) {
@@ -37,47 +24,33 @@ function subscribeReduced(onChange: () => void) {
 type Clone = { text: string; left: number; top: number; height: number; dx: number; dy: number; scale: number };
 
 /**
- * The hero's picture, playing by itself: a request by e-mail types itself out
- * and its key words are underlined; they fly onto a sheet of paper where a pen
- * sketches the form; a web part builds on an intranet page beside it, fills
- * itself in while the sketch mirrors every value, and is sent: the item lands
- * in the web part as real content. Then the next scenario.
+ * The hero's picture, playing by itself: a request is open in a mail app; its
+ * key words light up one by one, lift out of the mail and fly into a booking
+ * app that builds around them — each word lands in the part it asked for.
+ * The app holds, then the mail again. ~9 s per loop.
  *
- * From lg the paper and the intranet page sit side by side; below lg they are
- * one card, the sketch crossfading into the web part. Runs only while on screen and the tab
- * is visible. Decoration: `aria-hidden`, one sr-only sentence says what it
- * shows. Reduced motion: three still frames, switched slowly. The server
- * renders the first request fully typed, so there is no flash.
+ * Runs only while on screen and the tab is visible. Decoration: `aria-hidden`,
+ * one sr-only sentence says what it shows. Reduced motion: two still frames
+ * (mail · app), switched slowly. The server renders the open mail, so there
+ * is no flash. Narrow vs wide is a container query on the stage (26rem).
  */
-export function HeroStage({ scenarios, labels }: { scenarios: Scenario[]; labels: Labels }) {
+export function HeroStage({ labels }: { labels: Labels }) {
+  const { mail, app } = labels;
+  const segments = parse(mail.body);
+  const words = segments.filter((x) => x.key !== null).map((x) => x.text);
+
   const [running, setRunning] = useState(false);
   const reduced = useSyncExternalStore(subscribeReduced, () => matchMedia(REDUCED).matches, () => false);
-  const s = useSequence(scenarios, reduced, running);
+  const { phase, marked } = useSequence(words.length, reduced, running);
   const [clones, setClones] = useState<Clone[]>([]);
 
   const root = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const sources = useRef<(HTMLSpanElement | null)[]>([]);
-  const targets = useRef<(SVGTextElement | null)[]>([]);
+  const targets = useRef<(HTMLSpanElement | null)[]>([]);
   const cloneEls = useRef<(HTMLSpanElement | null)[]>([]);
-  const button = useRef<HTMLSpanElement>(null);
-  const pointer = useRef<HTMLDivElement>(null);
 
-  const scenario = scenarios[s.index];
-  const segments = parse(scenario.request);
-  const words = segments.filter((x) => x.key !== null).map((x) => x.text);
-  const fields = words.slice(1);
-  const length = segments.reduce((n, x) => n + x.text.length, 0);
-  const values = fields.map((_, i) =>
-    i < s.field ? scenario.values[i] : i === s.field ? scenario.values[i].slice(0, s.chars) : ""
-  );
-
-  const { phase } = s;
-  const email = phase === "type" || phase === "mark";
-  const sketching = phase === "fly" || phase === "draw";
-  const built = reached(phase, "build");
-  const done = reached(phase, "done");
-  const filling = phase === "fill" && !reduced;
+  const onMail = !reached(phase, "fly");
 
   // Run only while the stage is on screen and the tab is visible.
   useEffect(() => {
@@ -95,7 +68,7 @@ export function HeroStage({ scenarios, labels }: { scenarios: Scenario[]; labels
     };
   }, []);
 
-  // Entering "fly": measure each underlined word and its place on paper.
+  // Entering "fly": measure each lit word and its place in the app (laid out, still transparent).
   useLayoutEffect(() => {
     if (phase !== "fly" || !stage.current) return;
     const box = stage.current.getBoundingClientRect();
@@ -112,198 +85,128 @@ export function HeroStage({ scenarios, labels }: { scenarios: Scenario[]; labels
             height: from.height,
             dx: to.left - from.left,
             dy: to.top - from.top,
-            scale: to.height / from.height,
+            scale: parseFloat(getComputedStyle(targets.current[i]!).fontSize) / parseFloat(getComputedStyle(sources.current[i]!).fontSize),
           },
         ];
       })
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, s.index]);
+  }, [phase]);
 
-  // Fly the clones.
+  // Fly the clones: the move eases in the first 75 %, then each fades where it landed and the word in the app takes its place.
   useLayoutEffect(() => {
     clones.forEach((clone, i) => {
+      const end = `translate(${clone.dx}px, ${clone.dy}px) scale(${clone.scale})`;
       cloneEls.current[i]?.animate(
-        // The word fades as it lands: the handwritten one takes its place.
-        [
-          { transform: "none", opacity: 1 },
-          { opacity: 1, offset: 0.65 },
-          { transform: `translate(${clone.dx}px, ${clone.dy}px) scale(${clone.scale})`, opacity: 0 },
-        ],
-        { duration: FLY_MS - 150, delay: i * 60, easing: EASE, fill: "forwards" }
+        [{ transform: "none", opacity: 1, easing: EASE }, { transform: end, opacity: 1, offset: 0.75 }, { transform: end, opacity: 0 }],
+        { duration: FLY_MS - 80 * clones.length, delay: i * 80, fill: "forwards" }
       );
     });
   }, [clones]);
 
-  // Entering "point": the pointer glides onto the button.
-  useLayoutEffect(() => {
-    if (phase !== "point" || !stage.current || !button.current || !pointer.current) return;
-    const box = stage.current.getBoundingClientRect();
-    const b = button.current.getBoundingClientRect();
-    const x = b.left - box.left + b.width / 2;
-    const y = b.top - box.top + b.height / 2;
-    pointer.current.animate(
-      [{ transform: `translate(${x + 90}px, ${y + 70}px)` }, { transform: `translate(${x}px, ${y}px)` }],
-      { duration: 600, easing: EASE, fill: "forwards" }
-    );
-  }, [phase]);
+  // The mail shrinks a little as it goes; the app only fades, so the places measured in it hold still.
+  const layer = "absolute inset-0 transition-[opacity,scale] duration-500 ease-entrance";
 
   return (
     <div className="mx-auto w-full max-w-2xl">
       <p className="sr-only">{labels.summary}</p>
-      <div ref={root} aria-hidden="true">
+      <div ref={root} aria-hidden="true" data-hero-stage="">
         <div className="flex justify-end">
           <span className="rounded-tag border border-dashed border-ink px-1.5 py-0.5 font-mono text-[11px] text-ink uppercase">
             {labels.example}
           </span>
         </div>
 
-        <div
-          ref={stage}
-          className={cn("relative mt-3 h-[440px] transition-opacity duration-300 lg:h-[460px]", phase === "out" && "opacity-0")}
-        >
-          {/* 1 · The request */}
-          <div
-            className={cn(
-              "absolute inset-x-0 top-1/2 -translate-y-1/2 rounded-ui border border-ink bg-surface p-6 shadow-lift transition-opacity duration-300 sm:p-8",
-              !email && "opacity-0"
-            )}
-          >
-            <p className="font-mono text-label text-ink-muted uppercase">{labels.request}</p>
-            <p className="mt-4 text-[19px] leading-relaxed sm:text-[21px]">
-              {segments.map((segment, si) => {
-                const { start, key } = segment;
-                const end = start + segment.text.length;
-                const shown = segment.text.slice(0, Math.max(0, s.typed - start));
-                const hidden = segment.text.slice(shown.length);
-                const caret = phase === "type" && s.typed >= start && s.typed < end && !reduced;
-                return (
-                  <span
-                    key={si}
-                    ref={
-                      key === null
-                        ? undefined
-                        : (el) => {
+        <div ref={stage} className="@container relative mt-3 h-[440px] lg:h-[460px]">
+          {/* 1 · The mail */}
+          <div data-part="mail" className={cn(layer, !onMail && "scale-[0.98] opacity-0")}>
+            <div className="flex h-full flex-col overflow-hidden rounded-ui border border-ink bg-surface shadow-lift">
+              <div className="flex h-11 flex-none items-center gap-2 border-b border-line px-3">
+                <Inbox className="size-4 text-blueprint" strokeWidth={1.5} />
+                <span className="text-[14px] font-semibold">{mail.inbox}</span>
+              </div>
+              <div className="flex min-h-0 flex-1">
+                <div className="hidden w-[38%] flex-none flex-col border-r border-line @min-[26rem]:flex">
+                  {[{ from: mail.from, subject: mail.subject, time: mail.time }, ...mail.others].map((item, i) => (
+                    <div key={item.from} className={cn("border-b border-line px-3 py-2.5", i === 0 && "bg-blueprint-light")}>
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className={cn("truncate text-[13px]", i === 0 ? "font-semibold text-ink" : "text-ink-muted")}>{item.from}</span>
+                        <span className="flex-none font-mono text-label text-ink-muted uppercase">{item.time}</span>
+                      </div>
+                      <p className="mt-0.5 truncate text-[12px] text-ink-muted">{item.subject}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="min-w-0 flex-1 p-4 @min-[26rem]:p-5">
+                  <p className="text-[17px] leading-snug font-semibold">{mail.subject}</p>
+                  <div className="mt-3 flex items-center gap-2.5">
+                    <span className="flex size-8 flex-none items-center justify-center rounded-full bg-blueprint text-[12px] font-semibold text-blueprint-ink">
+                      {mail.initials}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[14px] font-semibold">{mail.from}</span>
+                      <span className="block truncate text-[12px] text-ink-muted">{mail.to}</span>
+                    </span>
+                    <span className="flex-none font-mono text-label text-ink-muted uppercase">{mail.time}</span>
+                  </div>
+                  <p className={cn("mt-4", BODY)}>
+                    {segments.map(({ text, key }, i) =>
+                      key === null ? (
+                        text
+                      ) : (
+                        <span
+                          key={i}
+                          ref={(el) => {
                             sources.current[key] = el;
-                          }
-                    }
-                    className={cn(
-                      key !== null && "decoration-blueprint decoration-2 underline-offset-4 transition-colors duration-200",
-                      key !== null && key < s.marked && "text-blueprint underline",
-                      key !== null && phase === "fly" && "opacity-0"
+                          }}
+                          className={cn(
+                            "rounded-tag decoration-blueprint decoration-2 underline-offset-4 transition-colors duration-200",
+                            (reduced || key < marked) && "bg-blueprint-light text-blueprint underline",
+                            phase === "fly" && "invisible"
+                          )}
+                        >
+                          {text}
+                        </span>
+                      )
                     )}
-                  >
-                    {shown}
-                    {caret && <Caret />}
-                    <span className="invisible">{hidden}</span>
-                  </span>
-                );
-              })}
-              {phase === "type" && s.typed >= length && !reduced && <Caret />}
-            </p>
+                  </p>
+                  <p className={cn("mt-3", BODY)}>{mail.signoff}</p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="absolute inset-0 grid grid-rows-[minmax(0,1fr)] gap-2 lg:grid-cols-[minmax(0,2fr)_48px_minmax(0,3fr)]">
-            {/* 2 · The sketch */}
-            <div
-              data-draw={reached(phase, "draw") || undefined}
-              className={cn(
-                "col-start-1 row-start-1 flex min-h-0 items-center justify-center py-2 transition-opacity duration-500",
-                sketching ? "opacity-100" : "opacity-0",
-                reached(phase, "fly") ? "lg:opacity-100" : "lg:opacity-0"
-              )}
-            >
-              <Sketch
-                key={s.index}
-                title={words[0]}
-                labels={fields}
-                values={values}
-                button={scenario.button}
-                active={filling ? s.field : -1}
-                note={labels.note}
-                done={done}
-                doneWord={labels.done}
-                showWords={reached(phase, "draw")}
-                targets={(el, i) => {
-                  targets.current[i] = el;
-                }}
-              />
-            </div>
-
-            {/* „wird zu →“ */}
-            <div
-              data-draw={built || undefined}
-              className={cn("col-start-2 row-start-1 hidden flex-col items-center justify-center gap-1 text-blueprint lg:flex", !built && "opacity-0")}
-            >
-              <span className="cd-hand cd-write text-[20px] leading-none" style={{ "--row": 1 } as CSSProperties}>
-                {labels.becomes}
-              </span>
-              <svg viewBox="0 0 56 32" className="w-12" focusable="false">
-                <path d="M3 20 C16 6 34 8 50 18" pathLength={1} className="cd-pen" />
-                <path d="M40 10 L51 18 L39 25" pathLength={1} className="cd-pen" style={{ "--row": 1 } as CSSProperties} />
-              </svg>
-            </div>
-
-            {/* 3 · The web part on its intranet page */}
-            <div
-              className={cn(
-                "col-start-1 row-start-1 min-h-0 py-2 transition-opacity duration-500 lg:col-start-3",
-                !built && "opacity-0"
-              )}
-            >
-              {built && (
-                <IntranetFrame intranet={labels.intranet} page={labels.page} title={words[0]} live={done ? labels.live : null}>
-                  {!done ? (
-                    <WebPartForm
-                      labels={fields}
-                      values={values}
-                      active={filling ? s.field : -1}
-                      caret={filling}
-                      button={scenario.button}
-                      pressed={phase === "press"}
-                      sending={phase === "send"}
-                      sendingLabel={labels.sending}
-                      buttonRef={button}
-                    />
-                  ) : scenario.result.kind === "checklist" ? (
-                    <Checklist {...scenario.result} labels={fields} values={scenario.values} />
-                  ) : scenario.result.kind === "calendar" ? (
-                    <Calendar {...scenario.result} values={scenario.values} />
-                  ) : (
-                    <News {...scenario.result} values={scenario.values} />
-                  )}
-                </IntranetFrame>
-              )}
-            </div>
+          {/* 2 · The app it becomes */}
+          <div data-part="app" className={cn(layer, onMail && "opacity-0")}>
+            <AppWindow
+              app={app}
+              initials={mail.initials}
+              words={words}
+              step={phase === "done" ? "done" : phase === "build" ? "build" : "slots"}
+              targetRef={(i, el) => {
+                targets.current[i] = el;
+              }}
+            />
           </div>
 
           {/* The flying words */}
           {phase === "fly" &&
             clones.map((clone, i) => (
-            <span
-              key={`${s.index}-${i}`}
-              ref={(el) => {
-                cloneEls.current[i] = el;
-              }}
-              className="pointer-events-none absolute origin-top-left text-[19px] whitespace-nowrap text-blueprint sm:text-[21px]"
-              style={{ left: clone.left, top: clone.top, height: clone.height, lineHeight: `${clone.height}px` }}
-            >
-              {clone.text}
-            </span>
-          ))}
-
-          {/* The pointer that sends the form */}
-          {(phase === "point" || phase === "press" || phase === "send") && !reduced && (
-            <div ref={pointer} className="pointer-events-none absolute top-0 left-0">
-              <svg
-                viewBox="0 0 16 22"
-                className={cn("block w-4 origin-top-left text-ink transition-transform duration-150", phase === "press" && "scale-90")}
-                focusable="false"
+              <span
+                key={i}
+                ref={(el) => {
+                  cloneEls.current[i] = el;
+                }}
+                className={cn(
+                  "pointer-events-none absolute origin-top-left rounded-tag bg-blueprint-light whitespace-nowrap text-blueprint",
+                  BODY
+                )}
+                style={{ left: clone.left, top: clone.top, height: clone.height, lineHeight: `${clone.height}px` }}
               >
-                <path d="M1 1v17l4.5-4.2 3 6.7 2.8-1.3-3-6.6H14z" fill="currentColor" stroke="var(--surface)" strokeWidth="1.2" strokeLinejoin="round" />
-              </svg>
-            </div>
-          )}
+                {clone.text}
+              </span>
+            ))}
         </div>
       </div>
     </div>
