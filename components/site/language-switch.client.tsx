@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import type { MouseEvent } from "react";
 
-import { locales, pages, type Locale } from "@/lib/i18n";
+import { locales, pages, type Locale } from "@/lib/locales";
 import { cn } from "@/lib/utils";
 
 /**
