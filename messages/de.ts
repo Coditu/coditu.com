@@ -135,8 +135,6 @@ const de = {
     team: {
       listLabel: "Das Team",
       line: "Ihr Team · Berlin · Kairo",
-      /** Blocks the production deploy until public/team/<slug>.jpg exist for everyone. */
-      photos: "[PLACEHOLDER: Teamfotos]",
       members: [
         { slug: "mohamed-tamer", hub: "cairo" as const, name: "Mohamed Tamer", role: "Frontend Lead" },
         { slug: "abdelrahman-elkhateeb", hub: "cairo" as const, name: "Abdelrahman Elkhateeb", role: "Frontend Engineer" },
