@@ -107,7 +107,6 @@ const en: Messages = {
     team: {
       listLabel: "The team",
       line: "Your team · Berlin · Cairo",
-      photos: "[PLACEHOLDER: team photos]",
       members: [
         { slug: "mohamed-tamer", hub: "cairo", name: "Mohamed Tamer", role: "Frontend Lead" },
         { slug: "abdelrahman-elkhateeb", hub: "cairo", name: "Abdelrahman Elkhateeb", role: "Frontend Engineer" },

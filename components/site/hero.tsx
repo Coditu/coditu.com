@@ -70,9 +70,9 @@ export function Hero({ locale }: { locale: Locale }) {
 }
 
 /**
- * A square portrait from public/team/<slug>.jpg, checked at build time. Until
- * it exists: the drawing placeholder from the team-card spec, which must not
- * reach production (`hero.team.photos` holds the deploy).
+ * A square portrait from public/team/<slug>.jpg, checked at build time. Without
+ * one: the drawing placeholder from the team-card spec, which must not reach
+ * production.
  */
 export function TeamTile({ slug, name, role }: { slug: string; name: string; role: string }) {
   const tooltip = `${name} · ${role}`;
