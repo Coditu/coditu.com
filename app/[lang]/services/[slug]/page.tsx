@@ -23,7 +23,10 @@ async function resolve(params: PageProps<"/[lang]/services/[slug]">["params"]) {
 export async function generateMetadata({ params }: PageProps<"/[lang]/services/[slug]">): Promise<Metadata> {
   const { lang, page } = await resolve(params);
   const key = findLanding(lang, page.slug)!;
-  return pageMetadata(lang, landingPaths(key), { title: page.meta.title, description: page.meta.description });
+  // The description carries a `{{price:...}}` token like `priceLine` below, so
+  // a SHOW_PRICES=false build never leaks a specific euro figure into the
+  // meta description Google shows, even while the page itself never did.
+  return pageMetadata(lang, landingPaths(key), { title: page.meta.title, description: withPrices(lang, page.meta.description) });
 }
 
 /**
