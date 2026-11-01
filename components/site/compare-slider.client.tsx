@@ -40,19 +40,27 @@ export function CompareSlider({
     if (!node) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
+    // `runDemo` starts asynchronously, inside the observer's callback, so its
+    // own stop function is captured here rather than returned straight from
+    // the effect — the effect's cleanup still has to call it, or an unmount
+    // mid-sweep leaves the rAF loop running against a gone component.
+    let stopDemo: (() => void) | undefined;
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
         if (!entry?.isIntersecting || touchedRef.current) return;
         observer.disconnect();
-        runDemo(touchedRef, setPos, () => {
+        stopDemo = runDemo(touchedRef, setPos, () => {
           if (!touchedRef.current) setShowHint(true);
         });
       },
       { threshold: 0.4 }
     );
     observer.observe(node);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      stopDemo?.();
+    };
   }, []);
 
   return (

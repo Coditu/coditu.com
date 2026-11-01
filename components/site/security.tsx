@@ -1,4 +1,4 @@
-import { Database, FolderGit2, KeyRound, LockKeyhole, ShieldCheck } from "lucide-react";
+import { Database, FolderGit2, KeyRound, LockKeyhole } from "lucide-react";
 
 import { Connector } from "@/components/blueprint/connector";
 import { Tag } from "@/components/ui/tag";
@@ -9,7 +9,16 @@ import { SectionHeader } from "./section-header";
 
 type S = ReturnType<typeof getMessages>["securitySection"];
 
-const POINT_ICONS = [Database, KeyRound, ShieldCheck, FolderGit2, LockKeyhole];
+/**
+ * One icon per `securitySection.points` entry, in the SAME order, in BOTH
+ * `messages/de.ts` and `messages/en.ts` (the two must already agree, or
+ * TypeScript already caught it). This array is positional and has no other
+ * check — a 5th icon (`ShieldCheck`, for the DSGVO/AVV point) was left here
+ * after that point was cut to four, silently showing the wrong icon for two
+ * of the remaining four. If you add, remove or reorder a point, update this
+ * list in the same change, not after.
+ */
+const POINT_ICONS = [Database, KeyRound, FolderGit2, LockKeyhole];
 
 /**
  * Security & data: the points as feature items, next to our own drawing of
@@ -19,6 +28,11 @@ const POINT_ICONS = [Database, KeyRound, ShieldCheck, FolderGit2, LockKeyhole];
 export function Security({ locale }: { locale: Locale }) {
   const t = getMessages(locale);
   const s = t.securitySection;
+  if (process.env.NODE_ENV !== "production" && s.points.length !== POINT_ICONS.length) {
+    throw new Error(
+      `Security: securitySection.points has ${s.points.length} entries but POINT_ICONS has ${POINT_ICONS.length} — keep them in sync.`
+    );
+  }
 
   return (
     <section id={t.anchors.security} aria-labelledby="security-title" className="py-16 md:py-24">
