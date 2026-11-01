@@ -50,7 +50,7 @@ touching any marketing copy or positioning-adjacent code. Everything below summa
 plus everything built since it was written; `02-POSITIONING.md` stays the source of truth
 if the two ever disagree (update whichever is stale).
 
-## Current state of the site (as of commit `7cc227b`)
+## Current state of the site (as of commit `34ef25a`)
 
 **Homepage section order:** Hero → Intranet (before/after compare-slider, now
 self-demonstrating) → Baukasten → Services → Process → Reference → Security → Pricing →
@@ -106,15 +106,42 @@ superlative, etc.) but **a human native speaker still needs one pass before real
 outreach** — that review was a careful read, not the real thing docs/02-POSITIONING.md
 calls for.
 
-**New this session:** `components/site/baukasten.tsx` (the flagship section),
-`components/site/price-cards.tsx` + `count-up.client.tsx` (counted pricing), the compare
-slider's self-demo (`compare-slider.client.tsx` — sweeps once on view, hand-hint, cancels
-on real interaction; two new animation types documented in
+**Shipped across the session (chronological, latest last):** `components/site/baukasten.tsx`
+(the flagship section); `components/site/price-cards.tsx` + `count-up.client.tsx` (counted
+pricing); the compare slider's self-demo (`compare-slider.client.tsx` — sweeps once on view,
+hand-hint, cancels on real interaction; two new animation types documented in
 `docs/design-system/tokens.md` "Motion" to stay inside that doc's "don't invent new
-animations except..." rule), `components/site/offer-panel.client.tsx` (intent-triggered
-corner panel / mobile sticky bar — 40% scroll / 25s / exit-intent, silent, dismissal
-remembered), `components/site/organization-schema.tsx` + `public/llms.txt` (AI-search
-SEO — Organization/Service JSON-LD and the llms.txt convention file).
+animations except..." rule); `components/site/offer-panel.client.tsx` (intent-triggered
+corner panel / mobile sticky bar); `components/site/organization-schema.tsx` + `public/llms.txt`
+(AI-search SEO phase 1); **two genuinely interactive services mockups** — the calendar web
+part's area filter and the editorial planner's status filter
+(`calendar-filter-demo.client.tsx`, `planner-filter-demo.client.tsx`, sharing a small
+`filter-chip.client.tsx`) — each a real `role="group"` of `aria-pressed` buttons sitting
+*outside* the mockup's `aria-hidden` picture as a sibling, with an sr-only `aria-live` line,
+so a screen-reader visitor gets the filter's effect even though the picture itself is
+decorative; the website/NVRMiss mockup stays static on purpose — forcing interaction onto a
+product-page screenshot would be gimmicky, not useful; and **a dedicated pricing page**
+(`app/[lang]/pricing/page.tsx`, same literal `/pricing` segment in both languages — see that
+file's own comment for why, and the follow-up it notes) with the homepage teaser now linking
+to it.
+
+A `/code-review high` pass on the day's full diff caught two real bugs, both fixed: `security.tsx`'s
+icon array hadn't been updated when a point was cut from 5→4, silently showing two wrong
+icons (verified visually and fixed; `baukasten.tsx` has the same positional-array pattern and
+now both throw in dev if their points/icons arrays ever disagree in length again); and
+`compare-slider.client.tsx` leaked a running animation frame on unmount mid-demo (now
+cleaned up properly, matching `count-up.client.tsx`'s existing pattern).
+
+**Performance, checked repeatedly, not just once:** `npm run lighthouse` has stayed
+100/100/100/100 (Performance/Accessibility/Best-Practices/SEO), CLS 0.000, LCP ~800ms,
+TBT ~30ms through every feature added today, re-run after each one specifically because
+"enhance performance" was an explicit instruction alongside "keep building." JS budget is at
+166.6 KB gz against a 172 KB gate (the gate, not the 130 KB figure also reported — see
+`scripts/check-budgets.mjs`'s own comment for why those differ) — **getting tighter**, about
+5.4 KB of headroom left. Worth watching before adding more client-side interactivity; a
+`FilterChip`/`Pin` dedup between the two interactive mockups was done for this reason, though
+it turned out to save effectively 0 KB post-gzip (near-duplicate text compresses well) — a
+maintainability win reported honestly as that, not oversold as a performance one.
 
 ## What's still open
 
@@ -126,12 +153,14 @@ SEO — Organization/Service JSON-LD and the llms.txt convention file).
   work deliberately, not urgently — but don't assume anything merged to `main` is live.
 - Native-German review of `messages/de.ts` (a real speaker, not a model), before outreach.
 - Hero-stage animation rebuild (see above) — the largest remaining visual gap.
-- Interactive web parts (making 2–3 of the services mockups genuinely clickable, not
-  static) — planned, not started.
+- A third interactive mockup, or further interactivity elsewhere — possible, but the JS
+  budget headroom above is worth checking first.
 - SEO phase 2: keyword/regional landing pages (`/de/spfx-entwickler`, Berlin/Bayern/NRW) —
   phase 1 (llms.txt + schema) is done, phase 2 is not.
-- A dedicated pricing page (the homepage pricing-cards section is a teaser, not a full
-  page) — mentioned in `02-POSITIONING.md`'s original page-order plan, not built.
+- Fully localized pricing-page URL (`/de/preise` instead of `/de/pricing`) — would need the
+  `[legal]`-style dynamic-route restructuring `app/[lang]/pricing/page.tsx`'s own comment
+  describes; the current same-segment approach (matching the `/blog` precedent) works and
+  is live, just not maximally SEO-polished for German search specifically.
 - AVV template, "taking over an existing codebase" FAQ answer, whether "Zugriff nur, wo
   nötig" is confirmed — all still factually unresolved; AVV specifically is intentionally
   not being raised again (see above), the other two are tracked but low-priority.
