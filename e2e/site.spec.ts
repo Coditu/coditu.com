@@ -431,6 +431,18 @@ for (const { lang, home, imprint, privacy, pricing } of LANGS) {
         subject: { de: "Kleine Aufgabe gratis – SPFx", en: "Free small task – SPFx" },
         cta: { de: "Kleine Aufgabe gratis sichern", en: "Try us free with a small task" },
       },
+      {
+        slug: { de: "sharepoint-entwicklung-berlin", en: "sharepoint-development-berlin" },
+        title: { de: "SharePoint-Entwicklung Berlin", en: "SharePoint Development Berlin" },
+        subject: { de: "Kleine Aufgabe gratis – Berlin", en: "Free small task – Berlin" },
+        cta: { de: "Kleine Aufgabe gratis sichern", en: "Try us free with a small task" },
+      },
+      {
+        slug: { de: "sharepoint-entwicklung-bayern", en: "sharepoint-development-bavaria" },
+        title: { de: "SharePoint-Entwicklung Bayern", en: "SharePoint Development Bavaria" },
+        subject: { de: "Kleine Aufgabe gratis – Bayern", en: "Free small task – Bavaria" },
+        cta: { de: "Kleine Aufgabe gratis sichern", en: "Try us free with a small task" },
+      },
     ] as const;
 
     for (const entry of LANDING_PAGES) {
