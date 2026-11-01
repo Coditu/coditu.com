@@ -230,6 +230,18 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       );
     });
 
+    test("baukasten: follows intranet, four points, the proof panel names no client", async ({ page }) => {
+      await page.goto(home);
+      const section = page.locator('section[aria-labelledby="baukasten-title"]');
+      expect(await section.getAttribute("id")).toBe("baukasten");
+      await expect(page.locator('section[aria-labelledby="intranet-title"] + section')).toHaveId("baukasten");
+      await expect(section.locator("h3")).toHaveCount(4);
+      // One real, anonymised number — see docs/02-POSITIONING.md "Baukasten
+      // permissions". "nothing invented, no old name, no old address" (above)
+      // already asserts the client's name never appears anywhere on the page.
+      await expect(section.getByText(/6\+/)).toBeVisible();
+    });
+
     test("reference: the section has its language's id", async ({ page }) => {
       await page.goto(home);
       const id = await page.locator('section[aria-labelledby="reference-title"]').getAttribute("id");
