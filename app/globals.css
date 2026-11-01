@@ -281,6 +281,18 @@
   }
 }
 
+/* The offer panel's one arrival pulse (components/site/offer-panel.client.tsx).
+   Border colour only — no new box-shadow colour, so it stays inside tokens.md. */
+@keyframes cd-panel-pulse {
+  0%,
+  100% {
+    border-color: var(--line);
+  }
+  40% {
+    border-color: var(--blueprint);
+  }
+}
+
 /* A list makes room for a new first row: it starts one row up. Rows are equal
    height with their gap as padding, so with four rows one row is 25 %. */
 @keyframes cd-push {
@@ -359,6 +371,10 @@
   animation-play-state: running;
 }
 
+.offer-panel-pulse {
+  animation: cd-panel-pulse 1100ms ease-out 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -385,6 +401,12 @@
   /* Nothing waits for a scroll. */
   .js [data-reveal-on-view] {
     animation-play-state: running !important;
+  }
+
+  /* No pulse — the panel just appears (docs/02-POSITIONING.md "The offer panel"). */
+  .offer-panel-pulse {
+    animation: none !important;
+    border-color: var(--line) !important;
   }
 }
 

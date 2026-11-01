@@ -52,6 +52,15 @@ const en: Messages = {
     switchTo: "Deutsch",
   },
 
+  panelSection: {
+    title: "One web part. Free. In 3 days.",
+    fine: "1 web part per client · in up to 3 days",
+    cta: "Request it free",
+    close: "Close offer",
+    subject: "Free small task – Panel",
+    body: "Hello Coditu,\n\nour free web part (screenshot or description):\n\n\nWhere it should run (e.g. SharePoint):\n",
+  },
+
   hero: {
     label: "SharePoint · Internal apps",
     // The blue period is added by the component, with no trailing period
