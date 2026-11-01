@@ -31,6 +31,7 @@ const de = {
     process: "arbeitsweise",
     reference: "referenz",
     security: "sicherheit",
+    pricing: "preise",
     team: "team",
     faq: "faq",
     contact: "kontakt",
@@ -491,10 +492,8 @@ const de = {
   /**
    * Security & data: four confirmed points and our own drawing of where the
    * work lives. See docs/02-POSITIONING.md "DSGVO and security claims" for
-   * what is confirmed and why the fifth point (an AVV) is not here: no
-   * template exists yet, so the site makes no promise about signing one.
-   * Getting a template is a prerequisite for outreach, tracked there as
-   * "still open" — add the point back once it exists.
+   * what is confirmed. A fifth point was cut rather than published
+   * unconfirmed — add it back once the team confirms it.
    */
   securitySection: {
     title: "Was mit Ihren Daten passiert",
@@ -530,6 +529,24 @@ const de = {
   },
 
   /**
+   * Pricing teaser: two cards, each number counting up once on view
+   * (components/site/count-up.client.tsx). Gone entirely while SHOW_PRICES
+   * is off (lib/site-config.ts) — the section returns null, so no markup
+   * and no counter JS ship either. The price itself comes from `PRICES` in
+   * lib/site-config.ts via the same `blog.prices.webPart` / `.change`
+   * templates the blog and the FAQ use — one number, three places.
+   */
+  pricingSection: {
+    title: "Was es kostet",
+    intro: "Der Preis richtet sich nach dem Aufwand. Diese Richtwerte helfen bei der ersten Einschätzung.",
+    webPartLabel: "Pro Webpart",
+    webPartText: "Je nach Umfang, meist 5–10 Stunden Arbeit.",
+    hourLabel: "Pro Stunde",
+    hourText: "Für laufende Änderungen und kleinere Aufgaben.",
+    note: "Bei größeren Projekten gibt es Rabatt – und die eine oder andere Kleinigkeit obendrauf. Vor dem Start bekommen Sie von uns eine Schätzung. Alle Preise netto.",
+  },
+
+  /**
    * FAQ. Every answer repeats what Services, How we work and Security already
    * say — no new promises. Also the FAQPage JSON-LD, so plain text only.
    * TODO(team): taking over an existing project is not written down anywhere
@@ -543,7 +560,7 @@ const de = {
       {
         question: "Was kostet ein Projekt?",
         answer:
-          "Ein Webpart kostet {{price:webPart}}, meist zum Festpreis. Laufende Änderungen rechnen wir mit {{price:change}} ab, die meisten brauchen unter 2 Stunden. Vor dem Start bekommen Sie von uns eine Schätzung. Alle Preise netto.",
+          "Der Preis richtet sich nach dem Aufwand – {{price:webPart}}, {{price:change}} für laufende Änderungen. Bei größeren Projekten gibt es Rabatt und kleine Extras obendrauf. Vor dem Start bekommen Sie von uns eine Schätzung. Alle Preise netto.",
       },
       {
         question: "Wie schnell gibt es eine erste Version?",

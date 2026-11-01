@@ -22,6 +22,7 @@ const en: Messages = {
     process: "how-we-work",
     reference: "reference",
     security: "security",
+    pricing: "pricing",
     team: "team",
     faq: "faq",
     contact: "contact",
@@ -420,8 +421,8 @@ const en: Messages = {
   },
 
   // See docs/02-POSITIONING.md "DSGVO and security claims" for what is
-  // confirmed and why a DPA point is not here: no template exists yet, so
-  // the site makes no promise about signing one. Add it back once it does.
+  // confirmed. A fifth point was cut rather than published unconfirmed —
+  // add it back once the team confirms it.
   securitySection: {
     title: "What happens to your data",
     intro: "How we handle your data, your access and your code.",
@@ -454,6 +455,17 @@ const en: Messages = {
     },
   },
 
+  // See messages/de.ts "pricingSection" — same shape, same numbers.
+  pricingSection: {
+    title: "What it costs",
+    intro: "The price depends on the amount of work. These are the figures we start from.",
+    webPartLabel: "Per web part",
+    webPartText: "Depends on scope, usually 5–10 hours of work.",
+    hourLabel: "Per hour",
+    hourText: "For ongoing changes and smaller tasks.",
+    note: "Larger projects get a discount — and a little extra on top. Before we start, you get an estimate from us. All prices net.",
+  },
+
   // TODO(team): see messages/de.ts — taking over an existing project is open.
   faqSection: {
     title: "Common questions",
@@ -462,7 +474,7 @@ const en: Messages = {
       {
         question: "What does a project cost?",
         answer:
-          "A web part costs {{price:webPart}}, usually a fixed price. Ongoing changes are billed at {{price:change}}, most take under 2 hours. Before we start, you get an estimate from us. All prices net.",
+          "The price depends on the amount of work – {{price:webPart}}, {{price:change}} for ongoing changes. Larger projects get a discount, plus a little extra on top. Before we start, you get an estimate from us. All prices net.",
       },
       {
         question: "How soon is there a first version?",
