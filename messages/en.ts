@@ -140,7 +140,7 @@ const en: Messages = {
         title: "Internal apps",
         problem: "“We still do this on paper, in Excel and by e-mail.”",
         text: "Small, focused apps built from your sketch — for requests, onboarding or the editorial plan.",
-        result: "A first version within days, with Microsoft sign-in and rights by group.",
+        result: "A first version in 1–2 days, with Microsoft sign-in and rights by group.",
         labels: ["Sign in with Microsoft", "Data in SharePoint", "Status at a glance"],
         summary:
           "Rebuild of an editorial planner: signed in with Microsoft, one week with a row per channel, each post with its area, status and editor.",
@@ -195,7 +195,7 @@ const en: Messages = {
       brand: "NVRMiss",
       nav: ["Features", "How it works", "Pricing", "FAQ"],
       demo: "Get a demo",
-      badge: "Launching soon · beta open",
+      badge: "Launching soon · open beta",
       headline: ["Never miss a call.", "Never miss a job."],
       lead: "Answers calls around the clock, qualifies the request and books the job — while you focus on the work.",
       cta: "Get beta access",
@@ -246,7 +246,7 @@ const en: Messages = {
       control: "Compare before and after",
       hint: "Drag to compare",
       summary:
-        "Example: the same news page twice. Before, a classic SharePoint with a grey bar, a list of links and a small table; after, our design with an area filter and large cards.",
+        "Example: the same news page twice. Before, a classic SharePoint intranet with a grey bar, a list of links and a small table; after, our design with an area filter and large cards.",
     },
     classic: {
       site: "Intranet",
@@ -312,11 +312,11 @@ const en: Messages = {
   baukastenSection: {
     title: "The Baukasten",
     intro:
-      "Our strongest product — we call it the Baukasten: a library of building blocks for your Microsoft 365, in your design, with your login, on your own server.",
+      "Our flagship — we call it the Baukasten: a library of building blocks for your Microsoft 365, in your design, with your login, on your own server.",
     points: [
       {
         title: "Blocks that fit together",
-        text: "React components in your design that snap together like Lego — a form, an approval, a dashboard.",
+        text: "React components in your design that snap together like building blocks — a form, an approval, a dashboard.",
       },
       {
         title: "Sign-in with Microsoft Entra",
@@ -336,7 +336,7 @@ const en: Messages = {
       stat: "6+ apps",
       statText: "at one organisation in Germany",
       types: ["Requests", "Onboarding", "News editing", "Editorial calendar"],
-      caption: "Illustrative grouping, no client data.",
+      caption: "Illustrative only, no real client data.",
     },
   },
 
@@ -380,7 +380,7 @@ const en: Messages = {
         text: "You send us a sketch, a photo or a few sentences. On a call we work out what the app has to do.",
       },
       {
-        title: "First version in a few days",
+        title: "First version in 1–2 days",
         text: "First you get something to click through. A first app version takes us about 10 to 14 hours of work.",
       },
       {
@@ -476,7 +476,7 @@ const en: Messages = {
       },
       {
         title: "No passwords in code",
-        text: "Keys and passwords live in a proper secret store — never in code and never in chat.",
+        text: "Keys and passwords live in their own protected store — never in code and never in chat.",
       },
     ],
     tenant: {
@@ -550,7 +550,7 @@ const en: Messages = {
       body: "Hello Coditu,\n\nOur idea in a few sentences:\n\n\nWe are happy to attach a photo of our sketch.\n",
       or: "Or straight to",
     },
-    booking: "Book a 30-minute call",
+    booking: "Book a call",
     reply: "You get a personal reply from Adam in Berlin.",
     contactTitle: "Your contact in Berlin",
     contactText: "From the first call to go-live, you talk to the same person.",
@@ -703,7 +703,7 @@ const en: Messages = {
 
   error: {
     title: "The page could not be loaded.",
-    body: "Reloading is safe. If the error persists, write to us.",
+    body: "A reload won't cause any harm. If the error persists, write to us.",
     retry: "Reload",
   },
 };

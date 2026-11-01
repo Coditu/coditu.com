@@ -80,14 +80,14 @@ const de = {
      * 3 days. Not a demo: we build what they ask for. The CTA opens a mail
      * whose subject sets these requests apart from „Projektanfrage“.
      */
-    cta: "Kleine Aufgabe gratis testen",
+    cta: "Kleine Aufgabe gratis sichern",
     freeTask: {
       line: "Schicken Sie uns eine kleine Anfrage, wir setzen sie kostenlos um.",
       fine: "1 Aufgabe pro Kunde · ein Screen oder eine Funktion · in bis zu 3 Tagen",
       subject: "Kleine Aufgabe gratis",
       body: "Hallo Coditu,\n\nunsere kleine Aufgabe (ein Screen oder eine Funktion):\n\n\nWo sie laufen soll (z. B. SharePoint):\n",
     },
-    booking: "Termin buchen",
+    booking: "Gespräch buchen",
     /**
      * The hero picture: a request by e-mail becomes a booking app. Example
      * data, marked „Beispiel“; close to a kind of app we really built (NVRMiss:
@@ -181,7 +181,7 @@ const de = {
         title: "Interne Apps",
         problem: "„Das läuft bei uns noch über Papier, Excel und E-Mail.“",
         text: "Kleine, fokussierte Apps nach Ihrer Skizze – für Anträge, Onboarding oder den Redaktionsplan.",
-        result: "Erste Version in wenigen Tagen, mit Microsoft-Anmeldung und Rechten nach Gruppen.",
+        result: "Erste Version in 1–2 Tagen, mit Microsoft-Login und Rechten nach Gruppen.",
         labels: ["Login mit Microsoft", "Daten in SharePoint", "Status auf einen Blick"],
         summary:
           "Nachbau eines Redaktionsplans: angemeldet mit Microsoft, eine Woche mit einer Zeile je Kanal, jeder Beitrag mit Bereich, Status und Redakteurin.",
@@ -193,7 +193,7 @@ const de = {
         result: "Eine Seite, die sofort sagt, was Sie anbieten – auf dem Handy wie am Schreibtisch.",
         labels: ["Klare Botschaft", "Produkt statt Stockfoto", "Ein nächster Schritt"],
         summary:
-          "Nachbau der Startseite von NVRMiss: eine Überschrift, ein Knopf für den Beta-Zugang und kleine Einblicke ins Produkt – Anrufe, Erinnerungen, Kalender.",
+          "Nachbau der Startseite von NVRMiss: eine Überschrift, ein Button für den Beta-Zugang und kleine Einblicke ins Produkt – Anrufe, Erinnerungen, Kalender.",
       },
     ],
     /** Mockup 01: the SPFx calendar web part. Day numbers and dots are in the component. */
@@ -239,7 +239,7 @@ const de = {
       brand: "NVRMiss",
       nav: ["Funktionen", "Ablauf", "Preise", "FAQ"],
       demo: "Demo anfragen",
-      badge: "Bald verfügbar · Beta offen",
+      badge: "Bald verfügbar · Offene Beta",
       headline: ["Kein Anruf verpasst.", "Kein Auftrag verpasst."],
       lead: "Nimmt Anrufe rund um die Uhr an, prüft die Anfrage und bucht den Termin – während Sie arbeiten.",
       cta: "Beta-Zugang sichern",
@@ -298,7 +298,7 @@ const de = {
       control: "Vorher und Nachher vergleichen",
       hint: "Zum Vergleichen ziehen",
       summary:
-        "Beispiel: dieselbe News-Seite zweimal. Vorher ein klassisches SharePoint mit grauer Leiste, Linkliste und kleiner Tabelle, nachher unser Design mit Bereichsfilter und großen Karten.",
+        "Beispiel: dieselbe News-Seite zweimal. Vorher ein klassisches SharePoint-Intranet mit grauer Leiste, Linkliste und kleiner Tabelle, nachher unser Design mit Bereichsfilter und großen Karten.",
     },
     /** The „before“: generic classic SharePoint, no Microsoft names or marks. */
     classic: {
@@ -373,11 +373,11 @@ const de = {
   baukastenSection: {
     title: "Der Baukasten",
     intro:
-      "Unser stärkstes Produkt: eine Bibliothek aus Bausteinen für Ihr Microsoft 365 – in Ihrem Design, mit Ihrem Login, auf Ihrem Server.",
+      "Unser Flaggschiff: eine Bibliothek aus Bausteinen für Ihr Microsoft 365 – in Ihrem Design, mit Ihrem Login, auf Ihrem Server.",
     points: [
       {
         title: "Bausteine, die zusammenpassen",
-        text: "React-Komponenten in Ihrem Design, die sich wie Lego zusammenstecken lassen – ein Formular, eine Freigabe, ein Dashboard.",
+        text: "React-Komponenten in Ihrem Design, die sich wie Bausteine zusammenstecken lassen – ein Formular, eine Freigabe, ein Dashboard.",
       },
       {
         title: "Anmeldung mit Microsoft Entra",
@@ -397,7 +397,7 @@ const de = {
       stat: "6+ Apps",
       statText: "bei einer Organisation in Deutschland",
       types: ["Anfragen", "Onboarding", "News-Redaktion", "Redaktionskalender"],
-      caption: "Beispielhafte Einordnung, keine Kundendaten.",
+      caption: "Nur beispielhaft, keine echten Kundendaten.",
     },
   },
 
@@ -446,7 +446,7 @@ const de = {
         text: "Sie schicken uns eine Skizze, ein Foto oder ein paar Sätze. Im Gespräch klären wir, was die App können muss.",
       },
       {
-        title: "Erste Version in wenigen Tagen",
+        title: "Erste Version in 1–2 Tagen",
         text: "Zuerst bekommen Sie etwas zum Anklicken. Eine erste App-Version braucht bei uns etwa 10 bis 14 Stunden Arbeit.",
       },
       {
@@ -560,7 +560,7 @@ const de = {
       },
       {
         title: "Keine Passwörter im Code",
-        text: "Schlüssel und Passwörter liegen in einem geschützten Speicher dafür – nie im Code und nie im Chat.",
+        text: "Schlüssel und Passwörter liegen in einem eigenen, geschützten Speicher – nie im Code und nie im Chat.",
       },
     ],
     /** Our own drawing: the web parts and apps sit inside the client's tenant. */
@@ -654,7 +654,7 @@ const de = {
       body: "Hallo Coditu,\n\nunsere Idee in ein paar Sätzen:\n\n\nGern hängen wir auch ein Foto unserer Skizze an.\n",
       or: "Oder direkt an",
     },
-    booking: "30-Minuten-Gespräch buchen",
+    booking: "Gespräch buchen",
     reply: "Sie bekommen eine persönliche Antwort von Adam in Berlin.",
     contactTitle: "Ihr Ansprechpartner in Berlin",
     contactText: "Vom ersten Gespräch bis zum Livegang sprechen Sie mit derselben Person.",

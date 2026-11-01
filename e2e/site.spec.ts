@@ -111,10 +111,10 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       // Primary: a mail whose subject sets free-task requests apart from project requests.
       const subject = encodeURIComponent(lang === "de" ? "Kleine Aufgabe gratis" : "Free small task");
       const freeTask = page.locator(`#hero-title ~ * a[href^="mailto:contact@coditu.com?subject=${subject}&"]`);
-      await expect(freeTask).toHaveText(lang === "de" ? "Kleine Aufgabe gratis testen" : "Try us free with a small task");
+      await expect(freeTask).toHaveText(lang === "de" ? "Kleine Aufgabe gratis sichern" : "Try us free with a small task");
       // Secondary: BOOKING_URL is set (lib/site-config.ts), so it goes straight to Cal.com.
       await expect(page.locator(`#hero-title ~ * a[href="https://cal.com/coditu/30min"]`)).toHaveText(
-        lang === "de" ? "Termin buchen" : "Book a call",
+        lang === "de" ? "Gespräch buchen" : "Book a call",
       );
       await expect(
         page.getByText(
@@ -297,7 +297,7 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(section.locator('a[href^="mailto:contact@coditu.com?subject="]')).toHaveCount(1);
       // BOOKING_URL is set (lib/site-config.ts): the booking button renders.
       await expect(section.locator('a[href="https://cal.com/coditu/30min"]')).toHaveText(
-        lang === "de" ? "30-Minuten-Gespräch buchen" : "Book a 30-minute call",
+        lang === "de" ? "Gespräch buchen" : "Book a call",
       );
       await expect(section.locator("a")).toHaveCount(3);
       await expect(section.getByText("Adam Nafie")).toBeVisible();
