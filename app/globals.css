@@ -301,6 +301,45 @@
   animation: cd-draw 900ms var(--ease-entrance) both;
 }
 
+/* The compare slider's drag hint: a hand icon nudges twice, then fades.
+   docs/design-system/tokens.md "Motion" — "drag-hint". Position (left/top,
+   the -50%/-50% centering) is baked into the keyframe itself, not a
+   Tailwind transform utility, because this animation owns `transform`
+   for its whole run. */
+@keyframes cd-hand-hint {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateX(0);
+  }
+  10% {
+    opacity: 1;
+  }
+  25% {
+    transform: translate(-50%, -50%) translateX(-6px);
+  }
+  40% {
+    transform: translate(-50%, -50%) translateX(6px);
+  }
+  55% {
+    transform: translate(-50%, -50%) translateX(-6px);
+  }
+  70% {
+    transform: translate(-50%, -50%) translateX(6px);
+  }
+  85% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateX(0);
+  }
+}
+
+.cd-hand-hint {
+  animation: cd-hand-hint 1200ms var(--ease-entrance) both;
+}
+
 [data-reveal="micro"] {
   animation: cd-reveal-micro var(--dur-micro) var(--ease-entrance) both;
 }

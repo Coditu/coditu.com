@@ -134,6 +134,8 @@ Calm. Opacity and transform only. Reuse the reveal system already in `globals.cs
 | hover / color change | 150 ms `ease-out` (`transition-colors duration-150`) |
 | draw-on of dimension lines / connectors | `stroke-dashoffset` → 0, 900 ms `--ease-entrance`, once, on view |
 | reveal | existing `section` (blocks) and `micro` (chips) tiers |
+| compare-slider auto-demo | the handle (`--pos`, already clip-path-driven — see `compare-slider.client.tsx`) sweeps 50 → 15 → 50, ~1.6 s total, `--ease-entrance`, once, on view, only if untouched |
+| drag-hint | a hand icon at the handle, two small side-to-side nudges then fades, ~1.2 s, once, immediately after the auto-demo settles, only if still untouched |
 
 `prefers-reduced-motion: reduce` → no movement, lines shown fully drawn.
 
