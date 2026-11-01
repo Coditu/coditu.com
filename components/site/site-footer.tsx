@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { CoditusLockup } from "@/components/coditu/coditus-mark";
 import { blogPath, getPosts } from "@/lib/blog";
 import { getMessages, pages, sectionHref, type Locale } from "@/lib/i18n";
+import { landingKeys, landingPaths } from "@/lib/landing-pages";
 import { CONTACT_EMAIL } from "@/lib/site-config";
 
 import { Container } from "./container";
@@ -55,6 +56,22 @@ export function SiteFooter({
                   </a>
                 </li>
               )}
+              <li>
+                <a href={pages.pricing[locale]} className={link}>
+                  {t.pricingSection.moreLabel}
+                </a>
+              </li>
+              {/* Real crawlable links to the keyword/regional landing pages —
+                  until this, they only existed in sitemap.xml and JSON-LD
+                  `Service.url`, neither of which a crawler follows as a link
+                  (docs/04-BRIEFING.md, SEO audit finding). */}
+              {landingKeys.map((key) => (
+                <li key={key}>
+                  <a href={landingPaths(key)[locale]} className={link}>
+                    {t.landingPages[key].title}
+                  </a>
+                </li>
+              ))}
             </ul>
           </Column>
 

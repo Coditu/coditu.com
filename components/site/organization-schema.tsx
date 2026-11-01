@@ -20,14 +20,23 @@ import { CONTACT_EMAIL, SITE_NAME, SITE_URL } from "@/lib/site-config";
  * the site's app icon (see `public/brand/`), not a new image made up for
  * this: Google's and schema.org's Organization guidance both call out `logo`
  * as a recommended property.
+ *
+ * `@id` and `description` exist to help AI/answer engines anchor this exact
+ * entity — there is at least one unrelated company with a confusingly
+ * similar name/domain (not coditu.com) that has shown up misattributed in a
+ * third-party AI answer. A stable `@id` and a real, specific description are
+ * the honest on-page lever here; the rest (consistent off-site citations —
+ * LinkedIn, directories, backlinks) is outside this codebase.
  */
 export function OrganizationSchema({ locale }: { locale: Locale }) {
   const t = getMessages(locale);
 
   const organization = {
     "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
     name: SITE_NAME,
     url: SITE_URL,
+    description: t.meta.description,
     logo: { "@type": "ImageObject", url: `${SITE_URL}/icon-512.png`, width: 512, height: 512 },
     email: CONTACT_EMAIL,
     inLanguage: t.locale,
