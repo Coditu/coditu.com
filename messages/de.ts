@@ -21,7 +21,7 @@ const de = {
     title: "Coditu — SharePoint-Webparts und interne Apps",
     description:
       "Coditu entwickelt SharePoint- und SPFx-Webparts und interne Apps für Organisationen in Deutschland. Ein Team von der Skizze bis zum Betrieb.",
-    ogAlt: "Coditu — Von der Mail zur App",
+    ogAlt: "Coditu — Sie wählen die Bausteine, wir bauen Ihre App",
   },
 
   /** Section ids on the home page. Language-specific, so URLs stay German. */
@@ -61,12 +61,19 @@ const de = {
     switchTo: "English",
   },
 
-  /** Hero. ENTWURF — Adam überarbeitet den Text. */
+  /**
+   * Hero. ENTWURF — Adam überarbeitet den Text.
+   * docs/02-POSITIONING.md: the Baukasten headline, not a workflow claim —
+   * the only line a competitor cannot copy by rewriting their own headline.
+   */
   hero: {
     label: "SharePoint · Interne Apps",
-    /** The blue period is added by the component. */
-    title: "Von der Mail zur App",
-    lead: "Wir bauen Software für soziale Organisationen, Vereine und den Mittelstand. Aus Ihrer E-Mail wird eine App, die im Alltag funktioniert. Jeden Schritt sehen Sie auf einem gemeinsamen Board.",
+    /**
+     * The blue period is added by the component, after whatever is here —
+     * written with no trailing period so it lands on "App".
+     */
+    title: "Sie wählen die Bausteine. Wir bauen Ihre App",
+    lead: "Wir bauen interne Software für kleine und mittlere Unternehmen: fertige Bausteine für Ihr Microsoft 365, in Ihrem Design, mit Ihrem Login. Jeden Schritt sehen Sie auf einem gemeinsamen Board.",
     /**
      * The free small task: one per client, one screen or one feature, in up to
      * 3 days. Not a demo: we build what they ask for. The CTA opens a mail
@@ -129,7 +136,7 @@ const de = {
       },
     },
     facts: [
-      { id: "T.01", text: "Von der Mail zur App in wenigen Tagen" },
+      { id: "T.01", text: "Erste App in 1–3 Tagen" },
       { id: "T.02", text: "Sie sehen jeden Schritt im Board" },
       { id: "T.03", text: "Läuft in Ihrem Microsoft 365" },
     ],
