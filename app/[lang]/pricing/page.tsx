@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ButtonLink } from "@/components/ui/button";
 import { Container } from "@/components/site/container";
 import { CountUp } from "@/components/site/count-up.client";
-import { CONTACT_EMAIL, PRICES, SHOW_PRICES } from "@/lib/site-config";
+import { BOOKING_URL, CONTACT_EMAIL, PRICES, SHOW_PRICES } from "@/lib/site-config";
 import { getMessages, hasLocale, pages } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/metadata";
 
@@ -80,11 +80,16 @@ export default async function PricingPage({ params }: PageProps<"/[lang]/pricing
 
       <p className="mt-6 max-w-[64ch] text-[15px] leading-normal text-ink-muted">{t.pricingSection.note}</p>
 
-      <p className="mt-10">
+      <div className="mt-10 flex flex-wrap gap-4">
         <ButtonLink href={mailto} variant="cta" size="lg">
           {p.cta}
         </ButtonLink>
-      </p>
+        {BOOKING_URL && (
+          <ButtonLink href={BOOKING_URL} variant="outline" size="lg">
+            {t.nav.booking}
+          </ButtonLink>
+        )}
+      </div>
     </Container>
   );
 }

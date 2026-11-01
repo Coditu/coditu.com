@@ -8,7 +8,7 @@ import { SiteNav } from "@/components/site/site-nav";
 import { switchPaths } from "@/lib/blog";
 import { fontVariables } from "@/lib/fonts";
 import { getMessages, hasLocale, locales, sectionMap } from "@/lib/i18n";
-import { CONTACT_EMAIL, SITE_NAME } from "@/lib/site-config";
+import { BOOKING_URL, CONTACT_EMAIL, SITE_NAME } from "@/lib/site-config";
 import { getSiteUrl } from "@/lib/site-url";
 
 import "../globals.css";
@@ -89,7 +89,15 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
           {children}
         </main>
         <SiteFooter locale={lang} hashMap={hashMap} pathMap={pathMap} />
-        <OfferPanel title={p.title} fine={p.fine} cta={p.cta} close={p.close} mailto={panelMailto} />
+        <OfferPanel
+          title={p.title}
+          fine={p.fine}
+          cta={p.cta}
+          close={p.close}
+          mailto={panelMailto}
+          booking={t.nav.booking}
+          bookingUrl={BOOKING_URL}
+        />
       </body>
     </html>
   );
