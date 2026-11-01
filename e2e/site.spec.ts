@@ -234,6 +234,44 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       }
     });
 
+    test("services: the calendar mockup's area filter is real — dims non-matching events, announces the change", async ({
+      page,
+    }) => {
+      await page.goto(home);
+      const card = page.locator('section[aria-labelledby="services-title"] article').first();
+      await card.scrollIntoViewIfNeeded();
+
+      const group = card.getByRole("group", { name: lang === "de" ? "Bereich" : "Area" });
+      const area = lang === "de" ? "Verwaltung" : "Admin";
+      const allButton = group.getByRole("button", { name: lang === "de" ? "Alle Bereiche" : "All areas" });
+      const areaButton = group.getByRole("button", { name: area, exact: true });
+
+      // Starts unfiltered.
+      await expect(allButton).toHaveAttribute("aria-pressed", "true");
+      await expect(areaButton).toHaveAttribute("aria-pressed", "false");
+
+      // A real, keyboard-reachable control — not just a click target.
+      await areaButton.focus();
+      await page.keyboard.press("Enter");
+      await expect(areaButton).toHaveAttribute("aria-pressed", "true");
+      await expect(allButton).toHaveAttribute("aria-pressed", "false");
+
+      // It actually filters the picture: an event from a different area dims.
+      // Scoped to the aria-hidden picture, not the real filter buttons —
+      // both render area names as text.
+      const picture = card.locator('[aria-hidden="true"]');
+      const otherArea = lang === "de" ? "Bildung" : "Education";
+      const otherEvent = picture.getByText(otherArea, { exact: true }).first();
+      await expect(otherEvent.locator("xpath=ancestor::div[contains(@class,'opacity-30')][1]")).toHaveCount(1);
+
+      // And a screen reader is told, even though the picture itself is aria-hidden.
+      await expect(card.getByText(`${lang === "de" ? "Bereich" : "Area"}: ${area}`)).toHaveCount(1);
+
+      // Back to "all": nothing stays dimmed.
+      await allButton.click();
+      await expect(picture.locator(".opacity-30")).toHaveCount(0);
+    });
+
     test("intranet: follows hero, the slider works by keyboard, the CTA is the free task marked Intranet", async ({ page }) => {
       // Reduced motion, set BEFORE navigation — it's the one documented way to
       // turn off the slider's own self-demo (tokens.md "compare-slider
