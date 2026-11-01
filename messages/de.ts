@@ -691,6 +691,36 @@ const de = {
       subject: "Kleine Aufgabe gratis – SharePoint Webparts",
       body: "Hallo Coditu,\n\nbitte gestalten Sie dieses Webpart kostenlos neu (Screenshot im Anhang).\n\nWas uns daran stört:\n\n",
     },
+    spfxDeveloper: {
+      slug: "spfx-entwickler",
+      meta: {
+        title: "SPFx-Entwickler",
+        description:
+          "SPFx-Entwicklung für SharePoint und Microsoft 365: ein Team, keine Subunternehmer, wöchentliche Sprints, 70 € pro Stunde.",
+      },
+      title: "SPFx-Entwickler",
+      intro:
+        "Auf der Suche nach SPFx-Entwicklung für Ihr SharePoint? Wir übernehmen Konzept, Umsetzung und Betrieb – als ein Team, nicht als Subunternehmer.",
+      points: [
+        {
+          title: "Ein Team, keine Subunternehmer",
+          text: "Dieselben Leute von der ersten Skizze bis zum Betrieb danach. Nichts wird weitergereicht.",
+        },
+        {
+          title: "Wöchentliche Sprints",
+          text: "Jede Woche zeigen wir, was fertig ist, auf einem gemeinsamen Board. Sie sagen, was sich ändern soll.",
+        },
+        {
+          title: "Berlin · Kairo",
+          text: "Ihr fester Ansprechpartner sitzt in Berlin. Zwischen Berlin und Kairo liegt höchstens eine Stunde Zeitunterschied.",
+        },
+      ],
+      proofLabel: "Aus einem echten Projekt",
+      priceLine: "Wir rechnen mit {{price:change}} ab, oder zum Festpreis je Webpart oder Projekt. Alle Preise netto.",
+      cta: "Kleine Aufgabe gratis sichern",
+      subject: "Kleine Aufgabe gratis – SPFx",
+      body: "Hallo Coditu,\n\nunsere kleine Aufgabe (ein Screen oder eine Funktion):\n\n\nWo sie laufen soll (z. B. SharePoint):\n",
+    },
   },
 
   /**
