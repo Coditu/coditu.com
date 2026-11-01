@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 
+import { OrganizationSchema } from "@/components/site/organization-schema";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteNav } from "@/components/site/site-nav";
 import { switchPaths } from "@/lib/blog";
@@ -71,6 +72,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
             broken bundle degrades to content that is simply visible), and sets
             the theme. */}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <OrganizationSchema locale={lang} />
         <a
           href="#inhalt"
           className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-surface focus:px-4 focus:py-3 focus:text-ink"
