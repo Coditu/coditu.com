@@ -234,12 +234,14 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       expect(id).toBe(lang === "de" ? "referenz" : "reference");
     });
 
-    test("security: follows the case study, five points", async ({ page }) => {
+    test("security: follows the case study, four points", async ({ page }) => {
       await page.goto(home);
       const section = page.locator('section[aria-labelledby="security-title"]');
       expect(await section.getAttribute("id")).toBe(lang === "de" ? "sicherheit" : "security");
       await expect(page.locator('section[aria-labelledby="reference-title"] + section')).toHaveId(/^(sicherheit|security)$/);
-      await expect(section.locator("h3")).toHaveCount(5);
+      // Four confirmed points, not five — see docs/02-POSITIONING.md: no AVV
+      // claim ships until a template exists.
+      await expect(section.locator("h3")).toHaveCount(4);
     });
 
     test("faq: follows security, all closed, opens by keyboard, JSON-LD says the same", async ({ page }) => {

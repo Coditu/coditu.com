@@ -127,7 +127,7 @@ const en: Messages = {
         title: "SharePoint web parts",
         problem: "“Our intranet is cluttered and out of date.”",
         text: "Web parts that slot into your existing SharePoint pages and show your lists live.",
-        result: "More than 35 web parts for one organisation, mostly 1–2 days per web part.",
+        result: "More than 40 web parts for one organisation, mostly 1–2 days per web part.",
         labels: ["Filter by area", "Four weeks at a glance", "Live from SharePoint"],
         summary:
           "Rebuild of a calendar web part on an intranet: a filter by area, four weeks with marked events and, beside them, the next events from a SharePoint list.",
@@ -371,7 +371,7 @@ const en: Messages = {
     footer: ["Client anonymous", "Illustration only"],
     factsLabel: "From the project",
     facts: [
-      { value: "~38", text: "web parts for one organisation" },
+      { value: "40+", text: "web parts for one organisation" },
       { value: "5–10 h", text: "for a new web part, mostly 1–2 days" },
       { value: "10–14 h", text: "for the first version of an internal app" },
       { value: "≤ 2 h", text: "for most change requests" },
@@ -419,30 +419,28 @@ const en: Messages = {
     ],
   },
 
-  // TODO(team): see messages/de.ts — none of the five points is confirmed yet.
+  // See docs/02-POSITIONING.md "DSGVO and security claims" for what is
+  // confirmed and why a DPA point is not here: no template exists yet, so
+  // the site makes no promise about signing one. Add it back once it does.
   securitySection: {
     title: "What happens to your data",
     intro: "How we handle your data, your access and your code.",
     points: [
       {
         title: "Your data stays in your system",
-        text: "[TODO: confirm] Where possible, we build inside your own Microsoft 365 and SharePoint. Your data does not move to our servers.",
+        text: "Where possible, we build inside your own Microsoft 365 and SharePoint. Your data does not move to our servers.",
       },
       {
-        title: "Access only as needed",
-        text: "[TODO: confirm] We use the access you give us, and only for the work. You can remove it at any time.",
-      },
-      {
-        title: "GDPR and a DPA",
-        text: "[TODO: confirm] We work under the GDPR. When it is needed, we sign a data processing agreement (DPA) with you.",
+        title: "Permissions stay in your hands",
+        text: "You grant us access to your Microsoft 365. Your own permission groups control who can see and edit what.",
       },
       {
         title: "A clean handover",
-        text: "[TODO: confirm] You get the code, the documentation and full control. There is no lock-in.",
+        text: "You get the code, the documentation and full control. There is no lock-in.",
       },
       {
         title: "No passwords in code",
-        text: "[TODO: confirm] Keys and passwords live in a proper secret store — never in code and never in chat.",
+        text: "Keys and passwords live in a proper secret store — never in code and never in chat.",
       },
     ],
     tenant: {
@@ -456,7 +454,7 @@ const en: Messages = {
     },
   },
 
-  // TODO(team): see messages/de.ts — prices, code ownership and takeover are open.
+  // TODO(team): see messages/de.ts — taking over an existing project is open.
   faqSection: {
     title: "Common questions",
     intro: "Short answers on cost, speed, working together and your code.",
@@ -464,7 +462,7 @@ const en: Messages = {
       {
         question: "What does a project cost?",
         answer:
-          "We bill by effort. Before we start, you get an estimate from us. Small changes usually take under 2 hours.",
+          "A web part costs {{price:webPart}}, usually a fixed price. Ongoing changes are billed at {{price:change}}, most take under 2 hours. Before we start, you get an estimate from us. All prices net.",
       },
       {
         question: "How soon is there a first version?",
@@ -487,13 +485,7 @@ const en: Messages = {
       },
       {
         question: "Who owns the code?",
-        answer:
-          "[TODO: confirm] You do. You get the code, the documentation and full control. There is no lock-in.",
-      },
-      {
-        question: "Can you take over an existing project?",
-        answer:
-          "[TODO: confirm] We decide that case by case. First we look at the existing code. Then we tell you whether we can take it over, and with how much effort.",
+        answer: "You do. You get the code, the documentation and full control. There is no lock-in.",
       },
       {
         question: "What happens after go-live?",
@@ -502,7 +494,6 @@ const en: Messages = {
     ],
   },
 
-  // TODO(team): see messages/de.ts — the reply time is not confirmed.
   contactSection: {
     title: "Send us your request",
     intro: "A few sentences are enough. If you have a sketch or files, attach them.",
@@ -513,7 +504,7 @@ const en: Messages = {
       or: "Or straight to",
     },
     booking: "Book a 20-minute call",
-    reply: "[TODO: confirm] We usually reply within 1 working day.",
+    reply: "You get a personal reply from Adam in Berlin.",
     contactTitle: "Your contact in Berlin",
     contactText: "From the first call to go-live, you talk to the same person.",
     teamTitle: "Your team in Cairo",

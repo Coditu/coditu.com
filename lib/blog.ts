@@ -4,7 +4,7 @@ import path from "node:path";
 import { marked } from "marked";
 
 import { getMessages, locales, otherLocale, pages, type Locale } from "@/lib/i18n";
-import { PRICES, SHOW_PRICES } from "@/lib/site-config";
+import { withPrices } from "@/lib/pricing";
 
 /**
  * The blog: one Markdown file per post in `content/blog/<locale>/`, front
@@ -142,13 +142,7 @@ export function formatDate(locale: Locale, date: string) {
  */
 export function renderPost(locale: Locale, post: Post) {
   const t = getMessages(locale).blog;
-  const euro = (amount: number) =>
-    new Intl.NumberFormat(getMessages(locale).locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(
-      amount
-    );
-  const markdown = post.body.replace(/\{\{price:(webPart|change)\}\}/g, (_, key: keyof typeof PRICES) =>
-    SHOW_PRICES ? t.prices[key].replace("{price}", euro(PRICES[key])) : t.prices.onRequest
-  );
+  const markdown = withPrices(locale, post.body);
 
   return (marked.parse(markdown, { async: false }) as string)
     .replaceAll("<table>", `<div class="table-scroll" role="region" tabindex="0" aria-label="${t.tableLabel}"><table>`)
