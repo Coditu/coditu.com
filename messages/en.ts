@@ -570,6 +570,35 @@ const en: Messages = {
       subject: "Free small task – SharePoint Web Parts",
       body: "Hello Coditu,\n\nplease redesign this web part for free (screenshot attached).\n\nWhat bothers us about it:\n\n",
     },
+    spfxDeveloper: {
+      slug: "spfx-developer",
+      meta: {
+        title: "SPFx Developer",
+        description: "SPFx development for SharePoint and Microsoft 365: one team, no subcontractors, weekly sprints, €70 per hour.",
+      },
+      title: "SPFx Developer",
+      intro:
+        "Looking for SPFx development for your SharePoint? We own the concept, the build and what comes after — as one team, not a subcontractor.",
+      points: [
+        {
+          title: "One team, no subcontractors",
+          text: "The same people from the first sketch to the operation after. Nothing gets handed off.",
+        },
+        {
+          title: "Weekly sprints",
+          text: "Every week we show what's done, on a shared board. You tell us what should change.",
+        },
+        {
+          title: "Berlin · Cairo",
+          text: "Your fixed contact is based in Berlin. Berlin and Cairo are at most one hour apart.",
+        },
+      ],
+      proofLabel: "From a real project",
+      priceLine: "We bill at {{price:change}}, or a fixed price per web part or project. All prices net.",
+      cta: "Try us free with a small task",
+      subject: "Free small task – SPFx",
+      body: "Hello Coditu,\n\nOur small task (one screen or one feature):\n\n\nWhere it should run (e.g. SharePoint):\n",
+    },
   },
 
   // TODO(team): see messages/de.ts — taking over an existing project is open.
