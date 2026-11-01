@@ -171,11 +171,13 @@ addition could fail the gate outright.
 - Native-German review of `messages/de.ts` (a real speaker, not a model), before outreach.
 - **JS budget headroom is down to ~3.8 KB** — see above. Check before adding client-side
   interactivity; raising the 172 KB gate itself needs a team decision, not a unilateral one.
-- SEO phase 2 is started, not finished: two keyword pages are live
-  (`sharepoint-webparts-entwickeln-lassen`, `spfx-entwickler`); the playbook's regional pages
-  (Berlin, Bayern, NRW with the Digitalbonus.Bayern angle) are not built. Adding another is
-  now cheap — content plus one `lib/landing-pages.ts` registry key, the route/sitemap/
-  language-switch plumbing is generic and already handles it.
+- SEO phase 2: all five planned keyword/regional pages are now live — two keyword pages
+  (`sharepoint-webparts-entwickeln-lassen`, `spfx-entwickler`) and three regional pages
+  (Berlin, Bayern with the Digitalbonus.Bayern angle, and NRW — no funding-programme claim
+  for NRW, since unlike Bavaria there's no confirmed NRW-specific grant; it leans on remote
+  delivery from Berlin/Cairo instead). Adding another is cheap — content plus one
+  `lib/landing-pages.ts` registry key, the route/sitemap/language-switch plumbing is generic
+  and already handles it.
 - Fully localized pricing-page URL (`/de/preise` instead of `/de/pricing`) — the keyword
   landing pages solved this exact problem for themselves (nested under a literal `services/`
   segment specifically to get a localized final slug without touching `[legal]`); the pricing
