@@ -58,13 +58,23 @@ npm run gate        # the whole list, in order (`npm run gate -- --fast` skips e
 
 ## Where things are written down
 
+**Start at `docs/04-BRIEFING.md` — read it first, before anything else in this list.** It's
+the single-file session briefing: who Coditu is, why the site looks the way it does, current
+state, what's still open, and operational gotchas found while building it (including a real
+sandbox instability that looks like flaky tests but isn't). It's kept current; if you make a
+decision it doesn't reflect, update it in the same commit.
+
 | File | What lives there |
 |---|---|
+| `docs/04-BRIEFING.md` | **Read first.** The session briefing — everything above, synthesised. |
 | `docs/00-CONTEXT.md` | Who Coditu is, the real work, the team, the voice rules, the things that must never ship. |
+| `docs/02-POSITIONING.md` | Every Nov 2026 repositioning decision (hero, audience, pricing, page order, motion, DSGVO claims) and the reasoning behind it. Source of truth for marketing copy/positioning. |
+| `docs/03-DEPLOYMENT-CHECKLIST.md` | Deploying to production — the real current blocker (missing GitHub Actions secrets) and exactly how to fix it. |
 | `docs/design-system/` | **The design system ("Blueprint", Rev. A). Read `docs/design-system/README.md` before building or changing any UI.** Tokens, motifs, component specs, rules, migration plan. |
 | `docs/01-DESIGN-SYSTEM.md` | History: the previous ("Instrument") system. Fully removed from the code; the last commit with it is tagged `old-design`. Not for new work. |
 | `docs/05-DECISIONS.md` | Append-only ADR log. Mostly about the removed app; kept unedited as history. |
-| `docs/coditu-revamp-prompt.md` | The brief the previous site was built from. Still the source for voice and company facts; its sections, visuals and motion are superseded by Blueprint. |
+| `docs/coditu-playbook.md` | The outreach/lead-gen strategy this site serves — free-demo policy, weekly pipeline, pricing hooks. |
+| `docs/coditu-revamp-prompt.md` | The brief the previous site was built from. Still the source for voice and company facts; its sections, visuals and motion are superseded by Blueprint, and its positioning is superseded by `02-POSITIONING.md`. |
 | `design/` | The earlier Claude Design bundle (previous design). Prototypes, not code; not the source for the current site. |
 
 Some of these still link to documents that were deleted with the app. Those are in `pre-split`.
