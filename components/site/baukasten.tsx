@@ -8,6 +8,13 @@ import { SectionHeader } from "./section-header";
 
 type B = ReturnType<typeof getMessages>["baukastenSection"];
 
+/**
+ * One icon per `baukastenSection.points` entry, in the SAME order, in BOTH
+ * `messages/de.ts` and `messages/en.ts`. Positional, no other check — the
+ * same pattern in `security.tsx` silently showed wrong icons after a point
+ * was cut without updating its array. Keep this list's length and order in
+ * sync with `points` in the same change that touches either.
+ */
 const POINT_ICONS = [Blocks, UserCheck, Server, ClipboardList];
 
 /**
@@ -20,6 +27,11 @@ const POINT_ICONS = [Blocks, UserCheck, Server, ClipboardList];
 export function Baukasten({ locale }: { locale: Locale }) {
   const t = getMessages(locale);
   const b = t.baukastenSection;
+  if (process.env.NODE_ENV !== "production" && b.points.length !== POINT_ICONS.length) {
+    throw new Error(
+      `Baukasten: baukastenSection.points has ${b.points.length} entries but POINT_ICONS has ${POINT_ICONS.length} — keep them in sync.`
+    );
+  }
 
   return (
     <section id={t.anchors.baukasten} aria-labelledby="baukasten-title" className="py-16 md:py-24">
