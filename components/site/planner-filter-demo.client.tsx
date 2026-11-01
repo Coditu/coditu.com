@@ -1,12 +1,13 @@
 "use client";
 
 import { Check, ChevronLeft, ChevronRight, Circle, Clock3, Lock, Plus, UserRound } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 
 import { buttonClasses } from "@/components/ui/button";
 import { type getMessages } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
+import { FilterChip, Pin } from "./filter-chip.client";
 import { Window } from "./window";
 
 type S = ReturnType<typeof getMessages>["servicesSection"];
@@ -134,22 +135,6 @@ function allLabel(statuses: string[]) {
   return statuses.join(" / ");
 }
 
-function FilterChip({ pressed, onClick, children }: { pressed: boolean; onClick: () => void; children: string }) {
-  return (
-    <button
-      type="button"
-      aria-pressed={pressed}
-      onClick={onClick}
-      className={cn(
-        "rounded-tag border px-2.5 py-1 font-mono text-label uppercase transition-colors duration-150",
-        pressed ? "border-blueprint bg-blueprint text-blueprint-ink" : "border-line-input text-ink-muted hover:border-blueprint hover:text-blueprint"
-      )}
-    >
-      {children}
-    </button>
-  );
-}
-
 function EntryCard({
   entry,
   statuses,
@@ -192,20 +177,3 @@ function EntryCard({
   );
 }
 
-/** A callout: dashed blue outline round a part of the mockup, its label on the edge. Duplicated from services.tsx's own `Pin` — same spec, this file needs its own because it's a separate client bundle. */
-function Pin({ label, at = "-top-2.5 left-2", className, children }: { label: string; at?: string; className?: string; children: ReactNode }) {
-  return (
-    <div className={cn("relative rounded-ui outline-1 outline-offset-2 outline-blueprint outline-dashed", className)}>
-      {children}
-      <span
-        data-pin
-        className={cn(
-          "absolute z-10 rounded-tag border border-blueprint bg-surface px-1.5 py-px font-mono text-label whitespace-nowrap text-blueprint uppercase",
-          at
-        )}
-      >
-        {label}
-      </span>
-    </div>
-  );
-}
