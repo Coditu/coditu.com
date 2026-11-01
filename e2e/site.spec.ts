@@ -11,6 +11,52 @@ const LANGS = [
   { lang: "en", home: "/en", imprint: "/en/legal-notice", privacy: "/en/privacy", pricing: "/en/pricing" },
 ] as const;
 
+/** Every keyword/regional landing page, by (de, en) slug — used for content checks below and
+ *  for the hreflang/canonical sweep, so a new page added to `lib/landing-pages.ts` without a
+ *  matching entry here is caught by `toHaveLength` in both places rather than silently skipped. */
+const LANDING_PAGES = [
+  {
+    slug: { de: "sharepoint-webparts-entwickeln-lassen", en: "sharepoint-web-parts-development" },
+    title: { de: "SharePoint-Webparts entwickeln lassen", en: "SharePoint Web Parts Development" },
+    subject: { de: "Kleine Aufgabe gratis – SharePoint Webparts", en: "Free small task – SharePoint Web Parts" },
+    cta: { de: "Webpart kostenlos neu gestalten lassen", en: "Get one web part redesigned free" },
+  },
+  {
+    slug: { de: "spfx-entwickler", en: "spfx-developer" },
+    title: { de: "SPFx-Entwickler", en: "SPFx Developer" },
+    subject: { de: "Kleine Aufgabe gratis – SPFx", en: "Free small task – SPFx" },
+    cta: { de: "Kleine Aufgabe gratis sichern", en: "Try us free with a small task" },
+  },
+  {
+    slug: { de: "sharepoint-entwicklung-berlin", en: "sharepoint-development-berlin" },
+    title: { de: "SharePoint-Entwicklung Berlin", en: "SharePoint Development Berlin" },
+    subject: { de: "Kleine Aufgabe gratis – Berlin", en: "Free small task – Berlin" },
+    cta: { de: "Kleine Aufgabe gratis sichern", en: "Try us free with a small task" },
+  },
+  {
+    slug: { de: "sharepoint-entwicklung-bayern", en: "sharepoint-development-bavaria" },
+    title: { de: "SharePoint-Entwicklung Bayern", en: "SharePoint Development Bavaria" },
+    subject: { de: "Kleine Aufgabe gratis – Bayern", en: "Free small task – Bavaria" },
+    cta: { de: "Kleine Aufgabe gratis sichern", en: "Try us free with a small task" },
+  },
+] as const;
+
+/** The blog index exists in both languages today; same shape as everything else checked here. */
+const BLOG_INDEX = { de: "/de/blog", en: "/en/blog" } as const;
+
+/** Every route this file checks for hreflang/canonical correctness, by (de, en) path — the
+ *  home page, the fixed pages, the blog index and every keyword/regional landing page. Blog
+ *  *posts* are excluded: they're generated from `content/blog/`, not a fixed table, and their
+ *  hreflang comes from the same `pageMetadata` helper every other page here already exercises. */
+const HREFLANG_ROUTES = [
+  { de: "/de", en: "/en" },
+  { de: "/de/impressum", en: "/en/legal-notice" },
+  { de: "/de/datenschutz", en: "/en/privacy" },
+  { de: "/de/pricing", en: "/en/pricing" },
+  { de: BLOG_INDEX.de, en: BLOG_INDEX.en },
+  ...LANDING_PAGES.map((page) => ({ de: `/de/services/${page.slug.de}`, en: `/en/services/${page.slug.en}` })),
+] as const;
+
 /** Every failing node by selector, so a regression names the element. */
 async function audit(page: Page): Promise<string[]> {
   // Let entrances finish: axe sampling a word mid-fade reports contrast that
@@ -50,6 +96,27 @@ for (const { lang, home, imprint, privacy, pricing } of LANGS) {
       expect(hreflang).toEqual({ de: "/de", en: "/en", "x-default": "/de" });
       expect(new URL((await page.locator('link[rel="canonical"]').getAttribute("href"))!).pathname).toBe(home);
     });
+
+    // Every other page's own hreflang/canonical: own-language alternate matches the page actually
+    // loaded, the other-language alternate resolves to a real page (checked via the language
+    // switch test below), and x-default always points at the German URL per the site-wide
+    // convention (lib/metadata.ts `pageMetadata`), not just on the home page.
+    for (const route of HREFLANG_ROUTES) {
+      test(`hreflang/canonical: ${route[lang]}`, async ({ page }) => {
+        await page.goto(route[lang]);
+        await expect(page).toHaveTitle(/.+/);
+        const hreflang = await page.evaluate(() =>
+          Object.fromEntries(
+            Array.from(document.querySelectorAll<HTMLLinkElement>('link[rel="alternate"][hreflang]')).map((l) => [
+              l.hreflang,
+              new URL(l.href).pathname,
+            ])
+          )
+        );
+        expect(hreflang).toEqual({ de: route.de, en: route.en, "x-default": route.de });
+        expect(new URL((await page.locator('link[rel="canonical"]').getAttribute("href"))!).pathname).toBe(route[lang]);
+      });
+    }
 
     test("the language switch lands on the same page in the other language", async ({ page }) => {
       const other = LANGS.find((l) => l.lang !== lang)!;
@@ -417,33 +484,6 @@ for (const { lang, home, imprint, privacy, pricing } of LANGS) {
         lang === "de" ? "Kleine Aufgabe gratis sichern" : "Try us free with a small task",
       );
     });
-
-    const LANDING_PAGES = [
-      {
-        slug: { de: "sharepoint-webparts-entwickeln-lassen", en: "sharepoint-web-parts-development" },
-        title: { de: "SharePoint-Webparts entwickeln lassen", en: "SharePoint Web Parts Development" },
-        subject: { de: "Kleine Aufgabe gratis – SharePoint Webparts", en: "Free small task – SharePoint Web Parts" },
-        cta: { de: "Webpart kostenlos neu gestalten lassen", en: "Get one web part redesigned free" },
-      },
-      {
-        slug: { de: "spfx-entwickler", en: "spfx-developer" },
-        title: { de: "SPFx-Entwickler", en: "SPFx Developer" },
-        subject: { de: "Kleine Aufgabe gratis – SPFx", en: "Free small task – SPFx" },
-        cta: { de: "Kleine Aufgabe gratis sichern", en: "Try us free with a small task" },
-      },
-      {
-        slug: { de: "sharepoint-entwicklung-berlin", en: "sharepoint-development-berlin" },
-        title: { de: "SharePoint-Entwicklung Berlin", en: "SharePoint Development Berlin" },
-        subject: { de: "Kleine Aufgabe gratis – Berlin", en: "Free small task – Berlin" },
-        cta: { de: "Kleine Aufgabe gratis sichern", en: "Try us free with a small task" },
-      },
-      {
-        slug: { de: "sharepoint-entwicklung-bayern", en: "sharepoint-development-bavaria" },
-        title: { de: "SharePoint-Entwicklung Bayern", en: "SharePoint Development Bavaria" },
-        subject: { de: "Kleine Aufgabe gratis – Bayern", en: "Free small task – Bavaria" },
-        cta: { de: "Kleine Aufgabe gratis sichern", en: "Try us free with a small task" },
-      },
-    ] as const;
 
     for (const entry of LANDING_PAGES) {
       test(`keyword landing page: ${entry.title.en} — three points, two real proof stats, a priced CTA`, async ({ page }) => {
