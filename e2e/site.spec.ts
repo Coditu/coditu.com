@@ -113,9 +113,9 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       const freeTask = page.locator(`#hero-title ~ * a[href^="mailto:contact@coditu.com?subject=${subject}&"]`);
       await expect(freeTask).toHaveText(lang === "de" ? "Kleine Aufgabe gratis testen" : "Try us free with a small task");
       // Secondary: BOOKING_URL is set (lib/site-config.ts), so it goes straight to Cal.com.
-      await expect(
-        page.locator(`#hero-title ~ * a[href="https://cal.com/abdelrahman-elkhateeb-q8tqm0/30min"]`),
-      ).toHaveText(lang === "de" ? "Termin buchen" : "Book a call");
+      await expect(page.locator(`#hero-title ~ * a[href="https://cal.com/coditu/30min"]`)).toHaveText(
+        lang === "de" ? "Termin buchen" : "Book a call",
+      );
       await expect(
         page.getByText(
           lang === "de"
@@ -296,7 +296,7 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       const section = page.locator(`#${id}`);
       await expect(section.locator('a[href^="mailto:contact@coditu.com?subject="]')).toHaveCount(1);
       // BOOKING_URL is set (lib/site-config.ts): the booking button renders.
-      await expect(section.locator('a[href="https://cal.com/abdelrahman-elkhateeb-q8tqm0/30min"]')).toHaveText(
+      await expect(section.locator('a[href="https://cal.com/coditu/30min"]')).toHaveText(
         lang === "de" ? "30-Minuten-Gespräch buchen" : "Book a 30-minute call",
       );
       await expect(section.locator("a")).toHaveCount(3);

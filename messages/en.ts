@@ -464,7 +464,7 @@ const en: Messages = {
     points: [
       {
         title: "Your data stays in your system",
-        text: "Where possible, we build inside your own Microsoft 365 and SharePoint. Your data does not move to our servers.",
+        text: "We build directly inside your Microsoft 365 and SharePoint. Your data lives with Microsoft, not with us — we have no servers of our own for it.",
       },
       {
         title: "Permissions stay in your hands",

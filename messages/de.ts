@@ -548,7 +548,7 @@ const de = {
     points: [
       {
         title: "Ihre Daten bleiben in Ihrem System",
-        text: "Wo es geht, bauen wir direkt in Ihrem Microsoft 365 und SharePoint. Ihre Daten wandern nicht auf unsere Server.",
+        text: "Wir bauen direkt in Ihrem Microsoft 365 und SharePoint. Ihre Daten liegen bei Microsoft, nicht bei uns – wir haben keine eigenen Server dafür.",
       },
       {
         title: "Rechte bleiben in Ihrer Hand",
