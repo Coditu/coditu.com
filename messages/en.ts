@@ -13,7 +13,7 @@ const en: Messages = {
     title: "Coditu — SharePoint web parts and internal apps",
     description:
       "Coditu builds SharePoint and SPFx web parts and internal apps for organisations in Germany. One team from sketch to operation.",
-    ogAlt: "Coditu — From mail to app",
+    ogAlt: "Coditu — You pick the building blocks, we build your app",
   },
 
   anchors: {
@@ -53,8 +53,10 @@ const en: Messages = {
 
   hero: {
     label: "SharePoint · Internal apps",
-    title: "From mail to app",
-    lead: "We build software for social organisations, associations and mid-sized companies. Your email becomes an app that works in your day-to-day. You see every step on a shared board.",
+    // The blue period is added by the component, with no trailing period
+    // here so it lands on "app".
+    title: "You pick the building blocks. We build your app",
+    lead: "We build internal software for small and mid-size companies: ready-made building blocks for your Microsoft 365, in your design, with your login. You see every step on a shared board.",
     cta: "Try us free with a small task",
     freeTask: {
       line: "Send us a small request, we'll build it for free.",
@@ -101,7 +103,7 @@ const en: Messages = {
       },
     },
     facts: [
-      { id: "T.01", text: "From mail to app in a few days" },
+      { id: "T.01", text: "First app in 1–3 days" },
       { id: "T.02", text: "You see every step on the board" },
       { id: "T.03", text: "Runs in your Microsoft 365" },
     ],

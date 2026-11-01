@@ -105,7 +105,9 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto(home);
       await expect(page.locator("h1")).toHaveCount(1);
-      await expect(page.locator("h1")).toHaveText(lang === "de" ? "Von der Mail zur App." : "From mail to app.");
+      await expect(page.locator("h1")).toHaveText(
+        lang === "de" ? "Sie wählen die Bausteine. Wir bauen Ihre App." : "You pick the building blocks. We build your app.",
+      );
       // Primary: a mail whose subject sets free-task requests apart from project requests.
       const subject = encodeURIComponent(lang === "de" ? "Kleine Aufgabe gratis" : "Free small task");
       const freeTask = page.locator(`#hero-title ~ * a[href^="mailto:contact@coditu.com?subject=${subject}&"]`);
