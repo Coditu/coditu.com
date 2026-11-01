@@ -77,23 +77,17 @@ const en: Messages = {
     booking: "Book a call",
     request: {
       example: "Example",
-      summary: "Example: a request by email becomes a booking app – with a dashboard, bookings, a calendar and a login.",
-      mail: {
-        inbox: "Inbox",
-        to: "to Coditu",
-        from: "Julia Brandt",
-        initials: "JB",
-        time: "09:41",
-        subject: "Room booking without Excel?",
-        body: "Hi Coditu team, we still book our rooms through Excel and email. We'd like a [dashboard] with all [bookings], a [calendar] for the week and a [login] for the team.",
-        signoff: "Best, Julia",
-        others: [
-          { from: "IT support", subject: "Maintenance on Saturday", time: "08:15" },
-          { from: "HR", subject: "New holiday rules", time: "Yesterday" },
-        ],
+      summary: "Example: building blocks become a booking app – with a dashboard, bookings, a calendar and a login.",
+      picker: {
+        title: "Baukasten",
+        hint: "Pick your blocks",
+        blocks: ["Dashboard", "Bookings", "Calendar", "Login"],
+        more: ["Form", "Approval", "Directory"],
       },
       app: {
         name: "Room booking",
+        /** The logged-in avatar's initials — example data, no real person. */
+        initials: "AB",
         live: "Live",
         nav: ["Overview", "Rooms", "Team"],
         newBooking: "New booking",

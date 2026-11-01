@@ -1,38 +1,27 @@
 import { useEffect, useState } from "react";
 
-export type Segment = { text: string; key: number | null };
-
-/** "a [b] c" → [{a}, {b, key 0}, {c}] */
-export function parse(body: string): Segment[] {
-  let key = 0;
-  return body
-    .split(/(\[[^\]]+\])/)
-    .filter(Boolean)
-    .map((part) => (part.startsWith("[") ? { text: part.slice(1, -1), key: key++ } : { text: part, key: null }));
-}
-
-/** In order: the mail is open, its key words light up, fly into the app, the app builds, holds. Then the mail again. */
-export const PHASES = ["mail", "mark", "fly", "build", "done"] as const;
+/** In order: the blocks are shown, picked one by one, fly into the app, the app builds, holds. Then the blocks again. */
+export const PHASES = ["pick", "mark", "fly", "build", "done"] as const;
 export type Phase = (typeof PHASES)[number];
 
-export type State = { phase: Phase; /** Key words lit. */ marked: number };
+export type State = { phase: Phase; /** Blocks picked. */ marked: number };
 
 export const FLY_MS = 1100;
 
-/** The server's frame: the mail, open, nothing lit yet. */
-export const INITIAL: State = { phase: "mail", marked: 0 };
+/** The server's frame: the blocks shown, nothing picked yet. */
+export const INITIAL: State = { phase: "pick", marked: 0 };
 
 export const reached = (phase: Phase, step: Phase) => PHASES.indexOf(phase) >= PHASES.indexOf(step);
 
 /**
  * One tick: how long to hold `s`, and what comes after. ~9 s per loop.
- * Reduced motion: two still frames, the mail (words lit) and the app, switched slowly.
+ * Reduced motion: two still frames, the blocks (all picked) and the app, switched slowly.
  */
 export function advance(s: State, words: number, reduced: boolean): [ms: number, next: State] {
-  if (reduced) return s.phase === "mail" ? [3500, { phase: "done", marked: words }] : [4500, { phase: "mail", marked: words }];
+  if (reduced) return s.phase === "pick" ? [3500, { phase: "done", marked: words }] : [4500, { phase: "pick", marked: words }];
 
   switch (s.phase) {
-    case "mail":
+    case "pick":
       return [1200, { phase: "mark", marked: 0 }];
     case "mark":
       return s.marked < words ? [300, { phase: "mark", marked: s.marked + 1 }] : [400, { phase: "fly", marked: words }];
