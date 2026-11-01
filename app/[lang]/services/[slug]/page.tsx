@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { ButtonLink } from "@/components/ui/button";
 import { Container } from "@/components/site/container";
-import { CONTACT_EMAIL } from "@/lib/site-config";
+import { BOOKING_URL, CONTACT_EMAIL } from "@/lib/site-config";
 import { allLandingParams, findLanding, landingPaths } from "@/lib/landing-pages";
 import { getMessages, hasLocale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/metadata";
@@ -68,11 +68,16 @@ export default async function LandingPage({ params }: PageProps<"/[lang]/service
 
       <p className="mt-6 max-w-[64ch] text-[15px] leading-normal text-ink-muted">{withPrices(lang, p.priceLine)}</p>
 
-      <p className="mt-10">
+      <div className="mt-10 flex flex-wrap gap-4">
         <ButtonLink href={mailto} variant="cta" size="lg">
           {p.cta}
         </ButtonLink>
-      </p>
+        {BOOKING_URL && (
+          <ButtonLink href={BOOKING_URL} variant="outline" size="lg">
+            {t.nav.booking}
+          </ButtonLink>
+        )}
+      </div>
     </Container>
   );
 }

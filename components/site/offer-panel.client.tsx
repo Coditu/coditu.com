@@ -48,12 +48,16 @@ export function OfferPanel({
   cta,
   close,
   mailto,
+  booking,
+  bookingUrl,
 }: {
   title: string;
   fine: string;
   cta: string;
   close: string;
   mailto: string;
+  booking: string;
+  bookingUrl: string | null;
 }) {
   const [visible, setVisible] = useState(false);
   // Lazy init only: reading `localStorage` here does not change what this
@@ -130,6 +134,13 @@ export function OfferPanel({
           <X aria-hidden="true" size={18} strokeWidth={1.5} />
         </button>
       </div>
+      {/* Desktop only — the mobile bar stays a single row (CTA + close); a
+          second full-width button there would crowd an 11 px-tall strip. */}
+      {bookingUrl && (
+        <ButtonLink href={bookingUrl} variant="outline" className="hidden lg:flex lg:w-full">
+          {booking}
+        </ButtonLink>
+      )}
     </aside>
   );
 }
