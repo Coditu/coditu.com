@@ -143,7 +143,8 @@ deliver silence.
 
 Confirmed by the team, stated flatly, no hedging:
 
-- Data stays in the client's own Microsoft 365 and SharePoint
+- Data lives in the client's own Microsoft 365 and SharePoint — Microsoft holds it, not Coditu;
+  Coditu has no servers of its own in the loop (confirmed by Ahmed, unhedged — no "where possible")
 - The client owns the code, the documentation and full control — no lock-in
 - Keys and passwords live in a protected secret store, never in code, never in chat
 
