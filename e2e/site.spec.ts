@@ -206,10 +206,12 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       }
     });
 
-    test("intranet: follows services, the slider works by keyboard, the CTA is the free task marked Intranet", async ({ page }) => {
+    test("intranet: follows hero, the slider works by keyboard, the CTA is the free task marked Intranet", async ({ page }) => {
       await page.goto(home);
       const section = page.locator('section[aria-labelledby="intranet-title"]');
-      await expect(page.locator('section[aria-labelledby="services-title"] + section')).toHaveId("intranet");
+      // Promoted ahead of Services on 2026-11-01 (docs/02-POSITIONING.md "Page order") —
+      // the before/after slider is the strongest two seconds on the site.
+      await expect(page.locator('section[aria-labelledby="hero-title"] + section')).toHaveId("intranet");
 
       // Before/after: a native range input, pictures hidden from screen readers.
       const slider = section.getByRole("slider");
@@ -230,11 +232,17 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       );
     });
 
-    test("baukasten: follows intranet, four points, the proof panel names no client", async ({ page }) => {
+    test("baukasten: follows intranet, precedes services, four points, the proof panel names no client", async ({
+      page,
+    }) => {
       await page.goto(home);
       const section = page.locator('section[aria-labelledby="baukasten-title"]');
       expect(await section.getAttribute("id")).toBe("baukasten");
       await expect(page.locator('section[aria-labelledby="intranet-title"] + section')).toHaveId("baukasten");
+      // Promoted ahead of Services on 2026-11-01 (docs/02-POSITIONING.md "Page order").
+      await expect(page.locator('section[aria-labelledby="baukasten-title"] + section')).toHaveId(
+        lang === "de" ? "leistungen" : "services",
+      );
       await expect(section.locator("h3")).toHaveCount(4);
       // One real, anonymised number — see docs/02-POSITIONING.md "Baukasten
       // permissions". "nothing invented, no old name, no old address" (above)
