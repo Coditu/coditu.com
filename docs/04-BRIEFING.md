@@ -50,7 +50,7 @@ touching any marketing copy or positioning-adjacent code. Everything below summa
 plus everything built since it was written; `02-POSITIONING.md` stays the source of truth
 if the two ever disagree (update whichever is stale).
 
-## Current state of the site (as of commit `a4a6b96`)
+## Current state of the site (as of commit `d50a9ea`)
 
 **Homepage section order:** Hero → Intranet (before/after compare-slider, now
 self-demonstrating) → Baukasten → Services → Process → Reference → Security → Pricing →
@@ -124,10 +124,22 @@ decorative; the website/NVRMiss mockup stays static on purpose — forcing inter
 product-page screenshot would be gimmicky, not useful; **a dedicated pricing page**
 (`app/[lang]/pricing/page.tsx`, same literal `/pricing` segment in both languages — see that
 file's own comment for why, and the follow-up it notes) with the homepage teaser now linking
-to it; and **the hero-stage rebuild** (`components/site/hero-stage/`) — the mail → app
+to it; **the hero-stage rebuild** (`components/site/hero-stage/`) — the mail → app
 picture replaced with blocks being picked from a Baukasten catalogue and flying into the app
 they build, matching the headline for the first time since it changed. Reused the same FLIP
-fly animation and phase engine (`use-sequence.ts`); `AppWindow` needed no changes at all.
+fly animation and phase engine (`use-sequence.ts`); `AppWindow` needed no changes at all; and
+**SEO phase 2, two keyword landing pages** (`app/[lang]/services/[slug]/page.tsx`,
+`lib/landing-pages.ts`) — `/de/services/sharepoint-webparts-entwickeln-lassen` and
+`/de/services/spfx-entwickler` (and their real, non-mirrored English equivalents), both fully
+static (no client JS), both built entirely from facts already published elsewhere. Nested
+under a literal `services/` segment specifically to get a genuinely localized, keyword-rich
+final URL segment per language without touching the `[legal]` route at all (Next.js won't
+allow two differently-named dynamic segments as siblings) — the pricing page's simpler
+same-segment shortcut wasn't good enough here, because the slug IS the point on these pages.
+Two things needed generic extension for this to behave like any other page:
+`app/sitemap.ts` (landing pages weren't in the static `pages` table it iterates) and
+`lib/blog.ts`'s `switchPaths` (the language switch silently fell back to the home page
+before this — confirmed, not assumed).
 
 A `/code-review high` pass on the day's full diff caught two real bugs, both fixed: `security.tsx`'s
 icon array hadn't been updated when a point was cut from 5→4, silently showing two wrong
@@ -139,13 +151,14 @@ cleaned up properly, matching `count-up.client.tsx`'s existing pattern).
 **Performance, checked repeatedly, not just once:** `npm run lighthouse` has stayed
 100/100/100/100 (Performance/Accessibility/Best-Practices/SEO), CLS 0.000, LCP ~800ms,
 TBT ~30ms through every feature added today, re-run after each one specifically because
-"enhance performance" was an explicit instruction alongside "keep building." JS budget is at
-166.6 KB gz against a 172 KB gate (the gate, not the 130 KB figure also reported — see
-`scripts/check-budgets.mjs`'s own comment for why those differ) — **getting tighter**, about
-5.4 KB of headroom left. Worth watching before adding more client-side interactivity; a
-`FilterChip`/`Pin` dedup between the two interactive mockups was done for this reason, though
-it turned out to save effectively 0 KB post-gzip (near-duplicate text compresses well) — a
-maintainability win reported honestly as that, not oversold as a performance one.
+"enhance performance" was an explicit instruction alongside "keep building." **JS budget is
+the thing to watch now: 168.2 KB gz against a 172 KB gate** (the gate, not the 130 KB figure
+also reported — see `scripts/check-budgets.mjs`'s own comment for why those differ) — only
+**~3.8 KB of headroom left**, tightened by every client-side feature added this session (the
+compare-slider demo, the offer panel, the two interactive mockups, the hero rebuild). The two
+keyword landing pages cost nothing here — fully static. **Run `npm run budgets` before
+writing the next client-side feature, not after** — this is close enough that a non-trivial
+addition could fail the gate outright.
 
 ## What's still open
 
@@ -156,15 +169,17 @@ maintainability win reported honestly as that, not oversold as a performance one
   each value: `docs/03-DEPLOYMENT-CHECKLIST.md`.** Ahmed is deploying at the end of this
   work deliberately, not urgently — but don't assume anything merged to `main` is live.
 - Native-German review of `messages/de.ts` (a real speaker, not a model), before outreach.
-- A third interactive mockup, or further interactivity elsewhere — possible, but the JS
-  budget headroom is down to ~4.9 KB under the 172 KB gate and tightening with each
-  client-side feature added; check `npm run budgets` before adding more.
-- SEO phase 2: keyword/regional landing pages (`/de/spfx-entwickler`, Berlin/Bayern/NRW) —
-  phase 1 (llms.txt + schema) is done, phase 2 is not.
-- Fully localized pricing-page URL (`/de/preise` instead of `/de/pricing`) — would need the
-  `[legal]`-style dynamic-route restructuring `app/[lang]/pricing/page.tsx`'s own comment
-  describes; the current same-segment approach (matching the `/blog` precedent) works and
-  is live, just not maximally SEO-polished for German search specifically.
+- **JS budget headroom is down to ~3.8 KB** — see above. Check before adding client-side
+  interactivity; raising the 172 KB gate itself needs a team decision, not a unilateral one.
+- SEO phase 2 is started, not finished: two keyword pages are live
+  (`sharepoint-webparts-entwickeln-lassen`, `spfx-entwickler`); the playbook's regional pages
+  (Berlin, Bayern, NRW with the Digitalbonus.Bayern angle) are not built. Adding another is
+  now cheap — content plus one `lib/landing-pages.ts` registry key, the route/sitemap/
+  language-switch plumbing is generic and already handles it.
+- Fully localized pricing-page URL (`/de/preise` instead of `/de/pricing`) — the keyword
+  landing pages solved this exact problem for themselves (nested under a literal `services/`
+  segment specifically to get a localized final slug without touching `[legal]`); the pricing
+  page could adopt the same trick later, it just hasn't been revisited since.
 - AVV template, "taking over an existing codebase" FAQ answer, whether "Zugriff nur, wo
   nötig" is confirmed — all still factually unresolved; AVV specifically is intentionally
   not being raised again (see above), the other two are tracked but low-priority.
