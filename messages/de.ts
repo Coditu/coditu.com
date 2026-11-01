@@ -181,7 +181,7 @@ const de = {
     intro: "Drei Beispiele aus echten Projekten, nachgebaut mit Beispieldaten.",
     caption: "Nachbau · Beispieldaten",
     result: "Ergebnis",
-    more: { label: "Nicht sicher, was passt? Schicken Sie uns Ihre Skizze.", subject: "Projektanfrage" },
+    more: { label: "Nicht sicher, was passt? Schicken Sie uns Ihre Skizze.", subject: "Projektidee" },
     rows: [
       {
         title: "SharePoint-Webparts",
@@ -666,7 +666,7 @@ const de = {
       meta: {
         title: "SharePoint-Webparts entwickeln lassen",
         description:
-          "SharePoint- und SPFx-Webparts für Ihr Intranet, in Ihrem Design, live aus Ihren SharePoint-Listen. Meist 1–2 Tage pro Webpart, ab 600 €.",
+          "SharePoint- und SPFx-Webparts für Ihr Intranet, in Ihrem Design, live aus Ihren SharePoint-Listen. Meist 1–2 Tage pro Webpart, {{price:webPart}}.",
       },
       title: "SharePoint-Webparts entwickeln lassen",
       intro:
@@ -696,7 +696,7 @@ const de = {
       meta: {
         title: "SPFx-Entwickler",
         description:
-          "SPFx-Entwicklung für SharePoint und Microsoft 365: ein Team, keine Subunternehmer, wöchentliche Sprints, 70 € pro Stunde.",
+          "SPFx-Entwicklung für SharePoint und Microsoft 365: ein Team, keine Subunternehmer, wöchentliche Sprints, {{price:change}}.",
       },
       title: "SPFx-Entwickler",
       intro:

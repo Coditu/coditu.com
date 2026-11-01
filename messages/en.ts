@@ -545,7 +545,7 @@ const en: Messages = {
       meta: {
         title: "SharePoint Web Parts Development",
         description:
-          "SharePoint and SPFx web parts for your intranet, in your design, live from your SharePoint lists. Usually 1–2 days per web part, from €600.",
+          "SharePoint and SPFx web parts for your intranet, in your design, live from your SharePoint lists. Usually 1–2 days per web part, {{price:webPart}}.",
       },
       title: "SharePoint Web Parts Development",
       intro:
@@ -574,7 +574,7 @@ const en: Messages = {
       slug: "spfx-developer",
       meta: {
         title: "SPFx Developer",
-        description: "SPFx development for SharePoint and Microsoft 365: one team, no subcontractors, weekly sprints, €70 per hour.",
+        description: "SPFx development for SharePoint and Microsoft 365: one team, no subcontractors, weekly sprints, {{price:change}}.",
       },
       title: "SPFx Developer",
       intro:
