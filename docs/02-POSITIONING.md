@@ -57,8 +57,12 @@ Published, and gated behind a build-time env var so they can be switched off.
 |---|---|---|
 | Web part | ab 600 € | from €600 |
 | Hourly | 70 € | €70 |
-| Projects | Festpreis nach Umfang | fixed price by scope |
-| | Alle Preise netto. | All prices net. |
+| Alle Preise netto. | All prices net. |
+
+**Not a fixed per-web-part price.** The site never says a web part "usually" has a fixed price —
+the real driver is the amount of work, which varies by scope. 600 €/70 €/h are starting figures,
+not a price list. Larger projects get a discount, and something extra on top — stated loosely
+(`pricingSection.note` in `messages/*.ts`), not as a specific named freebie.
 
 Three billing models: **per web part (default), per project, per hour.** Per-piece leads, because
 hourly billing punishes a team that delivers in days — see the playbook.
@@ -69,10 +73,14 @@ option. It is *not* justified by a low cost base — that sets margin, not price
 appear on the site or in a conversation with a client.
 
 Consistency rule: **600 € ÷ 70 €/h ≈ 8.6 hours.** Any statement about how long a web part takes has
-to land near that. `messages/de.ts:166` („meist 1–2 Tage") and `:434` must agree with it.
+to land near that. `messages/de.ts` → `servicesSection.rows[0].result` and
+`referenceSection.facts` must agree with it.
 
 Toggle note: a switch that works without a redeploy would need request state, which breaks the
-"every page stays prerendered" rule `npm run budgets` enforces. Build-time env var + redeploy only.
+"every page stays prerendered" rule `npm run budgets` enforces. Build-time env var
+(`NEXT_PUBLIC_SHOW_PRICES`) + redeploy only. This now gates a whole homepage section
+(`components/site/price-cards.tsx` → `Pricing`), not just blog/FAQ text: off, the section renders
+nothing and ships no counter JS.
 
 ## The free offer
 
@@ -139,12 +147,8 @@ Confirmed by the team, stated flatly, no hedging:
 - The client owns the code, the documentation and full control — no lock-in
 - Keys and passwords live in a protected secret store, never in code, never in chat
 
-**Not claimed: the AVV.** No Auftragsverarbeitungsvertrag is offered on the site, because none exists
-yet. German procurement asks for this by name and its absence can end an evaluation — getting a
-template is a prerequisite for outreach, not a nice-to-have.
-
-Every `[TODO: bestätigen]` string is removed. `scripts/deploy-production.sh` gains a `[TODO:` check
-alongside its existing `[PLACEHOLDER:` one, so this cannot ship again.
+A fifth, unconfirmed point was cut rather than published — `scripts/deploy-production.sh` already
+refuses to deploy while `[TODO: …]` or `[PLACEHOLDER: …]` remain in `messages/`, and none do now.
 
 ## Search
 
@@ -166,9 +170,6 @@ DSGVO page is what makes a German buyer quietly not reply.
 ## Still open
 
 - Cal.com URL → `BOOKING_URL` in `lib/site-config.ts` (every booking CTA is dead until then)
-- AVV template
-- „Zugriff nur, wo nötig" — confirm or cut
-- Response-time commitment — is „innerhalb von 1 Werktag" true?
 - Taking over an existing codebase — yes / no / case-by-case
 - Form endpoint: Next.js route handler + Resend (EU) recommended over US-hosted Formspree
 - Which three web parts become genuinely interactive
