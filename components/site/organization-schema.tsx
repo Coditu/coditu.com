@@ -1,4 +1,5 @@
 import { getMessages, type Locale } from "@/lib/i18n";
+import { landingKeys, landingPaths } from "@/lib/landing-pages";
 import { CONTACT_EMAIL, SITE_NAME, SITE_URL } from "@/lib/site-config";
 
 /**
@@ -40,9 +41,16 @@ export function OrganizationSchema({ locale }: { locale: Locale }) {
   // web apps), plus the Baukasten product (`baukastenSection`). 02-POSITIONING.md
   // wins over the older list in docs/00-CONTEXT.md where the two differ
   // (e.g. "AI assistants using RAG" is not in the current service list).
+  // The keyword landing pages (lib/landing-pages.ts) get their own Service
+  // entries too, each with a `url` — they're specific enough to deserve one,
+  // unlike the homepage service rows, which only have an in-page anchor.
   const services = [
     ...t.servicesSection.rows.map((row) => ({ name: row.title, description: row.text })),
     { name: t.baukastenSection.title, description: t.baukastenSection.intro },
+    ...landingKeys.map((key) => {
+      const page = t.landingPages[key];
+      return { name: page.title, description: page.intro, url: `${SITE_URL}${landingPaths(key)[locale]}` };
+    }),
   ].map((service) => ({
     "@type": "Service",
     provider: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
@@ -50,6 +58,7 @@ export function OrganizationSchema({ locale }: { locale: Locale }) {
     inLanguage: t.locale,
     name: service.name,
     description: service.description,
+    ...("url" in service ? { url: service.url } : {}),
   }));
 
   const jsonLd = {
