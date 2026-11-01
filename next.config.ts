@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Next sends this by default ("X-Powered-By: Next.js" — confirmed on a
+  // real built server). Pure information disclosure, no behavior tied to it.
+  poweredByHeader: false,
   // German is the primary language. A redirect rule, not a page, so nothing
   // under `/de` or `/en` has to read headers and both stay prerendered.
   redirects: async () => [{ source: "/", destination: "/de", permanent: false }],
