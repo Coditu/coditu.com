@@ -50,7 +50,7 @@ touching any marketing copy or positioning-adjacent code. Everything below summa
 plus everything built since it was written; `02-POSITIONING.md` stays the source of truth
 if the two ever disagree (update whichever is stale).
 
-## Current state of the site (as of commit `34ef25a`)
+## Current state of the site (as of commit `a4a6b96`)
 
 **Homepage section order:** Hero → Intranet (before/after compare-slider, now
 self-demonstrating) → Baukasten → Services → Process → Reference → Security → Pricing →
@@ -61,10 +61,11 @@ a visitor and Google see.
 
 **Hero:** "Sie wählen die Bausteine. Wir bauen Ihre App." / "You pick the building blocks.
 We build your app." — replaced "Von der Mail zur App". **The hero's visual animation
-(`components/site/hero-stage/`) was NOT rebuilt to match** — it still draws a literal
-mail → app sequence built for the old headline. Not false, just no longer illustrating the
-new one. This is flagged as a TODO directly in `hero.tsx` and is the single largest
-remaining visual-coherence gap on the site.
+(`components/site/hero-stage/`) now matches it**: a Baukasten catalogue of building
+blocks gets picked one by one and flies into the app they build — not an email inbox
+anymore. Same proven FLIP-style fly animation and five-phase state machine as before
+(`use-sequence.ts`, timing unchanged), only the source view was reskinned; `AppWindow`
+(what the blocks build into) needed zero changes — it was always content-agnostic.
 
 **Pricing:** published, not hidden. `600 €`/web part, `70 €`/hour (`lib/site-config.ts` →
 `PRICES`), deliberately ~26% under the German market median (95 €/h) — a positioning
@@ -120,10 +121,13 @@ part's area filter and the editorial planner's status filter
 *outside* the mockup's `aria-hidden` picture as a sibling, with an sr-only `aria-live` line,
 so a screen-reader visitor gets the filter's effect even though the picture itself is
 decorative; the website/NVRMiss mockup stays static on purpose — forcing interaction onto a
-product-page screenshot would be gimmicky, not useful; and **a dedicated pricing page**
+product-page screenshot would be gimmicky, not useful; **a dedicated pricing page**
 (`app/[lang]/pricing/page.tsx`, same literal `/pricing` segment in both languages — see that
 file's own comment for why, and the follow-up it notes) with the homepage teaser now linking
-to it.
+to it; and **the hero-stage rebuild** (`components/site/hero-stage/`) — the mail → app
+picture replaced with blocks being picked from a Baukasten catalogue and flying into the app
+they build, matching the headline for the first time since it changed. Reused the same FLIP
+fly animation and phase engine (`use-sequence.ts`); `AppWindow` needed no changes at all.
 
 A `/code-review high` pass on the day's full diff caught two real bugs, both fixed: `security.tsx`'s
 icon array hadn't been updated when a point was cut from 5→4, silently showing two wrong
@@ -152,9 +156,9 @@ maintainability win reported honestly as that, not oversold as a performance one
   each value: `docs/03-DEPLOYMENT-CHECKLIST.md`.** Ahmed is deploying at the end of this
   work deliberately, not urgently — but don't assume anything merged to `main` is live.
 - Native-German review of `messages/de.ts` (a real speaker, not a model), before outreach.
-- Hero-stage animation rebuild (see above) — the largest remaining visual gap.
 - A third interactive mockup, or further interactivity elsewhere — possible, but the JS
-  budget headroom above is worth checking first.
+  budget headroom is down to ~4.9 KB under the 172 KB gate and tightening with each
+  client-side feature added; check `npm run budgets` before adding more.
 - SEO phase 2: keyword/regional landing pages (`/de/spfx-entwickler`, Berlin/Bayern/NRW) —
   phase 1 (llms.txt + schema) is done, phase 2 is not.
 - Fully localized pricing-page URL (`/de/preise` instead of `/de/pricing`) — would need the
