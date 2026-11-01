@@ -4,7 +4,7 @@ import { CoditusLockup } from "@/components/coditu/coditus-mark";
 import { blogPath, getPosts } from "@/lib/blog";
 import { getMessages, pages, sectionHref, type Locale } from "@/lib/i18n";
 import { landingKeys, landingPaths } from "@/lib/landing-pages";
-import { CONTACT_EMAIL } from "@/lib/site-config";
+import { CONTACT_EMAIL, LINKEDIN_URL } from "@/lib/site-config";
 
 import { Container } from "./container";
 import { LanguageSwitch } from "./language-switch.client";
@@ -95,6 +95,9 @@ export function SiteFooter({
               {CONTACT_EMAIL}
             </a>
             <p className="text-[14px] text-ink-muted">{t.footer.locations}</p>
+            <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" className={link}>
+              {t.footer.linkedin}
+            </a>
             <LanguageSwitch locale={locale} label={t.footer.languageTitle} switchTo={t.language.switchTo} hashMap={hashMap} pathMap={pathMap} />
           </Column>
         </div>
