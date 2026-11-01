@@ -649,6 +649,51 @@ const de = {
   },
 
   /**
+   * Keyword landing pages (app/[lang]/services/[slug]/page.tsx) —
+   * docs/02-POSITIONING.md "Search" phase 2, from the playbook's move #7:
+   * "one landing page each for terms like 'SPFx Entwickler' and
+   * 'SharePoint Webparts entwickeln lassen'". `slug` is per language, on
+   * purpose a real localized URL segment (not the same-literal-segment
+   * compromise `pricingPage` uses) — the keyword IS the point here. Every
+   * fact repeats what's already published elsewhere (servicesSection,
+   * referenceSection, pricingSection) — invent nothing new for SEO's sake.
+   * Add a new key here, its slug in both files, and its entry in
+   * `lib/landing-pages.ts`'s registry, to add a page.
+   */
+  landingPages: {
+    sharepointWebparts: {
+      slug: "sharepoint-webparts-entwickeln-lassen",
+      meta: {
+        title: "SharePoint-Webparts entwickeln lassen",
+        description:
+          "SharePoint- und SPFx-Webparts für Ihr Intranet, in Ihrem Design, live aus Ihren SharePoint-Listen. Meist 1–2 Tage pro Webpart, ab 600 €.",
+      },
+      title: "SharePoint-Webparts entwickeln lassen",
+      intro:
+        "Veraltete oder starre Webparts in Ihrem Intranet? Wir gestalten sie neu – in Ihrem Design, live aus Ihren bestehenden SharePoint-Listen.",
+      points: [
+        {
+          title: "In Ihrem Design",
+          text: "Kein Standard-Layout. Jedes Webpart wird nach Ihrer Marke und Ihrem Intranet gestaltet.",
+        },
+        {
+          title: "Live aus SharePoint",
+          text: "Keine Kopie der Daten. Ihre Listen bleiben die Quelle, das Webpart zeigt sie nur neu an.",
+        },
+        {
+          title: "Meist 1–2 Tage",
+          text: "Ein einzelnes Webpart braucht selten länger – siehe die Zahlen unten, aus einem echten Projekt.",
+        },
+      ],
+      proofLabel: "Aus einem echten Projekt",
+      priceLine: "Ein Webpart kostet {{price:webPart}} – der Preis richtet sich nach dem Aufwand. Alle Preise netto.",
+      cta: "Webpart kostenlos neu gestalten lassen",
+      subject: "Kleine Aufgabe gratis – SharePoint Webparts",
+      body: "Hallo Coditu,\n\nbitte gestalten Sie dieses Webpart kostenlos neu (Screenshot im Anhang).\n\nWas uns daran stört:\n\n",
+    },
+  },
+
+  /**
    * FAQ. Every answer repeats what Services, How we work and Security already
    * say — no new promises. Also the FAQPage JSON-LD, so plain text only.
    * TODO(team): taking over an existing project is not written down anywhere

@@ -418,6 +418,38 @@ for (const { lang, home, imprint, privacy, pricing } of LANGS) {
       );
     });
 
+    test("keyword landing page: three points, two real proof stats, a priced CTA, the language switch stays on the same page", async ({
+      page,
+    }) => {
+      const slug = lang === "de" ? "sharepoint-webparts-entwickeln-lassen" : "sharepoint-web-parts-development";
+      await page.goto(`/${lang}/services/${slug}`);
+      await expect(page.locator("h1")).toHaveText(
+        lang === "de" ? "SharePoint-Webparts entwickeln lassen" : "SharePoint Web Parts Development",
+      );
+
+      const points = page.locator("main ul").nth(0).locator("li");
+      await expect(points).toHaveCount(3);
+
+      const proof = page.locator("main ul").nth(1).locator("li");
+      await expect(proof).toHaveCount(2);
+      await expect(proof.nth(0)).toContainText("40");
+
+      await expect(page.getByText("600", { exact: false })).toBeVisible();
+
+      const subject = encodeURIComponent(lang === "de" ? "Kleine Aufgabe gratis – SharePoint Webparts" : "Free small task – SharePoint Web Parts");
+      await expect(page.locator(`main a[href^="mailto:contact@coditu.com?subject=${subject}&"]`)).toHaveText(
+        lang === "de" ? "Webpart kostenlos neu gestalten lassen" : "Get one web part redesigned free",
+      );
+
+      // The language switch resolves to the matching page in the other
+      // language, not the other language's home page (lib/blog.ts
+      // switchPaths — this is the one it was specifically extended for).
+      const otherSlug = lang === "de" ? "sharepoint-web-parts-development" : "sharepoint-webparts-entwickeln-lassen";
+      const otherLang = lang === "de" ? "en" : "de";
+      await page.locator(`header a[hreflang="${otherLang}"]`).click();
+      await expect(page).toHaveURL(new RegExp(`/${otherLang}/services/${otherSlug}$`));
+    });
+
     test("faq: follows pricing, all closed, opens by keyboard, JSON-LD says the same", async ({ page }) => {
       await page.goto(home);
       const section = page.locator('section[aria-labelledby="faq-title"]');
