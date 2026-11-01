@@ -289,6 +289,36 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       expect(ld.mainEntity.map((q: { name: string }) => q.name)).toEqual(questions);
     });
 
+    test("Organization + Service JSON-LD: one script, right @types, locale-aware", async ({ page }) => {
+      await page.goto(home);
+      // Mounted once from the root layout (components/site/organization-schema.tsx),
+      // not per visible section — docs/02-POSITIONING.md "Search", Phase 1. It sits
+      // outside any <section> (the FAQ's own FAQPage JSON-LD lives inside one), and
+      // is the only script on the page carrying an "@graph".
+      const scripts = page.locator('script[type="application/ld+json"]');
+      const texts = await scripts.allTextContents();
+      const graphScripts = texts.filter((text) => JSON.parse(text)["@graph"]);
+      expect(graphScripts).toHaveLength(1);
+      const ld = JSON.parse(graphScripts[0]);
+      expect(ld["@context"]).toBe("https://schema.org");
+      const graph = ld["@graph"] as Array<Record<string, unknown>>;
+
+      const org = graph.find((node) => node["@type"] === "Organization")!;
+      expect(org.name).toBe("Coditu");
+      expect(org.url).toBe("https://coditu.com");
+      expect(org.email).toBe("contact@coditu.com");
+      expect(org.inLanguage).toBe(lang === "de" ? "de-DE" : "en-GB");
+      expect(JSON.stringify(org)).not.toMatch(/evim/i);
+
+      const services = graph.filter((node) => node["@type"] === "Service");
+      expect(services.length).toBeGreaterThanOrEqual(4); // 3 services + the Baukasten
+      const names = services.map((s) => s.name as string);
+      expect(names).toContain(lang === "de" ? "SharePoint-Webparts" : "SharePoint web parts");
+      for (const service of services) {
+        expect(service.inLanguage).toBe(lang === "de" ? "de-DE" : "en-GB");
+      }
+    });
+
     test("contact: follows the FAQ, mailto with a subject, booking button links to Cal.com", async ({ page }) => {
       await page.goto(home);
       const id = lang === "de" ? "kontakt" : "contact";
