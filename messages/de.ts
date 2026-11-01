@@ -107,34 +107,31 @@ const de = {
     },
     booking: "Gespräch buchen",
     /**
-     * The hero picture: a request by e-mail becomes a booking app. Example
-     * data, marked „Beispiel“; close to a kind of app we really built (NVRMiss:
-     * booking and calendar).
+     * The hero picture: you pick building blocks, they become a booking app.
+     * Example data, marked „Beispiel“; close to a kind of app we really built
+     * (NVRMiss: booking and calendar) and to the real Baukasten (see
+     * `baukastenSection`) — "Dashboard", "Freigabe" etc. are real block
+     * categories named there too, not invented for this picture.
      */
     request: {
       example: "Beispiel",
-      summary: "Beispiel: Aus einer Anfrage per E-Mail wird eine Buchungs-App – mit Dashboard, Buchungen, Kalender und Login.",
-      mail: {
-        inbox: "Posteingang",
-        to: "an Coditu",
-        from: "Julia Brandt",
-        initials: "JB",
-        time: "09:41",
-        subject: "Raumbuchung ohne Excel?",
+      summary: "Beispiel: Aus Bausteinen entsteht eine Buchungs-App – mit Dashboard, Buchungen, Kalender und Login.",
+      picker: {
+        title: "Baukasten",
+        hint: "Bausteine wählen",
         /**
-         * `[Words]` are picked up and land in the app, in this order: its page
-         * title, the bookings table, the calendar card, the sign-in. Exactly four.
+         * The four blocks you "pick"; they fly into the app, in this order:
+         * its page title, the bookings table, the calendar card, the
+         * sign-in. Exactly four — the app has four places.
          */
-        body: "Hallo Coditu-Team, unsere Räume buchen wir noch über Excel und E-Mail. Wir wünschen uns ein [Dashboard] mit allen [Buchungen], einen [Kalender] für die Woche und einen [Login] fürs Team.",
-        signoff: "Viele Grüße, Julia",
-        /** The other mails in the inbox list (wide stage only). */
-        others: [
-          { from: "IT-Support", subject: "Wartung am Samstag", time: "08:15" },
-          { from: "Personal", subject: "Neue Urlaubsregeln", time: "Gestern" },
-        ],
+        blocks: ["Dashboard", "Buchungen", "Kalender", "Login"],
+        /** More of the catalogue, shown but never picked — texture, not story. */
+        more: ["Formular", "Freigabe", "Verzeichnis"],
       },
       app: {
         name: "Raumbuchung",
+        /** The logged-in avatar's initials — example data, no real person. */
+        initials: "AB",
         live: "Live",
         nav: ["Übersicht", "Räume", "Team"],
         newBooking: "Neue Buchung",

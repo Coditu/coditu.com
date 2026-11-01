@@ -130,7 +130,7 @@ for (const { lang, home, imprint, privacy, pricing } of LANGS) {
       await expect(page.locator("aside")).toHaveCount(0);
     });
 
-    test("hero: one h1, the free-task mail and booking CTAs, the mail's key words build the app", async ({ page }) => {
+    test("hero: one h1, the free-task mail and booking CTAs, the picker's blocks build the app", async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto(home);
       await expect(page.locator("h1")).toHaveCount(1);
@@ -164,19 +164,19 @@ for (const { lang, home, imprint, privacy, pricing } of LANGS) {
       await expect(page.locator('section[aria-labelledby="hero-title"] .sr-only')).toHaveCount(1);
       await expect(stage.locator("input, select, textarea, button, a, [tabindex]")).toHaveCount(0);
 
-      // A mail app: the inbox list beside the open mail; its four key words light up.
-      const mail = stage.locator('[data-part="mail"]');
-      await expect(mail.getByText(lang === "de" ? "IT-Support" : "IT support")).toBeVisible();
-      await expect(mail.locator(".underline")).toHaveCount(4, { timeout: 5000 });
+      // A block catalogue: the four real blocks beside decorative "more" ones; all four get picked.
+      const picker = stage.locator('[data-part="picker"]');
+      await expect(picker.getByText(lang === "de" ? "Formular" : "Form")).toBeVisible();
+      await expect(picker.locator('[data-picked="true"]')).toHaveCount(4, { timeout: 5000 });
 
       // They land in the app: title, bookings table, calendar card, sign-in. Then it goes live.
       const app = stage.locator('[data-part="app"]');
       await expect(app.getByText(/^Live$/)).toBeVisible({ timeout: 10000 });
-      for (const word of lang === "de" ? ["Dashboard", "Buchungen", "Kalender", "Login"] : ["dashboard", "bookings", "calendar", "login"]) {
+      for (const word of lang === "de" ? ["Dashboard", "Buchungen", "Kalender", "Login"] : ["Dashboard", "Bookings", "Calendar", "Login"]) {
         await expect(app.getByText(word, { exact: true })).toBeVisible();
       }
       await expect(app.getByText(lang === "de" ? "Raum 1" : "Room 1")).toBeVisible();
-      await expect(mail).toHaveCSS("opacity", "0");
+      await expect(picker).toHaveCSS("opacity", "0");
     });
 
     test("hero: below lg, the stage follows the text and fits the screen", async ({ page }) => {
@@ -187,20 +187,20 @@ for (const { lang, home, imprint, privacy, pricing } of LANGS) {
       const box = (await stage.boundingBox())!;
       expect(box.y).toBeGreaterThan(h1.y + h1.height);
       expect(box.x + box.width).toBeLessThanOrEqual(375);
-      // Narrow: the open mail only, no inbox list.
-      await expect(stage.getByText(lang === "de" ? "IT-Support" : "IT support")).toBeHidden();
+      // Narrow: the four real blocks only, the decorative "more" catalogue entries hidden.
+      await expect(stage.getByText(lang === "de" ? "Formular" : "Form")).toBeHidden();
       // It plays only while on screen.
       await stage.scrollIntoViewIfNeeded();
       await expect(stage.getByText(/^Live$/)).toBeVisible({ timeout: 12000 });
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
     });
 
-    test("hero: reduced motion shows the mail with its words lit, then the app, without flying", async ({ page }) => {
+    test("hero: reduced motion shows the blocks already picked, then the app, without flying", async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto(home);
       const stage = page.locator("[data-hero-stage]");
-      await expect(stage.locator('[data-part="mail"] .underline')).toHaveCount(4);
+      await expect(stage.locator('[data-part="picker"] [data-picked="true"]')).toHaveCount(4);
       await expect(stage.getByText(/^Live$/)).toBeVisible({ timeout: 6000 });
     });
 

@@ -10,21 +10,11 @@ import { HeroStage } from "./hero-stage/stage.client";
 
 /**
  * Hero: the text on the left, and beside it the one picture of what we do:
- * a client's request by e-mail becomes the app it asks for (<HeroStage>).
- * On phones the stage comes after the text. Spec:
+ * you pick building blocks, they become the app (<HeroStage>, rebuilt
+ * 2026-11-01 to match the "Sie wählen die Bausteine…" headline — it used to
+ * draw a literal mail → app sequence, built for the retired "Von der Mail
+ * zur App" headline). On phones the stage comes after the text. Spec:
  * docs/design-system/components/page-sections.md → Hero.
- *
- * TODO(team): the headline now sells the Baukasten ("Sie wählen die
- * Bausteine…"), but <HeroStage> still draws a literal mail → app sequence —
- * the old "Von der Mail zur App" headline it was built to illustrate. Not
- * false (a request by e-mail is still one real way in), but it no longer
- * demonstrates the headline directly. Rebuilding it to show blocks
- * assembling into an app is tracked separately (docs/02-POSITIONING.md
- * "Motion") — larger than a copy change: hero-stage/stage.client.tsx and
- * app-window.tsx both render the mail/inbox chrome in markup, and
- * e2e/site.spec.ts asserts its exact DOM (`[data-part="mail"]`, the inbox
- * list, `.underline` on key words) and timing (use-sequence.ts,
- * tests/hero-sequence.test.ts).
  */
 export function Hero({ locale }: { locale: Locale }) {
   const t = getMessages(locale);

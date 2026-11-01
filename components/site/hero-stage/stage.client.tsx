@@ -1,6 +1,6 @@
 "use client";
 
-import { Inbox } from "lucide-react";
+import { Blocks, CalendarDays, Check, FileText, FolderOpen, LayoutDashboard, ListChecks, Lock, Users } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { Window } from "@/components/site/window";
@@ -8,12 +8,11 @@ import { cn } from "@/lib/utils";
 import type { Messages } from "@/messages/de";
 
 import { AppWindow } from "./app-window";
-import { FLY_MS, parse, reached, useSequence } from "./use-sequence";
+import { FLY_MS, reached, useSequence } from "./use-sequence";
 
 type Labels = Messages["hero"]["request"];
 
 const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
-const BODY = "text-[15px] leading-relaxed";
 
 const REDUCED = "(prefers-reduced-motion: reduce)";
 function subscribeReduced(onChange: () => void) {
@@ -25,20 +24,35 @@ function subscribeReduced(onChange: () => void) {
 type Clone = { text: string; left: number; top: number; height: number; dx: number; dy: number; scale: number };
 
 /**
- * The hero's picture, playing by itself: a request is open in a mail app; its
- * key words light up one by one, lift out of the mail and fly into a booking
- * app that builds around them — each word lands in the part it asked for.
- * The app holds, then the mail again. ~9 s per loop.
+ * The four blocks that fly, in the fixed order `picker.blocks` and the app's
+ * four word-slots both agree on — page title, bookings table, calendar card,
+ * sign-in (app-window.tsx). Positional, same risk class flagged in
+ * security.tsx/baukasten.tsx: if `picker.blocks` in messages/*.ts ever gains,
+ * loses or reorders an entry, update this list in the same change.
+ */
+const BLOCK_ICONS = [LayoutDashboard, ListChecks, CalendarDays, Lock];
+/** Icons for `picker.more` — decorative catalogue texture, never picked. */
+const MORE_ICONS = [FileText, Users, FolderOpen];
+
+/**
+ * The hero's picture, playing by itself: a catalogue of building blocks is
+ * open; four of them get picked one by one, lift out of the catalogue and
+ * fly into a booking app that builds around them — each block lands in the
+ * part it stands for. The app holds, then the catalogue again. ~9 s per loop.
  *
  * Runs only while on screen and the tab is visible. Decoration: `aria-hidden`,
  * one sr-only sentence says what it shows. Reduced motion: two still frames
- * (mail · app), switched slowly. The server renders the open mail, so there
- * is no flash. Narrow vs wide is a container query on the stage (26rem).
+ * (blocks, all picked · app), switched slowly. The server renders the open
+ * catalogue, so there is no flash. Narrow vs wide is a container query on the
+ * stage (26rem).
  */
 export function HeroStage({ labels }: { labels: Labels }) {
-  const { mail, app } = labels;
-  const segments = parse(mail.body);
-  const words = segments.filter((x) => x.key !== null).map((x) => x.text);
+  const { picker, app } = labels;
+  const words = picker.blocks;
+
+  if (process.env.NODE_ENV !== "production" && words.length !== BLOCK_ICONS.length) {
+    throw new Error(`HeroStage: picker.blocks has ${words.length} entries but BLOCK_ICONS has ${BLOCK_ICONS.length} — keep them in sync.`);
+  }
 
   const [running, setRunning] = useState(false);
   const reduced = useSyncExternalStore(subscribeReduced, () => matchMedia(REDUCED).matches, () => false);
@@ -51,7 +65,7 @@ export function HeroStage({ labels }: { labels: Labels }) {
   const targets = useRef<(HTMLSpanElement | null)[]>([]);
   const cloneEls = useRef<(HTMLSpanElement | null)[]>([]);
 
-  const onMail = !reached(phase, "fly");
+  const onPick = !reached(phase, "fly");
 
   // Run only while the stage is on screen and the tab is visible.
   useEffect(() => {
@@ -69,7 +83,7 @@ export function HeroStage({ labels }: { labels: Labels }) {
     };
   }, []);
 
-  // Entering "fly": measure each lit word and its place in the app (laid out, still transparent).
+  // Entering "fly": measure each picked block and its place in the app (laid out, still transparent).
   useLayoutEffect(() => {
     if (phase !== "fly" || !stage.current) return;
     const box = stage.current.getBoundingClientRect();
@@ -105,7 +119,7 @@ export function HeroStage({ labels }: { labels: Labels }) {
     });
   }, [clones]);
 
-  // The mail shrinks a little as it goes; the app only fades, so the places measured in it hold still.
+  // The catalogue shrinks a little as it goes; the app only fades, so the places measured in it hold still.
   const layer = "absolute inset-0 transition-[opacity,scale] duration-500 ease-entrance";
 
   return (
@@ -119,74 +133,80 @@ export function HeroStage({ labels }: { labels: Labels }) {
         </div>
 
         <div ref={stage} className="@container relative mt-3 h-[440px] lg:h-[460px]">
-          {/* 1 · The mail */}
-          <div data-part="mail" className={cn(layer, !onMail && "scale-[0.98] opacity-0")}>
+          {/* 1 · The block catalogue */}
+          <div data-part="picker" className={cn(layer, !onPick && "scale-[0.98] opacity-0")}>
             <Window
               className="h-full"
               bar={
                 <>
-                  <Inbox className="size-4 text-blueprint" strokeWidth={1.5} />
-                  <span className="text-[14px] font-semibold">{mail.inbox}</span>
+                  <Blocks className="size-4 text-blueprint" strokeWidth={1.5} />
+                  <span className="text-[14px] font-semibold">{picker.title}</span>
                 </>
               }
             >
-              <div className="flex min-h-0 flex-1">
-                <div className="hidden w-[38%] flex-none flex-col border-r border-line @min-[26rem]:flex">
-                  {[{ from: mail.from, subject: mail.subject, time: mail.time }, ...mail.others].map((item, i) => (
-                    <div key={item.from} className={cn("border-b border-line px-3 py-2.5", i === 0 && "bg-blueprint-light")}>
-                      <div className="flex items-baseline justify-between gap-2">
-                        <span className={cn("truncate text-[13px]", i === 0 ? "font-semibold text-ink" : "text-ink-muted")}>{item.from}</span>
-                        <span className="flex-none font-mono text-label text-ink-muted uppercase">{item.time}</span>
-                      </div>
-                      <p className="mt-0.5 truncate text-[12px] text-ink-muted">{item.subject}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="min-w-0 flex-1 p-4 @min-[26rem]:p-5">
-                  <p className="text-[17px] leading-snug font-semibold">{mail.subject}</p>
-                  <div className="mt-3 flex items-center gap-2.5">
-                    <span className="flex size-8 flex-none items-center justify-center rounded-full bg-blueprint text-[12px] font-semibold text-blueprint-ink">
-                      {mail.initials}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[14px] font-semibold">{mail.from}</span>
-                      <span className="block truncate text-[12px] text-ink-muted">{mail.to}</span>
-                    </span>
-                    <span className="flex-none font-mono text-label text-ink-muted uppercase">{mail.time}</span>
-                  </div>
-                  <p className={cn("mt-4", BODY)}>
-                    {segments.map(({ text, key }, i) =>
-                      key === null ? (
-                        text
-                      ) : (
+              <div className="flex min-h-0 flex-1 flex-col p-4 @min-[26rem]:p-5">
+                <p className="font-mono text-label text-ink-muted uppercase">{picker.hint}</p>
+                <div className="mt-3 grid grid-cols-2 gap-2.5 @min-[26rem]:grid-cols-3">
+                  {words.map((label, i) => {
+                    const Icon = BLOCK_ICONS[i]!;
+                    const picked = reduced || i < marked;
+                    return (
+                      <div
+                        key={label}
+                        data-picked={picked}
+                        className={cn(
+                          "flex flex-col items-start gap-2 rounded-ui border p-3 transition-colors duration-200",
+                          picked ? "border-blueprint bg-blueprint-light" : "border-line-input"
+                        )}
+                      >
+                        <span className="flex w-full items-center justify-between">
+                          <Icon className={cn("size-4", picked ? "text-blueprint" : "text-ink-muted")} strokeWidth={1.5} />
+                          <span
+                            className={cn(
+                              "flex size-4 items-center justify-center rounded-full border transition-colors duration-200",
+                              picked ? "border-blueprint bg-blueprint text-blueprint-ink" : "border-line-input"
+                            )}
+                          >
+                            {picked && <Check className="size-3" strokeWidth={2.5} />}
+                          </span>
+                        </span>
                         <span
-                          key={i}
                           ref={(el) => {
-                            sources.current[key] = el;
+                            sources.current[i] = el;
                           }}
                           className={cn(
-                            "rounded-tag decoration-blueprint decoration-2 underline-offset-4 transition-colors duration-200",
-                            (reduced || key < marked) && "bg-blueprint-light text-blueprint underline",
+                            "text-[13px] leading-tight font-semibold",
+                            picked ? "text-blueprint" : "text-ink",
                             phase === "fly" && "invisible"
                           )}
                         >
-                          {text}
+                          {label}
                         </span>
-                      )
-                    )}
-                  </p>
-                  <p className={cn("mt-3", BODY)}>{mail.signoff}</p>
+                      </div>
+                    );
+                  })}
+                  {picker.more.map((label, i) => {
+                    const Icon = MORE_ICONS[i];
+                    return (
+                      <div
+                        key={label}
+                        className="hidden flex-col items-start gap-2 rounded-ui border border-dashed border-line-input p-3 text-ink-muted @min-[30rem]:flex"
+                      >
+                        {Icon && <Icon className="size-4" strokeWidth={1.5} />}
+                        <span className="text-[13px] leading-tight font-semibold">{label}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </Window>
           </div>
 
           {/* 2 · The app it becomes */}
-          <div data-part="app" className={cn(layer, onMail && "opacity-0")}>
+          <div data-part="app" className={cn(layer, onPick && "opacity-0")}>
             <AppWindow
               app={app}
-              initials={mail.initials}
+              initials={app.initials}
               words={words}
               step={phase === "done" ? "done" : phase === "build" ? "build" : "slots"}
               targetRef={(i, el) => {
@@ -195,7 +215,7 @@ export function HeroStage({ labels }: { labels: Labels }) {
             />
           </div>
 
-          {/* The flying words */}
+          {/* The flying blocks */}
           {phase === "fly" &&
             clones.map((clone, i) => (
               <span
@@ -203,10 +223,7 @@ export function HeroStage({ labels }: { labels: Labels }) {
                 ref={(el) => {
                   cloneEls.current[i] = el;
                 }}
-                className={cn(
-                  "pointer-events-none absolute origin-top-left rounded-tag bg-blueprint-light whitespace-nowrap text-blueprint",
-                  BODY
-                )}
+                className="pointer-events-none absolute origin-top-left rounded-tag bg-blueprint-light px-1 text-[13px] leading-tight font-semibold whitespace-nowrap text-blueprint"
                 style={{ left: clone.left, top: clone.top, height: clone.height, lineHeight: `${clone.height}px` }}
               >
                 {clone.text}
