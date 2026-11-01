@@ -13,6 +13,7 @@
 - [SPFx developer](https://coditu.com/en/services/spfx-developer): Dedicated page for SPFx development specifically — one team (no subcontractors), weekly sprints, billed by the hour or per piece.
 - [SharePoint development, Berlin](https://coditu.com/en/services/sharepoint-development-berlin): Dedicated page for SharePoint/SPFx development with a fixed contact based in Berlin.
 - [SharePoint development, Bavaria](https://coditu.com/en/services/sharepoint-development-bavaria): Dedicated page for companies in Bavaria; projects may qualify for the Digitalbonus.Bayern public funding programme.
+- [SharePoint development, North Rhine-Westphalia](https://coditu.com/en/services/sharepoint-development-nrw): Dedicated page for companies in North Rhine-Westphalia, served remotely from Berlin and Cairo.
 - [Internal apps](https://coditu.com/en#services): Small, focused apps built from a sketch — requests, onboarding, editorial calendars — signed in with Microsoft and permissioned by group. A first version typically takes 10–14 hours.
 - [Websites & web apps](https://coditu.com/en#services): Fast, SEO-structured websites and product pages.
 - [The Baukasten](https://coditu.com/en#baukasten): Coditu's own product — React components that snap together, Microsoft Entra sign-in, deployed on the client's own server so data never leaves their system.
