@@ -599,6 +599,65 @@ const en: Messages = {
       subject: "Free small task – SPFx",
       body: "Hello Coditu,\n\nOur small task (one screen or one feature):\n\n\nWhere it should run (e.g. SharePoint):\n",
     },
+    berlin: {
+      slug: "sharepoint-development-berlin",
+      meta: {
+        title: "SharePoint Development Berlin",
+        description: "SharePoint and SPFx development with a fixed contact based in Berlin. Weekly sprints, from €600 per web part.",
+      },
+      title: "SharePoint Development Berlin",
+      intro:
+        "Looking for SharePoint or SPFx development with a contact based in Berlin? Your fixed contact sits in Berlin; the development team works remotely from Cairo — as one team, not a subcontractor.",
+      points: [
+        {
+          title: "A contact based in Berlin",
+          text: "Adam Nafie is your fixed contact, from the first sketch to the operation after.",
+        },
+        {
+          title: "Weekly sprints",
+          text: "Every week we show what's done, on a shared board. You tell us what should change.",
+        },
+        {
+          title: "One team, no subcontractors",
+          text: "The same people from the first sketch to the operation after. Nothing gets handed off.",
+        },
+      ],
+      proofLabel: "From a real project",
+      priceLine: "A web part costs {{price:webPart}} — the price depends on the amount of work. All prices net.",
+      cta: "Try us free with a small task",
+      subject: "Free small task – Berlin",
+      body: "Hello Coditu,\n\nOur small task (one screen or one feature):\n\n\nWhere it should run (e.g. SharePoint):\n",
+    },
+    bavaria: {
+      slug: "sharepoint-development-bavaria",
+      meta: {
+        title: "SharePoint Development Bavaria",
+        description:
+          "SharePoint and SPFx development for companies in Bavaria. Projects may qualify for the Digitalbonus.Bayern public funding programme. From €600 per web part.",
+      },
+      title: "SharePoint Development Bavaria",
+      intro:
+        "Looking for SharePoint or SPFx development for your company in Bavaria? We build web parts, internal apps and websites — as one team, from the first sketch to the operation after.",
+      points: [
+        {
+          title: "Eligible for Digitalbonus.Bayern funding",
+          text: "Bavarian SMEs with up to 249 staff can apply for the public Digitalbonus.Bayern grant, which runs until the end of 2027. Check whether your project qualifies directly with the Free State of Bavaria.",
+        },
+        {
+          title: "Weekly sprints",
+          text: "Every week we show what's done, on a shared board. You tell us what should change.",
+        },
+        {
+          title: "Berlin · Cairo",
+          text: "Your fixed contact is based in Berlin. Berlin and Cairo are at most one hour apart.",
+        },
+      ],
+      proofLabel: "From a real project",
+      priceLine: "A web part costs {{price:webPart}} — the price depends on the amount of work. All prices net.",
+      cta: "Try us free with a small task",
+      subject: "Free small task – Bavaria",
+      body: "Hello Coditu,\n\nOur small task (one screen or one feature):\n\n\nWhere it should run (e.g. SharePoint):\n",
+    },
   },
 
   // TODO(team): see messages/de.ts — taking over an existing project is open.

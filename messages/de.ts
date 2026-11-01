@@ -721,6 +721,65 @@ const de = {
       subject: "Kleine Aufgabe gratis – SPFx",
       body: "Hallo Coditu,\n\nunsere kleine Aufgabe (ein Screen oder eine Funktion):\n\n\nWo sie laufen soll (z. B. SharePoint):\n",
     },
+    berlin: {
+      slug: "sharepoint-entwicklung-berlin",
+      meta: {
+        title: "SharePoint-Entwicklung Berlin",
+        description: "SharePoint- und SPFx-Entwicklung mit festem Ansprechpartner in Berlin. Wöchentliche Sprints, ab 600 € pro Webpart.",
+      },
+      title: "SharePoint-Entwicklung Berlin",
+      intro:
+        "Auf der Suche nach SharePoint- oder SPFx-Entwicklung mit einem Ansprechpartner in Berlin? Ihr fester Kontakt sitzt in Berlin, das Entwicklungsteam arbeitet remote aus Kairo – als ein Team, nicht als Subunternehmer.",
+      points: [
+        {
+          title: "Ansprechpartner in Berlin",
+          text: "Adam Nafie ist Ihr fester Ansprechpartner, von der ersten Skizze bis zum Betrieb danach.",
+        },
+        {
+          title: "Wöchentliche Sprints",
+          text: "Jede Woche zeigen wir, was fertig ist, auf einem gemeinsamen Board. Sie sagen, was sich ändern soll.",
+        },
+        {
+          title: "Ein Team, keine Subunternehmer",
+          text: "Dieselben Leute von der ersten Skizze bis zum Betrieb danach. Nichts wird weitergereicht.",
+        },
+      ],
+      proofLabel: "Aus einem echten Projekt",
+      priceLine: "Ein Webpart kostet {{price:webPart}} – der Preis richtet sich nach dem Aufwand. Alle Preise netto.",
+      cta: "Kleine Aufgabe gratis sichern",
+      subject: "Kleine Aufgabe gratis – Berlin",
+      body: "Hallo Coditu,\n\nunsere kleine Aufgabe (ein Screen oder eine Funktion):\n\n\nWo sie laufen soll (z. B. SharePoint):\n",
+    },
+    bavaria: {
+      slug: "sharepoint-entwicklung-bayern",
+      meta: {
+        title: "SharePoint-Entwicklung Bayern",
+        description:
+          "SharePoint- und SPFx-Entwicklung für Unternehmen in Bayern. Projekte können über das Förderprogramm Digitalbonus.Bayern förderfähig sein. Ab 600 € pro Webpart.",
+      },
+      title: "SharePoint-Entwicklung Bayern",
+      intro:
+        "Auf der Suche nach SharePoint- oder SPFx-Entwicklung für Ihr Unternehmen in Bayern? Wir bauen Webparts, interne Apps und Websites – als ein Team, von der ersten Skizze bis zum Betrieb danach.",
+      points: [
+        {
+          title: "Förderfähig über Digitalbonus.Bayern",
+          text: "Für bayerische KMU mit bis zu 249 Mitarbeitenden gibt es das öffentliche Förderprogramm Digitalbonus.Bayern, das noch bis Ende 2027 läuft. Ob Ihr Projekt förderfähig ist, prüfen Sie direkt beim Freistaat Bayern.",
+        },
+        {
+          title: "Wöchentliche Sprints",
+          text: "Jede Woche zeigen wir, was fertig ist, auf einem gemeinsamen Board. Sie sagen, was sich ändern soll.",
+        },
+        {
+          title: "Berlin · Kairo",
+          text: "Ihr fester Ansprechpartner sitzt in Berlin. Zwischen Berlin und Kairo liegt höchstens eine Stunde Zeitunterschied.",
+        },
+      ],
+      proofLabel: "Aus einem echten Projekt",
+      priceLine: "Ein Webpart kostet {{price:webPart}} – der Preis richtet sich nach dem Aufwand. Alle Preise netto.",
+      cta: "Kleine Aufgabe gratis sichern",
+      subject: "Kleine Aufgabe gratis – Bayern",
+      body: "Hallo Coditu,\n\nunsere kleine Aufgabe (ein Screen oder eine Funktion):\n\n\nWo sie laufen soll (z. B. SharePoint):\n",
+    },
   },
 
   /**
