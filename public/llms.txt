@@ -11,6 +11,8 @@
 - [SharePoint web parts](https://coditu.com/en#services): Web parts that slot into existing SharePoint pages and show the client's SharePoint lists live. Over 40 built for one organisation; a new web part is usually 5–10 hours of work.
 - [SharePoint web parts development](https://coditu.com/en/services/sharepoint-web-parts-development): Dedicated page on getting a SharePoint/SPFx web part redesigned or built — in the client's design, live from their SharePoint lists, usually 1–2 days.
 - [SPFx developer](https://coditu.com/en/services/spfx-developer): Dedicated page for SPFx development specifically — one team (no subcontractors), weekly sprints, billed by the hour or per piece.
+- [SharePoint development, Berlin](https://coditu.com/en/services/sharepoint-development-berlin): Dedicated page for SharePoint/SPFx development with a fixed contact based in Berlin.
+- [SharePoint development, Bavaria](https://coditu.com/en/services/sharepoint-development-bavaria): Dedicated page for companies in Bavaria; projects may qualify for the Digitalbonus.Bayern public funding programme.
 - [Internal apps](https://coditu.com/en#services): Small, focused apps built from a sketch — requests, onboarding, editorial calendars — signed in with Microsoft and permissioned by group. A first version typically takes 10–14 hours.
 - [Websites & web apps](https://coditu.com/en#services): Fast, SEO-structured websites and product pages.
 - [The Baukasten](https://coditu.com/en#baukasten): Coditu's own product — React components that snap together, Microsoft Entra sign-in, deployed on the client's own server so data never leaves their system.
@@ -19,15 +21,21 @@
 
 - [Home (English)](https://coditu.com/en): Services, the Baukasten, pricing, reference project and FAQ.
 - [Home (German)](https://coditu.com/de): The same site in German, the primary language.
-- [Pricing](https://coditu.com/en/pricing): The three ways Coditu bills (per web part, per project, per hour) and the starting figures.
-- [Blog](https://coditu.com/en/blog): Short, specific answers to the questions clients ask about SharePoint, SPFx web parts, Power Apps and internal apps.
+- [Pricing (English)](https://coditu.com/en/pricing): The three ways Coditu bills (per web part, per project, per hour) and the starting figures.
+- [Pricing (German)](https://coditu.com/de/pricing): The same pricing page in German.
+- [Blog (English)](https://coditu.com/en/blog): Short, specific answers to the questions clients ask about SharePoint, SPFx web parts, Power Apps and internal apps.
+- [Blog (German)](https://coditu.com/de/blog): The same blog in German.
 
 ## Blog
 
 - [How much does a SharePoint web part cost?](https://coditu.com/en/blog/sharepoint-web-part-cost): A SharePoint web part costs the hours it takes to build — usually 5 to 10 hours — and what drives that effort.
+- [Was kostet ein SharePoint-Webpart?](https://coditu.com/de/blog/was-kostet-ein-sharepoint-webpart): German version of the above.
 - [SPFx web parts: when is a custom solution worth it over standard web parts?](https://coditu.com/en/blog/spfx-web-part-vs-standard-web-part): When a custom SPFx web part pays off over a standard one, and when it does not.
+- [SPFx-Webparts: Wann lohnt sich eine eigene Lösung statt Standard-Webparts?](https://coditu.com/de/blog/spfx-webpart-oder-standard-webpart): German version of the above.
 - [Which 5 internal apps do staff actually use?](https://coditu.com/en/blog/internal-apps-staff-actually-use): Five examples of internal apps that make an existing process simpler, from onboarding to a people directory.
+- [Welche 5 internen Apps nutzen Mitarbeitende wirklich?](https://coditu.com/de/blog/interne-apps-die-mitarbeitende-nutzen): German version of the above.
 - [Power Apps or a custom app: which fits when?](https://coditu.com/en/blog/power-apps-or-custom-app): When a Power Apps form is enough, and when a custom app pays off instead.
+- [Power Apps oder eigene App: Was passt wann?](https://coditu.com/de/blog/power-apps-oder-eigene-app): German version of the above.
 
 ## Facts
 
@@ -39,4 +47,6 @@
 ## Optional
 
 - [Legal notice](https://coditu.com/en/legal-notice): Provider identification for Coditu.
+- [Impressum](https://coditu.com/de/impressum): German version of the above.
 - [Privacy policy](https://coditu.com/en/privacy): How Coditu processes personal data on this website.
+- [Datenschutz](https://coditu.com/de/datenschutz): German version of the above.

@@ -11,11 +11,15 @@ const languages = (paths: Partial<Record<Locale, string>>) =>
 
 /** Every page in both languages, then each language's blog, then the keyword landing pages. */
 export default function sitemap(): MetadataRoute.Sitemap {
+  // No per-page "last changed" date is tracked for these (no CMS, no commit
+  // metadata at build time) — omitting `lastModified` rather than stamping
+  // every build with `new Date()`, which would claim every page changed on
+  // every deploy whether or not it actually did. The blog below has a real
+  // date (front matter `updated`) and keeps it.
   const landing = landingKeys.flatMap((key) => {
     const paths = landingPaths(key);
     return locales.map((locale) => ({
       url: getAbsoluteUrl(paths[locale]),
-      lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.5,
       alternates: { languages: languages(paths) },
@@ -40,7 +44,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const site = Object.entries(pages).flatMap(([key, paths]) =>
     Object.values(paths).map((path) => ({
       url: getAbsoluteUrl(path),
-      lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: key === "home" ? 1 : 0.3,
       alternates: { languages: { de: getAbsoluteUrl(paths.de), en: getAbsoluteUrl(paths.en) } },
