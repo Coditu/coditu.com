@@ -112,10 +112,10 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       const subject = encodeURIComponent(lang === "de" ? "Kleine Aufgabe gratis" : "Free small task");
       const freeTask = page.locator(`#hero-title ~ * a[href^="mailto:contact@coditu.com?subject=${subject}&"]`);
       await expect(freeTask).toHaveText(lang === "de" ? "Kleine Aufgabe gratis testen" : "Try us free with a small task");
-      // Secondary: no booking tool yet (BOOKING_URL is null), so it goes to the contact section.
-      await expect(page.locator(`#hero-title ~ * a[href="#${lang === "de" ? "kontakt" : "contact"}"]`)).toHaveText(
-        lang === "de" ? "Termin buchen" : "Book a call",
-      );
+      // Secondary: BOOKING_URL is set (lib/site-config.ts), so it goes straight to Cal.com.
+      await expect(
+        page.locator(`#hero-title ~ * a[href="https://cal.com/abdelrahman-elkhateeb-q8tqm0/30min"]`),
+      ).toHaveText(lang === "de" ? "Termin buchen" : "Book a call");
       await expect(
         page.getByText(
           lang === "de"
@@ -289,17 +289,24 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       expect(ld.mainEntity.map((q: { name: string }) => q.name)).toEqual(questions);
     });
 
-    test("contact: follows the FAQ, the hero CTA lands on it, mailto with a subject", async ({ page }) => {
+    test("contact: follows the FAQ, mailto with a subject, booking button links to Cal.com", async ({ page }) => {
       await page.goto(home);
       const id = lang === "de" ? "kontakt" : "contact";
       await expect(page.locator('section[aria-labelledby="faq-title"] + section')).toHaveId(id);
       const section = page.locator(`#${id}`);
       await expect(section.locator('a[href^="mailto:contact@coditu.com?subject="]')).toHaveCount(1);
-      // No booking tool yet (BOOKING_URL is null): no booking button.
-      await expect(section.locator("a")).toHaveCount(2);
+      // BOOKING_URL is set (lib/site-config.ts): the booking button renders.
+      await expect(section.locator('a[href="https://cal.com/abdelrahman-elkhateeb-q8tqm0/30min"]')).toHaveText(
+        lang === "de" ? "30-Minuten-Gespräch buchen" : "Book a 30-minute call",
+      );
+      await expect(section.locator("a")).toHaveCount(3);
       await expect(section.getByText("Adam Nafie")).toBeVisible();
+    });
 
-      await page.locator(`#hero-title ~ * a[href="#${id}"]`).click();
+    test("footer: its contact link lands on the contact section", async ({ page }) => {
+      await page.goto(home);
+      const id = lang === "de" ? "kontakt" : "contact";
+      await page.locator(`footer a[href="${home}#${id}"]`).click();
       await expect(page).toHaveURL(new RegExp(`#${id}$`));
       await expect(page.locator("#contact-title")).toBeInViewport();
     });

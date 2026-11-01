@@ -5,11 +5,14 @@ export const SITE_URL = "https://coditu.com";
 export const CONTACT_EMAIL = "contact@coditu.com";
 
 /**
- * „Gespräch buchen“ / "Book a call": a 20-minute call.
- * TODO(team): the booking tool's URL. While null, the contact section hides
- * its booking button and the nav's „Gespräch buchen“ goes to the contact section.
+ * „Gespräch buchen“ / "Book a call": a 30-minute call, on Abdelrahman's
+ * Cal.com. Not yet a dedicated Coditu profile (no Coditu branding, a
+ * personal username) — fine for now, revisit once one exists. Set to
+ * `null`, the contact section hides its booking button and the nav's
+ * „Gespräch buchen“ goes to the contact section instead — that was the
+ * state before this URL existed.
  */
-export const BOOKING_URL: string | null = null;
+export const BOOKING_URL: string | null = "https://cal.com/abdelrahman-elkhateeb-q8tqm0/30min";
 
 /**
  * Our starting prices, in euros: a web part from 600, ongoing changes at 70
