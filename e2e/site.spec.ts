@@ -272,6 +272,32 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(picture.locator(".opacity-30")).toHaveCount(0);
     });
 
+    test("services: the planner mockup's status filter is real — dims entries in other statuses", async ({ page }) => {
+      await page.goto(home);
+      const card = page.locator('section[aria-labelledby="services-title"] article').nth(1);
+      await card.scrollIntoViewIfNeeded();
+
+      const label = lang === "de" ? "Status auf einen Blick" : "Status at a glance";
+      const group = card.getByRole("group", { name: label });
+      const status = lang === "de" ? "Entwurf" : "Draft";
+      const statusButton = group.getByRole("button", { name: status, exact: true });
+      const picture = card.locator('[aria-hidden="true"]');
+
+      await expect(statusButton).toHaveAttribute("aria-pressed", "false");
+      await statusButton.focus();
+      await page.keyboard.press("Enter");
+      await expect(statusButton).toHaveAttribute("aria-pressed", "true");
+
+      // An entry with a different status dims; the matching one doesn't.
+      const otherStatus = lang === "de" ? "Veröffentlicht" : "Published";
+      const otherEntry = picture.getByText(otherStatus, { exact: true }).first();
+      await expect(otherEntry.locator("xpath=ancestor::div[contains(@class,'opacity-30')][1]")).toHaveCount(1);
+      const matchingEntry = picture.getByText(status, { exact: true }).first();
+      await expect(matchingEntry.locator("xpath=ancestor::div[contains(@class,'opacity-30')][1]")).toHaveCount(0);
+
+      await expect(card.getByText(`${label}: ${status}`)).toHaveCount(1);
+    });
+
     test("intranet: follows hero, the slider works by keyboard, the CTA is the free task marked Intranet", async ({ page }) => {
       // Reduced motion, set BEFORE navigation — it's the one documented way to
       // turn off the slider's own self-demo (tokens.md "compare-slider

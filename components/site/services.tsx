@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Bell, CalendarDays, Check, ChevronLeft, ChevronRight, Circle, Clock3, Lock, Phone, Plus, UserRound } from "lucide-react";
+import { Bell, CalendarDays, Phone } from "lucide-react";
 
 import { buttonClasses, textLink } from "@/components/ui/button";
 import { getMessages, type Locale } from "@/lib/i18n";
@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 
 import { CalendarFilterDemo } from "./calendar-filter-demo.client";
 import { Container } from "./container";
+import { PlannerFilterDemo } from "./planner-filter-demo.client";
 import { SectionHeader } from "./section-header";
 import { Window } from "./window";
 
@@ -24,10 +25,10 @@ type S = ReturnType<typeof getMessages>["servicesSection"];
 export function Services({ locale }: { locale: Locale }) {
   const t = getMessages(locale);
   const s = t.servicesSection;
-  // Row 0 (the calendar web part) is the one genuinely interactive mockup —
-  // CalendarFilterDemo owns its own aria-hidden scoping internally, so it's
-  // rendered outright below, not through this array.
-  const mockups = [null, <PlannerMock key="planner" s={s} />, <WebsiteMock key="website" s={s} />];
+  // Rows 0 and 1 (the calendar and planner web parts) are the two genuinely
+  // interactive mockups — each owns its own aria-hidden scoping internally,
+  // so they're rendered outright below, not through this array.
+  const mockups = [null, null, <WebsiteMock key="website" s={s} />];
 
   return (
     <section id={t.anchors.services} aria-labelledby="services-title" className="py-16 md:py-24">
@@ -45,6 +46,8 @@ export function Services({ locale }: { locale: Locale }) {
               <figure className={cn("min-w-0 lg:col-span-7", i % 2 === 1 && "lg:order-last")}>
                 {i === 0 ? (
                   <CalendarFilterDemo s={s} />
+                ) : i === 1 ? (
+                  <PlannerFilterDemo s={s} />
                 ) : (
                   <div aria-hidden="true" className="@container">
                     {mockups[i]}
@@ -92,122 +95,6 @@ function Pin({ label, at = "-top-2.5 left-2", className, children }: { label: st
         )}
       >
         {label}
-      </span>
-    </div>
-  );
-}
-
-// --- 02 · Internal app: the editorial planner -------------------------------
-
-const STATUS_ICONS = [Circle, Clock3, Check];
-const PLANNER_TODAY = 2; // Wednesday 21
-/** How many days show: one on a phone, three in a narrow column, five when there is room. */
-const dayVisibility = (day: number) => (day === 0 ? "" : day < 3 ? "hidden @min-[30rem]:block" : "hidden @min-[42rem]:block");
-
-function PlannerMock({ s }: { s: S }) {
-  const p = s.planner;
-  const [login, data, status] = s.rows[1].labels;
-  return (
-    <Window
-      bar={
-        <>
-          <span className="size-3 flex-none rounded-tag bg-blueprint" />
-          <span className="truncate text-[14px] font-semibold">{p.app}</span>
-          <span className="ml-auto flex flex-none items-center gap-2">
-            <Pin label={login} at="top-full right-0 mt-2.5" className="flex items-center gap-1 px-1 text-[13px] text-ink-muted">
-              <Lock className="size-3.5" strokeWidth={1.5} />
-              {p.login}
-            </Pin>
-            <span className="flex size-7 items-center justify-center rounded-full bg-blueprint text-[11px] font-semibold text-blueprint-ink">
-              {p.initials}
-            </span>
-          </span>
-        </>
-      }
-    >
-      <div className="p-3 @min-[26rem]:p-4">
-        <div className="mt-6 flex flex-wrap items-center gap-2">
-          {[ChevronLeft, ChevronRight].map((Icon, i) => (
-            <span key={i} className="flex size-8 items-center justify-center rounded-ui border border-line-input">
-              <Icon className="size-4" strokeWidth={1.5} />
-            </span>
-          ))}
-          <span className="flex h-8 items-center rounded-ui border border-line-input px-2.5 text-[13px] font-semibold">{p.today}</span>
-          <span className="min-w-0 flex-1 text-[15px] font-bold whitespace-nowrap tabular-nums">{p.range}</span>
-          <span className={buttonClasses({ variant: "app" }, "hidden h-8 gap-1.5 px-2.5 text-[13px] @min-[26rem]:inline-flex")}>
-            <Plus className="size-3.5" strokeWidth={2} />
-            {p.add}
-          </span>
-        </div>
-
-        <Pin label={data} at="-bottom-2.5 right-2" className="mt-4 pb-3">
-          <div className="grid grid-cols-[6rem_minmax(0,1fr)] gap-x-2 @min-[30rem]:grid-cols-[6.5rem_repeat(3,minmax(0,1fr))] @min-[42rem]:grid-cols-[7rem_repeat(5,minmax(0,1fr))]">
-            <span />
-            {p.days.map((day, d) => (
-              <span
-                key={day}
-                className={cn(
-                  "rounded-tag py-1 text-center font-mono text-label uppercase",
-                  d === PLANNER_TODAY ? "bg-blueprint-light font-semibold text-blueprint" : "text-ink-muted",
-                  dayVisibility(d)
-                )}
-              >
-                {day}
-              </span>
-            ))}
-            {p.channels.map((channel, ch) => (
-              <div key={channel} className="contents">
-                <span className="flex items-start gap-1.5 border-t border-line pt-3 pb-2 text-[12px] font-semibold">
-                  <span className="mt-1 size-2 flex-none rounded-tag bg-blueprint" />
-                  <span className="min-w-0 hyphens-auto">{channel}</span>
-                </span>
-                {p.days.map((day, d) => {
-                  const entry = p.entries.find((e) => e.channel === ch && e.day === d);
-                  return (
-                    <div key={day} className={cn("min-w-0 border-t border-line pt-2 pb-2", dayVisibility(d))}>
-                      {entry && <EntryCard entry={entry} statuses={p.statuses} pin={ch === 0 && d === 0 ? status : undefined} />}
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
-          </div>
-        </Pin>
-      </div>
-    </Window>
-  );
-}
-
-function EntryCard({
-  entry,
-  statuses,
-  pin,
-}: {
-  entry: S["planner"]["entries"][number];
-  statuses: string[];
-  pin?: string;
-}) {
-  const Icon = STATUS_ICONS[entry.status];
-  const state = (
-    <span className="flex min-w-0 items-center gap-1 text-[12px] font-semibold">
-      <Icon className={cn("size-3.5 flex-none", entry.status === 2 ? "text-success" : "text-ink-muted")} strokeWidth={2} />
-      <span className="truncate">{statuses[entry.status]}</span>
-    </span>
-  );
-  return (
-    <div className="flex flex-col gap-1.5 rounded-ui border border-line bg-surface p-2">
-      <span className="text-[13px] leading-tight font-semibold">{entry.title}</span>
-      <span className="self-start rounded-tag bg-surface-sunk px-1.5 py-px text-[12px]">{entry.area}</span>
-      {pin ? (
-        <Pin label={pin} at="top-full left-0 mt-1.5">
-          {state}
-        </Pin>
-      ) : (
-        state
-      )}
-      <span className="hidden min-w-0 items-center gap-1 text-[12px] text-ink-muted @min-[30rem]:flex">
-        <UserRound className="size-3.5 flex-none" strokeWidth={1.5} />
-        <span className="truncate">{entry.editor}</span>
       </span>
     </div>
   );
