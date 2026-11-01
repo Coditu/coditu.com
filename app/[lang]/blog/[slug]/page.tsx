@@ -6,7 +6,7 @@ import { Container } from "@/components/site/container";
 import { ButtonLink, textLink } from "@/components/ui/button";
 import { blogPath, formatDate, getPost, getPosts, postPaths, renderPost } from "@/lib/blog";
 import { getMessages, hasLocale, sectionHref, type Locale } from "@/lib/i18n";
-import { pageMetadata } from "@/lib/metadata";
+import { OG_IMAGE, pageMetadata } from "@/lib/metadata";
 import { SITE_NAME } from "@/lib/site-config";
 import { getAbsoluteUrl } from "@/lib/site-url";
 
@@ -43,12 +43,18 @@ export default async function BlogPost({ params }: PageProps<"/[lang]/blog/[slug
   const { lang, post } = await resolve(params);
   const t = getMessages(lang);
   const url = getAbsoluteUrl(blogPath(lang, post.slug));
-  const organization = { "@type": "Organization", name: SITE_NAME, url: getAbsoluteUrl(`/${lang}`) };
+  const logo = { "@type": "ImageObject", url: getAbsoluteUrl("/icon-512.png"), width: 512, height: 512 };
+  const organization = { "@type": "Organization", name: SITE_NAME, url: getAbsoluteUrl(`/${lang}`), logo };
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: post.title,
     description: post.description,
+    // The site's one OG image (lib/metadata.ts, also used for this page's
+    // own OpenGraph/Twitter card) — a real, already-published asset, not a
+    // new one made up for structured data. Google lists `image` as a
+    // recommended Article property.
+    image: getAbsoluteUrl(OG_IMAGE),
     datePublished: post.date,
     dateModified: post.updated,
     inLanguage: t.locale,

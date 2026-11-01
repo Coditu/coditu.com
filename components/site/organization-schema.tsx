@@ -15,6 +15,11 @@ import { CONTACT_EMAIL, SITE_NAME, SITE_URL } from "@/lib/site-config";
  * docs/02-POSITIONING.md / messages/*.ts (service list, Baukasten) — no
  * street address (none is published) and no `sameAs`: no real social profile
  * URL exists in this codebase to link to.
+ *
+ * `logo` points at `public/icon-512.png` — a real asset already shipped as
+ * the site's app icon (see `public/brand/`), not a new image made up for
+ * this: Google's and schema.org's Organization guidance both call out `logo`
+ * as a recommended property.
  */
 export function OrganizationSchema({ locale }: { locale: Locale }) {
   const t = getMessages(locale);
@@ -23,6 +28,7 @@ export function OrganizationSchema({ locale }: { locale: Locale }) {
     "@type": "Organization",
     name: SITE_NAME,
     url: SITE_URL,
+    logo: { "@type": "ImageObject", url: `${SITE_URL}/icon-512.png`, width: 512, height: 512 },
     email: CONTACT_EMAIL,
     inLanguage: t.locale,
     address: [
