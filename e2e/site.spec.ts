@@ -461,8 +461,9 @@ for (const { lang, home, imprint, privacy, pricing } of LANGS) {
       await expect(cards.nth(0)).toContainText("600");
       await expect(cards.nth(1)).toContainText("70");
 
-      // Links through to the dedicated pricing page.
-      await page.getByRole("link", { name: lang === "de" ? "Alle Preise und Abrechnungsarten ansehen" : "See all prices and billing models" }).click();
+      // Links through to the dedicated pricing page. Scoped to `section`, not
+      // `page` — the footer now has its own link with the same name.
+      await section.getByRole("link", { name: lang === "de" ? "Alle Preise und Abrechnungsarten ansehen" : "See all prices and billing models" }).click();
       await expect(page).toHaveURL(new RegExp(`${pricing}$`));
     });
 
