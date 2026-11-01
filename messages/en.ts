@@ -537,6 +537,41 @@ const en: Messages = {
     body: "Hello Coditu,\n\nOur small task (one screen or one feature):\n\n\nWhere it should run (e.g. SharePoint):\n",
   },
 
+  // See messages/de.ts "landingPages" — same shape, same facts, a
+  // genuinely different (not translated 1:1) English search phrase.
+  landingPages: {
+    sharepointWebparts: {
+      slug: "sharepoint-web-parts-development",
+      meta: {
+        title: "SharePoint Web Parts Development",
+        description:
+          "SharePoint and SPFx web parts for your intranet, in your design, live from your SharePoint lists. Usually 1–2 days per web part, from €600.",
+      },
+      title: "SharePoint Web Parts Development",
+      intro:
+        "Outdated or rigid web parts in your intranet? We redesign them — in your design, live from your existing SharePoint lists.",
+      points: [
+        {
+          title: "In your design",
+          text: "No standard layout. Every web part is designed to match your brand and your intranet.",
+        },
+        {
+          title: "Live from SharePoint",
+          text: "No copy of your data. Your lists stay the source; the web part just shows them differently.",
+        },
+        {
+          title: "Usually 1–2 days",
+          text: "A single web part rarely takes longer — see the numbers below, from a real project.",
+        },
+      ],
+      proofLabel: "From a real project",
+      priceLine: "A web part costs {{price:webPart}} — the price depends on the amount of work. All prices net.",
+      cta: "Get one web part redesigned free",
+      subject: "Free small task – SharePoint Web Parts",
+      body: "Hello Coditu,\n\nplease redesign this web part for free (screenshot attached).\n\nWhat bothers us about it:\n\n",
+    },
+  },
+
   // TODO(team): see messages/de.ts — taking over an existing project is open.
   faqSection: {
     title: "Common questions",

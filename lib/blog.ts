@@ -4,6 +4,7 @@ import path from "node:path";
 import { marked } from "marked";
 
 import { getMessages, locales, otherLocale, pages, type Locale } from "@/lib/i18n";
+import { landingKeys, landingPaths } from "@/lib/landing-pages";
 import { withPrices } from "@/lib/pricing";
 
 /**
@@ -116,7 +117,10 @@ export const blogIndexPaths = (): Partial<Record<Locale, string>> =>
 /**
  * Every path in this language → the same page in the other, for the language
  * switch. A post without a translation goes to the other blog, or its home
- * page if that language has no posts.
+ * page if that language has no posts. Keyword landing pages
+ * (lib/landing-pages.ts) go in the same map, by the same generic pattern as
+ * the static `pages` table — every one exists in both languages, so no
+ * fallback is needed for those.
  */
 export function switchPaths(locale: Locale): Record<string, string> {
   const other = otherLocale(locale);
@@ -124,6 +128,10 @@ export function switchPaths(locale: Locale): Record<string, string> {
   const map: Record<string, string> = Object.fromEntries(Object.values(pages).map((p) => [p[locale], p[other]]));
   map[blogPath(locale)] = otherBlog;
   for (const post of getPosts(locale)) map[blogPath(locale, post.slug)] = postPaths(locale, post)[other] ?? otherBlog;
+  for (const key of landingKeys) {
+    const paths = landingPaths(key);
+    map[paths[locale]] = paths[other];
+  }
   return map;
 }
 
