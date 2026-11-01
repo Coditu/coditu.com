@@ -609,6 +609,46 @@ const de = {
     hourLabel: "Pro Stunde",
     hourText: "Für laufende Änderungen und kleinere Aufgaben.",
     note: "Bei größeren Projekten gibt es Rabatt – und die eine oder andere Kleinigkeit obendrauf. Vor dem Start bekommen Sie von uns eine Schätzung. Alle Preise netto.",
+    moreLabel: "Alle Preise und Abrechnungsarten ansehen",
+  },
+
+  /**
+   * The dedicated pricing page (app/[lang]/pricing/page.tsx) — the teaser
+   * above links here. Three billing models in prose (per web part is the
+   * default per docs/02-POSITIONING.md: hourly billing punishes a team
+   * that delivers in days), then the same two counted cards, gated the
+   * same way on SHOW_PRICES. `hidden` is what shows instead while prices
+   * are off — the page is never blank, just less specific.
+   */
+  pricingPage: {
+    meta: {
+      title: "Preise",
+      description: "Wie wir bei Coditu abrechnen: pro Webpart, pro Projekt oder pro Stunde – und die Zahlen, von denen wir ausgehen.",
+    },
+    title: "Preise",
+    intro:
+      "Der Preis richtet sich nach dem Aufwand, nicht nach einer festen Liste. Hier die drei Wege, wie wir abrechnen, und die Richtwerte für den Anfang.",
+    models: [
+      {
+        title: "Pro Webpart",
+        text: "Unser Standard für ein einzelnes Webpart oder eine kleine App-Funktion. Festpreis, nach kurzer Abstimmung.",
+      },
+      {
+        title: "Pro Projekt",
+        text: "Für größere Vorhaben wie ein ganzes Intranet oder eine neue App: Festpreis nach Umfang, in Meilensteinen vereinbart.",
+      },
+      {
+        title: "Pro Stunde",
+        text: "Für laufende Änderungen und kleinere Aufgaben nach dem Livegang.",
+      },
+    ],
+    hidden: {
+      title: "Preis auf Anfrage",
+      text: "Schreiben Sie uns kurz, worum es geht. Vor dem Start bekommen Sie von uns eine Schätzung.",
+    },
+    cta: "Kleine Aufgabe gratis sichern",
+    subject: "Kleine Aufgabe gratis – Preise",
+    body: "Hallo Coditu,\n\nunsere kleine Aufgabe (ein Screen oder eine Funktion):\n\n\nWo sie laufen soll (z. B. SharePoint):\n",
   },
 
   /**

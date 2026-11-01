@@ -508,6 +508,39 @@ const en: Messages = {
     hourLabel: "Per hour",
     hourText: "For ongoing changes and smaller tasks.",
     note: "Larger projects get a discount — and a little extra on top. Before we start, you get an estimate from us. All prices net.",
+    moreLabel: "See all prices and billing models",
+  },
+
+  // See messages/de.ts "pricingPage" — same shape, same numbers.
+  pricingPage: {
+    meta: {
+      title: "Pricing",
+      description: "How Coditu bills: per web part, per project or per hour — and the figures we start from.",
+    },
+    title: "Pricing",
+    intro:
+      "The price depends on the amount of work, not a fixed list. Here are the three ways we bill, and the starting figures.",
+    models: [
+      {
+        title: "Per web part",
+        text: "Our default for a single web part or a small app feature. A fixed price, after a short discussion.",
+      },
+      {
+        title: "Per project",
+        text: "For larger work like a whole intranet or a new app: a fixed price by scope, agreed in milestones.",
+      },
+      {
+        title: "Per hour",
+        text: "For ongoing changes and smaller tasks after go-live.",
+      },
+    ],
+    hidden: {
+      title: "Price on request",
+      text: "Send us a few sentences about what you need. Before we start, you get an estimate from us.",
+    },
+    cta: "Try us free with a small task",
+    subject: "Free small task – Pricing",
+    body: "Hello Coditu,\n\nOur small task (one screen or one feature):\n\n\nWhere it should run (e.g. SharePoint):\n",
   },
 
   // TODO(team): see messages/de.ts — taking over an existing project is open.
