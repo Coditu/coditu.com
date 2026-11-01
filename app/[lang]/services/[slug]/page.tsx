@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ButtonLink } from "@/components/ui/button";
+import { BreadcrumbSchema } from "@/components/site/breadcrumb-schema";
 import { Container } from "@/components/site/container";
 import { BOOKING_URL, CONTACT_EMAIL } from "@/lib/site-config";
 import { allLandingParams, findLanding, landingPaths } from "@/lib/landing-pages";
@@ -34,7 +35,8 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/services/[
  * here needs the JS budget.
  */
 export default async function LandingPage({ params }: PageProps<"/[lang]/services/[slug]">) {
-  const { t, page: p } = await resolve(params);
+  const { lang, t, page: p } = await resolve(params);
+  const key = findLanding(lang, p.slug)!;
   const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(p.subject)}&body=${encodeURIComponent(p.body)}`;
   // The two facts most relevant to a single web part — the same real numbers
   // referenceSection already states, not new ones.
@@ -42,6 +44,7 @@ export default async function LandingPage({ params }: PageProps<"/[lang]/service
 
   return (
     <Container className="py-16 md:py-24">
+      <BreadcrumbSchema locale={lang} title={p.title} path={landingPaths(key)[lang]} />
       <div className="grid gap-6 lg:grid-cols-12 lg:items-end">
         <h1 className="text-h1 lg:col-span-7">{p.title}</h1>
         <p className="max-w-[46ch] text-lead text-ink-muted lg:col-span-5">{p.intro}</p>
