@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { getMessages, type Locale } from "@/lib/i18n";
 import { SITE_NAME } from "@/lib/site-config";
 
-const OG_IMAGE = "/og.png";
+/** Also used for the blog's Article JSON-LD `image` (app/[lang]/blog/[slug]/page.tsx). */
+export const OG_IMAGE = "/og.png";
 
 /**
  * Title, description, canonical, hreflang (de, en, x-default → German) and the
