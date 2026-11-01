@@ -207,6 +207,14 @@ for (const { lang, home, imprint, privacy } of LANGS) {
     });
 
     test("intranet: follows hero, the slider works by keyboard, the CTA is the free task marked Intranet", async ({ page }) => {
+      // Reduced motion, set BEFORE navigation — it's the one documented way to
+      // turn off the slider's own self-demo (tokens.md "compare-slider
+      // auto-demo"), so a keyboard press lands on a value this test can
+      // predict instead of racing an in-flight sweep. The component reads
+      // this once at mount, so it has to be set before `goto`, not after.
+      // The self-demo's own behaviour is covered by "compare-slider:
+      // demonstrates itself..." below.
+      await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto(home);
       const section = page.locator('section[aria-labelledby="intranet-title"]');
       // Promoted ahead of Services on 2026-11-01 (docs/02-POSITIONING.md "Page order") —
@@ -230,6 +238,20 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(section.locator(`a[href^="mailto:contact@coditu.com?subject=${subject}&"]`)).toHaveText(
         lang === "de" ? "Webpart kostenlos neu gestalten lassen" : "Get one web part redesigned free",
       );
+    });
+
+    test("compare-slider: demonstrates itself once on view, then settles back and hints at the drag", async ({ page }) => {
+      // Full motion this time — this test is specifically about the self-demo
+      // (tokens.md "compare-slider auto-demo" / "drag-hint"), which only runs
+      // without prefers-reduced-motion.
+      await page.goto(home);
+      const slider = page.locator('section[aria-labelledby="intranet-title"]').getByRole("slider");
+      await expect(slider).toHaveValue("50");
+      await slider.scrollIntoViewIfNeeded();
+      // The sweep's first leg moves it away from 50 within ~700 ms of entering view.
+      await expect(slider).not.toHaveValue("50", { timeout: 2000 });
+      // It returns to 50 once the full ~1.6 s sequence finishes.
+      await expect(slider).toHaveValue("50", { timeout: 4000 });
     });
 
     test("baukasten: follows intranet, precedes services, four points, the proof panel names no client", async ({
