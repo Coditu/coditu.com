@@ -1,13 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 
+import { OfferPanel } from "@/components/site/offer-panel.client";
 import { OrganizationSchema } from "@/components/site/organization-schema";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteNav } from "@/components/site/site-nav";
 import { switchPaths } from "@/lib/blog";
 import { fontVariables } from "@/lib/fonts";
 import { getMessages, hasLocale, locales, sectionMap } from "@/lib/i18n";
-import { SITE_NAME } from "@/lib/site-config";
+import { CONTACT_EMAIL, SITE_NAME } from "@/lib/site-config";
 import { getSiteUrl } from "@/lib/site-url";
 
 import "../globals.css";
@@ -62,6 +63,10 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
   const t = getMessages(lang);
   const hashMap = sectionMap(lang);
   const pathMap = switchPaths(lang);
+  const p = t.panelSection;
+  const panelMailto =
+    `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(p.subject)}` +
+    `&body=${encodeURIComponent(p.body)}`;
 
   return (
     // The script below sets `data-theme` before hydration.
@@ -84,6 +89,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
           {children}
         </main>
         <SiteFooter locale={lang} hashMap={hashMap} pathMap={pathMap} />
+        <OfferPanel title={p.title} fine={p.fine} cta={p.cta} close={p.close} mailto={panelMailto} />
       </body>
     </html>
   );
