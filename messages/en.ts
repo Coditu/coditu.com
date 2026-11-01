@@ -19,6 +19,7 @@ const en: Messages = {
   anchors: {
     services: "services",
     intranet: "intranet",
+    baukasten: "baukasten",
     process: "how-we-work",
     reference: "reference",
     security: "security",
@@ -305,6 +306,38 @@ const en: Messages = {
     fine: "Your free small task · 1 per client · in up to 3 days",
     subject: "Free small task – Intranet",
     body: "Hello Coditu,\n\nplease redesign this web part for free (screenshot attached).\n\nWhat bothers us about it:\n\n",
+  },
+
+  // See messages/de.ts "baukastenSection" — same shape, same numbers.
+  baukastenSection: {
+    title: "The Baukasten",
+    intro:
+      "Our strongest product — we call it the Baukasten: a library of building blocks for your Microsoft 365, in your design, with your login, on your own server.",
+    points: [
+      {
+        title: "Blocks that fit together",
+        text: "React components in your design that snap together like Lego — a form, an approval, a dashboard.",
+      },
+      {
+        title: "Sign-in with Microsoft Entra",
+        text: "Everyone signs in with their Microsoft account and sees only what their permissions allow.",
+      },
+      {
+        title: "On your own server",
+        text: "Runs on your intranet domain. Your data never leaves your system.",
+      },
+      {
+        title: "For requests, approvals and more",
+        text: "Forms, approvals, dashboards and directories — built from the same blocks.",
+      },
+    ],
+    proof: {
+      label: "In production",
+      stat: "6+ apps",
+      statText: "at one organisation in Germany",
+      types: ["Requests", "Onboarding", "News editing", "Editorial calendar"],
+      caption: "Illustrative grouping, no client data.",
+    },
   },
 
   processSection: {

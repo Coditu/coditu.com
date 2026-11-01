@@ -28,6 +28,7 @@ const de = {
   anchors: {
     services: "leistungen",
     intranet: "intranet",
+    baukasten: "baukasten",
     process: "arbeitsweise",
     reference: "referenz",
     security: "sicherheit",
@@ -359,6 +360,45 @@ const de = {
     fine: "Ihre kleine Gratis-Aufgabe · 1 pro Kunde · in bis zu 3 Tagen",
     subject: "Kleine Aufgabe gratis – Intranet",
     body: "Hallo Coditu,\n\nbitte gestalten Sie dieses Webpart kostenlos neu (Screenshot im Anhang).\n\nWas uns daran stört:\n\n",
+  },
+
+  /**
+   * The Baukasten: our flagship offer (docs/02-POSITIONING.md "Baukasten
+   * permissions" — full anonymised description cleared by the team). The
+   * client stays anonymous — no name, no logo — per docs/00-CONTEXT.md rule
+   * 5 (the EVIM mark is third-party and does not go on the public site
+   * without their written permission). "6+ apps" and the four app types are
+   * real, from docs/02-POSITIONING.md; add nothing beyond them.
+   */
+  baukastenSection: {
+    title: "Der Baukasten",
+    intro:
+      "Unser stärkstes Produkt: eine Bibliothek aus Bausteinen für Ihr Microsoft 365 – in Ihrem Design, mit Ihrem Login, auf Ihrem Server.",
+    points: [
+      {
+        title: "Bausteine, die zusammenpassen",
+        text: "React-Komponenten in Ihrem Design, die sich wie Lego zusammenstecken lassen – ein Formular, eine Freigabe, ein Dashboard.",
+      },
+      {
+        title: "Anmeldung mit Microsoft Entra",
+        text: "Jede Person meldet sich mit ihrem Microsoft-Konto an und sieht nur, was ihre Rechte erlauben.",
+      },
+      {
+        title: "Auf Ihrem eigenen Server",
+        text: "Läuft auf Ihrer Intranet-Domain. Ihre Daten verlassen Ihr System nicht.",
+      },
+      {
+        title: "Für Anträge, Freigaben und mehr",
+        text: "Formulare, Freigaben, Dashboards und Verzeichnisse – aus denselben Bausteinen zusammengesetzt.",
+      },
+    ],
+    proof: {
+      label: "Im Einsatz",
+      stat: "6+ Apps",
+      statText: "bei einer Organisation in Deutschland",
+      types: ["Anfragen", "Onboarding", "News-Redaktion", "Redaktionskalender"],
+      caption: "Beispielhafte Einordnung, keine Kundendaten.",
+    },
   },
 
   /**
