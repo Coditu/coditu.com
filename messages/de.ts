@@ -654,7 +654,7 @@ const de = {
       body: "Hallo Coditu,\n\nunsere Idee in ein paar Sätzen:\n\n\nGern hängen wir auch ein Foto unserer Skizze an.\n",
       or: "Oder direkt an",
     },
-    booking: "20-Minuten-Gespräch buchen",
+    booking: "30-Minuten-Gespräch buchen",
     reply: "Sie bekommen eine persönliche Antwort von Adam in Berlin.",
     contactTitle: "Ihr Ansprechpartner in Berlin",
     contactText: "Vom ersten Gespräch bis zum Livegang sprechen Sie mit derselben Person.",

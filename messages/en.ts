@@ -550,7 +550,7 @@ const en: Messages = {
       body: "Hello Coditu,\n\nOur idea in a few sentences:\n\n\nWe are happy to attach a photo of our sketch.\n",
       or: "Or straight to",
     },
-    booking: "Book a 20-minute call",
+    booking: "Book a 30-minute call",
     reply: "You get a personal reply from Adam in Berlin.",
     contactTitle: "Your contact in Berlin",
     contactText: "From the first call to go-live, you talk to the same person.",
