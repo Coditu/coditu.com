@@ -1,6 +1,6 @@
 import { getMessages, type Locale } from "@/lib/i18n";
 import { landingKeys, landingPaths } from "@/lib/landing-pages";
-import { CONTACT_EMAIL, SITE_NAME, SITE_URL } from "@/lib/site-config";
+import { CONTACT_EMAIL, LINKEDIN_URL, SITE_NAME, SITE_URL } from "@/lib/site-config";
 
 /**
  * Organization + Service JSON-LD, mounted once from the root layout — see
@@ -13,8 +13,7 @@ import { CONTACT_EMAIL, SITE_NAME, SITE_URL } from "@/lib/site-config";
  *
  * Facts only from docs/00-CONTEXT.md (team, locations, contact) and
  * docs/02-POSITIONING.md / messages/*.ts (service list, Baukasten) — no
- * street address (none is published) and no `sameAs`: no real social profile
- * URL exists in this codebase to link to.
+ * street address (none is published).
  *
  * `logo` points at `public/icon-512.png` — a real asset already shipped as
  * the site's app icon (see `public/brand/`), not a new image made up for
@@ -24,9 +23,9 @@ import { CONTACT_EMAIL, SITE_NAME, SITE_URL } from "@/lib/site-config";
  * `@id` and `description` exist to help AI/answer engines anchor this exact
  * entity — there is at least one unrelated company with a confusingly
  * similar name/domain (not coditu.com) that has shown up misattributed in a
- * third-party AI answer. A stable `@id` and a real, specific description are
- * the honest on-page lever here; the rest (consistent off-site citations —
- * LinkedIn, directories, backlinks) is outside this codebase.
+ * third-party AI answer. A stable `@id`, a real, specific description, and
+ * now `sameAs` pointing at the real LinkedIn company page are the honest
+ * on-page + off-site citation lever together.
  */
 export function OrganizationSchema({ locale }: { locale: Locale }) {
   const t = getMessages(locale);
@@ -39,6 +38,7 @@ export function OrganizationSchema({ locale }: { locale: Locale }) {
     description: t.meta.description,
     logo: { "@type": "ImageObject", url: `${SITE_URL}/icon-512.png`, width: 512, height: 512 },
     email: CONTACT_EMAIL,
+    sameAs: [LINKEDIN_URL],
     inLanguage: t.locale,
     address: [
       { "@type": "PostalAddress", addressLocality: "Berlin", addressCountry: "DE" },
