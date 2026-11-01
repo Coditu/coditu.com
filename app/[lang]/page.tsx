@@ -22,7 +22,13 @@ export async function generateMetadata({ params }: PageProps<"/[lang]">): Promis
   return pageMetadata(lang, pages.home, { title: { absolute: t.meta.title }, description: t.meta.description });
 }
 
-/** Sections are added one by one in page order (Phase 2). */
+/**
+ * Sections are added one by one in page order (Phase 2). Order per
+ * docs/02-POSITIONING.md "Page order": the before/after slider (Intranet)
+ * and the Baukasten were promoted ahead of Services on 2026-11-01 — the
+ * slider is the strongest two seconds on the site and was previously
+ * buried, and the Baukasten is the flagship offer.
+ */
 export default async function HomePage({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
@@ -30,9 +36,9 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
   return (
     <>
       <Hero locale={lang} />
-      <Services locale={lang} />
       <Intranet locale={lang} />
       <Baukasten locale={lang} />
+      <Services locale={lang} />
       <Process locale={lang} />
       <Reference locale={lang} />
       <Security locale={lang} />
