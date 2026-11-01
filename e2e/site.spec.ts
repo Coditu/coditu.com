@@ -101,6 +101,34 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(html).toHaveAttribute("data-theme", "light");
     });
 
+    test("offer panel: hidden on load, appears after 25s, dismissible, dismissal persists across reload", async ({ page }) => {
+      test.setTimeout(90_000);
+      const subject = encodeURIComponent(lang === "de" ? "Kleine Aufgabe gratis – Panel" : "Free small task – Panel");
+      const cta = lang === "de" ? "Kostenlos anfragen" : "Request it free";
+      const close = lang === "de" ? "Angebot schließen" : "Close offer";
+
+      await page.goto(home);
+      const panel = page.locator("aside");
+      await expect(panel).toHaveCount(0);
+
+      // The real 25 s timer — no scroll, no mouse movement, so neither of the
+      // other two triggers fires first.
+      await expect(panel).toBeVisible({ timeout: 30_000 });
+      await expect(panel.locator(`a[href^="mailto:contact@coditu.com?subject=${subject}&"]`)).toHaveText(cta);
+
+      // Dismissible, by a real <button> with an accessible name, reachable by keyboard.
+      const closeButton = panel.getByRole("button", { name: close });
+      await closeButton.focus();
+      await page.keyboard.press("Enter");
+      await expect(panel).toHaveCount(0);
+
+      // Remembered via localStorage: still gone after a reload, even once the
+      // same trigger would otherwise fire again.
+      await page.reload();
+      await page.waitForTimeout(27_000);
+      await expect(page.locator("aside")).toHaveCount(0);
+    });
+
     test("hero: one h1, the free-task mail and booking CTAs, the mail's key words build the app", async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto(home);
