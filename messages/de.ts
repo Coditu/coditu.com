@@ -894,6 +894,7 @@ const de = {
     privacy: "Datenschutz",
     contactTitle: "Kontakt",
     languageTitle: "Sprache",
+    linkedin: "LinkedIn",
   },
 
   legal: {

@@ -753,6 +753,7 @@ const en: Messages = {
     privacy: "Privacy policy",
     contactTitle: "Contact",
     languageTitle: "Language",
+    linkedin: "LinkedIn",
   },
 
   legal: {
