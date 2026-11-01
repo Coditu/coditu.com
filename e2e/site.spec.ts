@@ -498,11 +498,23 @@ for (const { lang, home, imprint, privacy, pricing } of LANGS) {
       expect(JSON.stringify(org)).not.toMatch(/evim/i);
 
       const services = graph.filter((node) => node["@type"] === "Service");
-      expect(services.length).toBeGreaterThanOrEqual(4); // 3 services + the Baukasten
+      expect(services.length).toBeGreaterThanOrEqual(6); // 3 services + the Baukasten + 2 landing pages
       const names = services.map((s) => s.name as string);
       expect(names).toContain(lang === "de" ? "SharePoint-Webparts" : "SharePoint web parts");
       for (const service of services) {
         expect(service.inLanguage).toBe(lang === "de" ? "de-DE" : "en-GB");
+      }
+
+      // The two keyword landing pages carry their own `url`, unlike the
+      // homepage service rows (which only have an in-page anchor).
+      const landingServiceNames = [
+        lang === "de" ? "SharePoint-Webparts entwickeln lassen" : "SharePoint Web Parts Development",
+        lang === "de" ? "SPFx-Entwickler" : "SPFx Developer",
+      ];
+      for (const name of landingServiceNames) {
+        const service = services.find((s) => s.name === name);
+        expect(service, `no Service node named "${name}"`).toBeTruthy();
+        expect(service!.url).toMatch(/^https:\/\/coditu\.com\/(de|en)\/services\//);
       }
     });
 

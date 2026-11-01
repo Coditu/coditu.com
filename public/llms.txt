@@ -9,6 +9,8 @@
 ## What we build
 
 - [SharePoint web parts](https://coditu.com/en#services): Web parts that slot into existing SharePoint pages and show the client's SharePoint lists live. Over 40 built for one organisation; a new web part is usually 5–10 hours of work.
+- [SharePoint web parts development](https://coditu.com/en/services/sharepoint-web-parts-development): Dedicated page on getting a SharePoint/SPFx web part redesigned or built — in the client's design, live from their SharePoint lists, usually 1–2 days.
+- [SPFx developer](https://coditu.com/en/services/spfx-developer): Dedicated page for SPFx development specifically — one team (no subcontractors), weekly sprints, billed by the hour or per piece.
 - [Internal apps](https://coditu.com/en#services): Small, focused apps built from a sketch — requests, onboarding, editorial calendars — signed in with Microsoft and permissioned by group. A first version typically takes 10–14 hours.
 - [Websites & web apps](https://coditu.com/en#services): Fast, SEO-structured websites and product pages.
 - [The Baukasten](https://coditu.com/en#baukasten): Coditu's own product — React components that snap together, Microsoft Entra sign-in, deployed on the client's own server so data never leaves their system.
@@ -17,6 +19,7 @@
 
 - [Home (English)](https://coditu.com/en): Services, the Baukasten, pricing, reference project and FAQ.
 - [Home (German)](https://coditu.com/de): The same site in German, the primary language.
+- [Pricing](https://coditu.com/en/pricing): The three ways Coditu bills (per web part, per project, per hour) and the starting figures.
 - [Blog](https://coditu.com/en/blog): Short, specific answers to the questions clients ask about SharePoint, SPFx web parts, Power Apps and internal apps.
 
 ## Blog
