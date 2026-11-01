@@ -163,7 +163,7 @@ const de = {
         title: "SharePoint-Webparts",
         problem: "„Unser Intranet ist unübersichtlich und veraltet.“",
         text: "Webparts, die sich in Ihre bestehenden SharePoint-Seiten einfügen und Ihre Listen live zeigen.",
-        result: "Über 35 Webparts für eine Organisation, meist 1–2 Tage pro Webpart.",
+        result: "Über 40 Webparts für eine Organisation, meist 1–2 Tage pro Webpart.",
         labels: ["Filter nach Bereich", "Vier Wochen im Blick", "Live aus SharePoint"],
         summary:
           "Nachbau eines Kalender-Webparts im Intranet: ein Filter nach Bereich, vier Wochen mit markierten Terminen und daneben die nächsten Termine aus einer SharePoint-Liste.",
@@ -431,7 +431,7 @@ const de = {
     footer: ["Kunde anonym", "Abbildung beispielhaft"],
     factsLabel: "Aus dem Projekt",
     facts: [
-      { value: "ca. 38", text: "Webparts für eine Organisation" },
+      { value: "über 40", text: "Webparts für eine Organisation" },
       { value: "5–10 Std.", text: "für einen neuen Webpart, meist 1–2 Tage" },
       { value: "10–14 Std.", text: "für die erste Version einer internen App" },
       { value: "≤ 2 Std.", text: "für die meisten Änderungswünsche" },
@@ -489,16 +489,12 @@ const de = {
   },
 
   /**
-   * Security & data: five points and our own drawing of where the work lives.
-   * TODO(team): none of the five points is written down in docs/ yet, so each
-   * one carries a visible „[TODO: bestätigen]“ and production refuses to deploy
-   * while any is left (scripts/deploy-production.sh). Confirm a point, then
-   * delete its marker — or delete the point. Do not soften the wording instead.
-   *  1. No client data on Coditu servers — true for every project, not only SPFx?
-   *  2. Access only through accounts the client grants, revocable at any time.
-   *  3. GDPR, and an AVV signed on request — who signs, which template?
-   *  4. Code, docs and full control handed over; no lock-in — in every contract?
-   *  5. Keys and passwords in a secret store, never in code or chat — which one?
+   * Security & data: four confirmed points and our own drawing of where the
+   * work lives. See docs/02-POSITIONING.md "DSGVO and security claims" for
+   * what is confirmed and why the fifth point (an AVV) is not here: no
+   * template exists yet, so the site makes no promise about signing one.
+   * Getting a template is a prerequisite for outreach, tracked there as
+   * "still open" — add the point back once it exists.
    */
   securitySection: {
     title: "Was mit Ihren Daten passiert",
@@ -506,23 +502,19 @@ const de = {
     points: [
       {
         title: "Ihre Daten bleiben in Ihrem System",
-        text: "[TODO: bestätigen] Wo es geht, bauen wir direkt in Ihrem Microsoft 365 und SharePoint. Ihre Daten wandern nicht auf unsere Server.",
+        text: "Wo es geht, bauen wir direkt in Ihrem Microsoft 365 und SharePoint. Ihre Daten wandern nicht auf unsere Server.",
       },
       {
-        title: "Zugriff nur, wo nötig",
-        text: "[TODO: bestätigen] Wir nutzen die Zugänge, die Sie uns geben, und nur für die Arbeit. Sie können sie jederzeit wieder entziehen.",
-      },
-      {
-        title: "DSGVO und AVV",
-        text: "[TODO: bestätigen] Wir arbeiten nach der DSGVO. Wenn nötig, schließen wir mit Ihnen einen Auftragsverarbeitungsvertrag (AVV).",
+        title: "Rechte bleiben in Ihrer Hand",
+        text: "Sie geben uns Zugriff auf Ihr Microsoft 365. Wer was sehen und bearbeiten darf, regeln Ihre eigenen Berechtigungsgruppen.",
       },
       {
         title: "Saubere Übergabe",
-        text: "[TODO: bestätigen] Sie bekommen den Code, die Dokumentation und die volle Kontrolle. Sie sind nicht an uns gebunden.",
+        text: "Sie bekommen den Code, die Dokumentation und die volle Kontrolle. Sie sind nicht an uns gebunden.",
       },
       {
         title: "Keine Passwörter im Code",
-        text: "[TODO: bestätigen] Schlüssel und Passwörter liegen in einem geschützten Speicher dafür – nie im Code und nie im Chat.",
+        text: "Schlüssel und Passwörter liegen in einem geschützten Speicher dafür – nie im Code und nie im Chat.",
       },
     ],
     /** Our own drawing: the web parts and apps sit inside the client's tenant. */
@@ -540,11 +532,9 @@ const de = {
   /**
    * FAQ. Every answer repeats what Services, How we work and Security already
    * say — no new promises. Also the FAQPage JSON-LD, so plain text only.
-   * TODO(team): no prices or hourly rate anywhere in docs/, so the cost answer
-   * names none. Add a range here once the team decides to publish one.
-   * TODO(team): „Wem gehört der Code?“ is Security point 4 — confirm both together.
-   * TODO(team): taking over an existing project is not written down anywhere.
-   * Confirm the answer or delete the question.
+   * TODO(team): taking over an existing project is not written down anywhere
+   * (docs/02-POSITIONING.md, "still open"). Confirm the answer, then add the
+   * question back — do not guess at it meanwhile.
    */
   faqSection: {
     title: "Häufige Fragen",
@@ -553,7 +543,7 @@ const de = {
       {
         question: "Was kostet ein Projekt?",
         answer:
-          "Wir rechnen nach Aufwand ab. Vor dem Start bekommen Sie von uns eine Schätzung. Kleine Änderungen brauchen meist unter 2 Stunden.",
+          "Ein Webpart kostet {{price:webPart}}, meist zum Festpreis. Laufende Änderungen rechnen wir mit {{price:change}} ab, die meisten brauchen unter 2 Stunden. Vor dem Start bekommen Sie von uns eine Schätzung. Alle Preise netto.",
       },
       {
         question: "Wie schnell gibt es eine erste Version?",
@@ -578,13 +568,7 @@ const de = {
       },
       {
         question: "Wem gehört der Code?",
-        answer:
-          "[TODO: bestätigen] Ihnen. Sie bekommen den Code, die Dokumentation und die volle Kontrolle. Sie sind nicht an uns gebunden.",
-      },
-      {
-        question: "Übernehmen Sie auch ein bestehendes Projekt?",
-        answer:
-          "[TODO: bestätigen] Das klären wir im Einzelfall. Zuerst sehen wir uns den bestehenden Code an. Dann sagen wir Ihnen, ob wir ihn übernehmen können und mit welchem Aufwand.",
+        answer: "Ihnen. Sie bekommen den Code, die Dokumentation und die volle Kontrolle. Sie sind nicht an uns gebunden.",
       },
       {
         question: "Was passiert nach dem Livegang?",
@@ -596,8 +580,6 @@ const de = {
 
   /**
    * Contact: the last section. No form — there is no backend to send it to.
-   * TODO(team): the reply time is not written down anywhere. Confirm it or
-   * delete the line.
    */
   contactSection: {
     title: "Schicken Sie uns Ihre Anfrage",
@@ -609,7 +591,7 @@ const de = {
       or: "Oder direkt an",
     },
     booking: "20-Minuten-Gespräch buchen",
-    reply: "[TODO: bestätigen] Antwort in der Regel innerhalb von 1 Werktag.",
+    reply: "Sie bekommen eine persönliche Antwort von Adam in Berlin.",
     contactTitle: "Ihr Ansprechpartner in Berlin",
     contactText: "Vom ersten Gespräch bis zum Livegang sprechen Sie mit derselben Person.",
     teamTitle: "Ihr Team in Kairo",
