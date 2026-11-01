@@ -63,6 +63,24 @@ const de = {
   },
 
   /**
+   * The intent-triggered offer panel (components/site/offer-panel.client.tsx):
+   * bottom-right on desktop, a sticky bar on mobile, shown once per visitor
+   * after 40 % scroll, 25 s, or exit-intent, never again once dismissed. The
+   * one public offer, unchanged everywhere it appears — docs/02-POSITIONING.md
+   * "The offer panel" and "The free offer". Reuses the free-task mailto flow
+   * (see `hero.freeTask`), marked „Panel" the way the intranet section marks
+   * its own copy „Intranet".
+   */
+  panelSection: {
+    title: "Ein Webpart. Kostenlos. In 3 Tagen.",
+    fine: "1 Webpart pro Kunde · in bis zu 3 Tagen",
+    cta: "Kostenlos anfragen",
+    close: "Angebot schließen",
+    subject: "Kleine Aufgabe gratis – Panel",
+    body: "Hallo Coditu,\n\nunser kostenloses Webpart (Screenshot oder Beschreibung):\n\n\nWo es laufen soll (z. B. SharePoint):\n",
+  },
+
+  /**
    * Hero. ENTWURF — Adam überarbeitet den Text.
    * docs/02-POSITIONING.md: the Baukasten headline, not a workflow claim —
    * the only line a competitor cannot copy by rewriting their own headline.
