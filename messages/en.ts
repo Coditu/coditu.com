@@ -658,6 +658,35 @@ const en: Messages = {
       subject: "Free small task – Bavaria",
       body: "Hello Coditu,\n\nOur small task (one screen or one feature):\n\n\nWhere it should run (e.g. SharePoint):\n",
     },
+    nrw: {
+      slug: "sharepoint-development-nrw",
+      meta: {
+        title: "SharePoint Development North Rhine-Westphalia",
+        description: "SharePoint and SPFx development for companies in North Rhine-Westphalia. Weekly sprints, from €600 per web part.",
+      },
+      title: "SharePoint Development North Rhine-Westphalia",
+      intro:
+        "Looking for SharePoint or SPFx development for your company in North Rhine-Westphalia? We build web parts, internal apps and websites — as one team, from the first sketch to the operation after.",
+      points: [
+        {
+          title: "Remote from Berlin and Cairo",
+          text: "No travel needed for an on-site visit: your fixed contact is based in Berlin, the team works remotely from Cairo — for companies across North Rhine-Westphalia.",
+        },
+        {
+          title: "Weekly sprints",
+          text: "Every week we show what's done, on a shared board. You tell us what should change.",
+        },
+        {
+          title: "One team, no subcontractors",
+          text: "The same people from the first sketch to the operation after. Nothing gets handed off.",
+        },
+      ],
+      proofLabel: "From a real project",
+      priceLine: "A web part costs {{price:webPart}} — the price depends on the amount of work. All prices net.",
+      cta: "Try us free with a small task",
+      subject: "Free small task – NRW",
+      body: "Hello Coditu,\n\nOur small task (one screen or one feature):\n\n\nWhere it should run (e.g. SharePoint):\n",
+    },
   },
 
   // TODO(team): see messages/de.ts — taking over an existing project is open.

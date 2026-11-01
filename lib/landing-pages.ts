@@ -6,7 +6,7 @@ import { getMessages, locales, type Locale } from "@/lib/i18n";
  * "landingPages", and it's live in both languages. See messages/de.ts
  * "landingPages" doc comment for the full picture.
  */
-export const landingKeys = ["sharepointWebparts", "spfxDeveloper", "berlin", "bavaria"] as const;
+export const landingKeys = ["sharepointWebparts", "spfxDeveloper", "berlin", "bavaria", "nrw"] as const;
 export type LandingKey = (typeof landingKeys)[number];
 
 /** This page's path in every language — for hreflang and the sitemap. */

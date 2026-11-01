@@ -780,6 +780,35 @@ const de = {
       subject: "Kleine Aufgabe gratis – Bayern",
       body: "Hallo Coditu,\n\nunsere kleine Aufgabe (ein Screen oder eine Funktion):\n\n\nWo sie laufen soll (z. B. SharePoint):\n",
     },
+    nrw: {
+      slug: "sharepoint-entwicklung-nrw",
+      meta: {
+        title: "SharePoint-Entwicklung Nordrhein-Westfalen",
+        description: "SharePoint- und SPFx-Entwicklung für Unternehmen in Nordrhein-Westfalen. Wöchentliche Sprints, ab 600 € pro Webpart.",
+      },
+      title: "SharePoint-Entwicklung Nordrhein-Westfalen",
+      intro:
+        "Auf der Suche nach SharePoint- oder SPFx-Entwicklung für Ihr Unternehmen in Nordrhein-Westfalen? Wir bauen Webparts, interne Apps und Websites – als ein Team, von der ersten Skizze bis zum Betrieb danach.",
+      points: [
+        {
+          title: "Remote aus Berlin und Kairo",
+          text: "Kein Pendeln für einen Vor-Ort-Termin nötig: Ihr fester Ansprechpartner sitzt in Berlin, das Team arbeitet remote aus Kairo – für Unternehmen in ganz Nordrhein-Westfalen.",
+        },
+        {
+          title: "Wöchentliche Sprints",
+          text: "Jede Woche zeigen wir, was fertig ist, auf einem gemeinsamen Board. Sie sagen, was sich ändern soll.",
+        },
+        {
+          title: "Ein Team, keine Subunternehmer",
+          text: "Dieselben Leute von der ersten Skizze bis zum Betrieb danach. Nichts wird weitergereicht.",
+        },
+      ],
+      proofLabel: "Aus einem echten Projekt",
+      priceLine: "Ein Webpart kostet {{price:webPart}} – der Preis richtet sich nach dem Aufwand. Alle Preise netto.",
+      cta: "Kleine Aufgabe gratis sichern",
+      subject: "Kleine Aufgabe gratis – NRW",
+      body: "Hallo Coditu,\n\nunsere kleine Aufgabe (ein Screen oder eine Funktion):\n\n\nWo sie laufen soll (z. B. SharePoint):\n",
+    },
   },
 
   /**
