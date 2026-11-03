@@ -3,7 +3,7 @@ title: "Was kostet ein SharePoint-Webpart?"
 description: "Ein SharePoint-Webpart kostet so viel, wie seine Entwicklung an Stunden braucht. Bei uns sind das meist 5 bis 10 Stunden. Welche Faktoren den Aufwand bestimmen."
 slug: was-kostet-ein-sharepoint-webpart
 date: 2026-10-19
-updated: 2026-10-19
+updated: 2026-11-03
 readingTime: 4
 tags: [SharePoint, SPFx, Kosten]
 service: 0
@@ -53,10 +53,11 @@ Für eine Organisation haben wir rund 38 Webparts gebaut, in wöchentlichen Spri
 - Ein neuer Webpart braucht meist 5 bis 10 Stunden.
 - Die meisten Änderungswünsche brauchen höchstens 2 Stunden.
 
-Wir rechnen nach Aufwand ab. Vor dem Start bekommen Sie von uns eine Schätzung.
+Wir rechnen nach Aufwand ab, zum Festpreis pro Webpart oder nach Stunden. Vor dem Start bekommen Sie von uns eine Schätzung.
 
-- Neuer Webpart: {{price:webPart}}
-- Kleine Änderung: {{price:change}}
+## Was SharePoint-Entwicklung in Deutschland kostet
+
+Der Marktpreis für SharePoint- und SPFx-Entwicklung in Deutschland liegt im Schnitt bei rund 95 € pro Stunde – mit Junior-Sätzen um 80 bis 100 € und Senior-Sätzen um 120 bis 160 €. Unsere Sätze liegen deutlich unter diesem Durchschnitt. Den genauen Stundensatz oder Festpreis für Ihr Projekt nennen wir nach einer kurzen Abstimmung, nicht pauschal auf der Website – der Aufwand entscheidet, nicht eine Liste.
 
 ## Was in einer Schätzung stehen sollte
 

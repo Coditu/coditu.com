@@ -4,7 +4,7 @@ description: "A SharePoint web part costs the hours it takes to build. For us th
 slug: sharepoint-web-part-cost
 translationOf: was-kostet-ein-sharepoint-webpart
 date: 2026-10-19
-updated: 2026-10-19
+updated: 2026-11-03
 readingTime: 4
 tags: [SharePoint, SPFx, Cost]
 service: 0
@@ -54,10 +54,11 @@ We have built around 38 web parts for one organisation, in weekly sprints for al
 - A new web part usually takes 5 to 10 hours.
 - Most change requests take 2 hours or less.
 
-We bill by effort. Before we start, you get an estimate from us.
+We bill by effort, at a fixed price per web part or by the hour. Before we start, you get an estimate from us.
 
-- New web part: {{price:webPart}}
-- Small change: {{price:change}}
+## What SharePoint development costs in Germany
+
+The market rate for SharePoint and SPFx development in Germany averages around €95 per hour — junior rates sit around €80–100, senior rates around €120–160. Our rates are well below that average. We quote the exact hourly rate or fixed price for your project after a short discussion, not as a flat figure on the website — the amount of work decides, not a list.
 
 ## What an estimate should include
 

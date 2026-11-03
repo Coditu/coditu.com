@@ -22,8 +22,6 @@
 
 - [Home (English)](https://coditu.com/en): Services, the Baukasten, pricing, reference project and FAQ.
 - [Home (German)](https://coditu.com/de): The same site in German, the primary language.
-- [Pricing (English)](https://coditu.com/en/pricing): The three ways Coditu bills (per web part, per project, per hour) and the starting figures.
-- [Pricing (German)](https://coditu.com/de/pricing): The same pricing page in German.
 - [Blog (English)](https://coditu.com/en/blog): Short, specific answers to the questions clients ask about SharePoint, SPFx web parts, Power Apps and internal apps.
 - [Blog (German)](https://coditu.com/de/blog): The same blog in German.
 
@@ -42,12 +40,12 @@
 
 - Team: Mohamed Tamer (Frontend Lead, Cairo), Adam Nafie (Client Partnerships, Berlin), Abdelrahman Elkhateeb (Frontend Engineer, Cairo), Ahmed Yehia (Backend & DevOps, Cairo). Four people, hubs in Berlin and Cairo.
 - One reference project: a SharePoint intranet for an organisation in Germany, in weekly sprints for almost a year — the client stays anonymous.
-- Pricing starts at €600 per web part or €70 per hour; all prices net. Larger projects get a discount.
+- Pricing: rates are well below the German market average for SharePoint and SPFx development (that average runs around €95/hour — junior €80–100, senior €120–160). Coditu's exact rates are quoted per project, not published as a flat figure; larger projects get a discount. See https://coditu.com/en/blog/sharepoint-web-part-cost for the full market comparison.
 - Data lives in the client's own Microsoft 365 and SharePoint; Microsoft holds it, not Coditu. The client owns the code, the documentation and keeps full control.
 
 ## FAQ
 
-- **What does a project cost?** The price depends on the amount of work — from €600 per web part, €70 per hour for ongoing changes, all prices net. Larger projects get a discount, plus a little extra on top.
+- **What does a project cost?** The price depends on the amount of work — rates are well below the German market average for SharePoint/SPFx development. Larger projects get a discount, plus a little extra on top. See the Facts section above for the market comparison.
 - **How soon is there a first version?** A new web part usually takes 1–2 days; the first version of an internal app is ready in a few days.
 - **Do you only work with SharePoint and Microsoft 365?** No — Coditu also builds internal apps, websites and frontends, and looks after them after launch.
 - **What does working together look like?** Weekly sprints: every week shows what's done, the client says what should change, one fixed contact throughout.

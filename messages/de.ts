@@ -32,7 +32,6 @@ const de = {
     process: "arbeitsweise",
     reference: "referenz",
     security: "sicherheit",
-    pricing: "preise",
     team: "team",
     faq: "faq",
     contact: "kontakt",
@@ -53,6 +52,7 @@ const de = {
     blog: "Blog",
     booking: "Gespräch buchen",
     themeToggle: "Hell / Dunkel umschalten",
+    linkedin: "Coditu auf LinkedIn",
     menu: "Menü",
   },
 
@@ -591,72 +591,15 @@ const de = {
   },
 
   /**
-   * Pricing teaser: two cards, each number counting up once on view
-   * (components/site/count-up.client.tsx). Gone entirely while SHOW_PRICES
-   * is off (lib/site-config.ts) — the section returns null, so no markup
-   * and no counter JS ship either. The price itself comes from `PRICES` in
-   * lib/site-config.ts via the same `blog.prices.webPart` / `.change`
-   * templates the blog and the FAQ use — one number, three places.
-   */
-  pricingSection: {
-    title: "Was es kostet",
-    intro: "Der Preis richtet sich nach dem Aufwand. Diese Richtwerte helfen bei der ersten Einschätzung.",
-    webPartLabel: "Pro Webpart",
-    webPartText: "Je nach Umfang, meist 5–10 Stunden Arbeit.",
-    hourLabel: "Pro Stunde",
-    hourText: "Für laufende Änderungen und kleinere Aufgaben.",
-    note: "Bei größeren Projekten gibt es Rabatt – und die eine oder andere Kleinigkeit obendrauf. Vor dem Start bekommen Sie von uns eine Schätzung. Alle Preise netto.",
-    moreLabel: "Alle Preise und Abrechnungsarten ansehen",
-  },
-
-  /**
-   * The dedicated pricing page (app/[lang]/pricing/page.tsx) — the teaser
-   * above links here. Three billing models in prose (per web part is the
-   * default per docs/02-POSITIONING.md: hourly billing punishes a team
-   * that delivers in days), then the same two counted cards, gated the
-   * same way on SHOW_PRICES. `hidden` is what shows instead while prices
-   * are off — the page is never blank, just less specific.
-   */
-  pricingPage: {
-    meta: {
-      title: "Preise",
-      description: "Wie wir bei Coditu abrechnen: pro Webpart, pro Projekt oder pro Stunde – und die Zahlen, von denen wir ausgehen.",
-    },
-    title: "Preise",
-    intro:
-      "Der Preis richtet sich nach dem Aufwand, nicht nach einer festen Liste. Hier die drei Wege, wie wir abrechnen, und die Richtwerte für den Anfang.",
-    models: [
-      {
-        title: "Pro Webpart",
-        text: "Unser Standard für ein einzelnes Webpart oder eine kleine App-Funktion. Festpreis, nach kurzer Abstimmung.",
-      },
-      {
-        title: "Pro Projekt",
-        text: "Für größere Vorhaben wie ein ganzes Intranet oder eine neue App: Festpreis nach Umfang, in Meilensteinen vereinbart.",
-      },
-      {
-        title: "Pro Stunde",
-        text: "Für laufende Änderungen und kleinere Aufgaben nach dem Livegang.",
-      },
-    ],
-    hidden: {
-      title: "Preis auf Anfrage",
-      text: "Schreiben Sie uns kurz, worum es geht. Vor dem Start bekommen Sie von uns eine Schätzung.",
-    },
-    cta: "Kleine Aufgabe gratis sichern",
-    subject: "Kleine Aufgabe gratis – Preise",
-    body: "Hallo Coditu,\n\nunsere kleine Aufgabe (ein Screen oder eine Funktion):\n\n\nWo sie laufen soll (z. B. SharePoint):\n",
-  },
-
-  /**
    * Keyword landing pages (app/[lang]/services/[slug]/page.tsx) —
    * docs/02-POSITIONING.md "Search" phase 2, from the playbook's move #7:
    * "one landing page each for terms like 'SPFx Entwickler' and
    * 'SharePoint Webparts entwickeln lassen'". `slug` is per language, on
-   * purpose a real localized URL segment (not the same-literal-segment
-   * compromise `pricingPage` uses) — the keyword IS the point here. Every
-   * fact repeats what's already published elsewhere (servicesSection,
-   * referenceSection, pricingSection) — invent nothing new for SEO's sake.
+   * purpose a real localized URL segment — the keyword IS the point here.
+   * Every fact repeats what's already published elsewhere (servicesSection,
+   * referenceSection) — invent nothing new for SEO's sake. No price figures:
+   * see "Prices" in docs/02-POSITIONING.md for why the site states only that
+   * rates are below the German market average, never a number.
    * Add a new key here, its slug in both files, and its entry in
    * `lib/landing-pages.ts`'s registry, to add a page.
    */
@@ -666,7 +609,7 @@ const de = {
       meta: {
         title: "SharePoint-Webparts entwickeln lassen",
         description:
-          "SharePoint- und SPFx-Webparts für Ihr Intranet, in Ihrem Design, live aus Ihren SharePoint-Listen. Meist 1–2 Tage pro Webpart, {{price:webPart}}.",
+          "SharePoint- und SPFx-Webparts für Ihr Intranet, in Ihrem Design, live aus Ihren SharePoint-Listen. Meist 1–2 Tage pro Webpart, zu Sätzen unter dem deutschen Marktdurchschnitt.",
       },
       title: "SharePoint-Webparts entwickeln lassen",
       intro:
@@ -686,7 +629,7 @@ const de = {
         },
       ],
       proofLabel: "Aus einem echten Projekt",
-      priceLine: "Ein Webpart kostet {{price:webPart}} – der Preis richtet sich nach dem Aufwand. Alle Preise netto.",
+      priceLine: "Der Preis richtet sich nach dem Aufwand – unsere Sätze liegen unter dem deutschen Marktdurchschnitt.",
       cta: "Webpart kostenlos neu gestalten lassen",
       subject: "Kleine Aufgabe gratis – SharePoint Webparts",
       body: "Hallo Coditu,\n\nbitte gestalten Sie dieses Webpart kostenlos neu (Screenshot im Anhang).\n\nWas uns daran stört:\n\n",
@@ -696,7 +639,7 @@ const de = {
       meta: {
         title: "SPFx-Entwickler",
         description:
-          "SPFx-Entwicklung für SharePoint und Microsoft 365: ein Team, keine Subunternehmer, wöchentliche Sprints, {{price:change}}.",
+          "SPFx-Entwicklung für SharePoint und Microsoft 365: ein Team, keine Subunternehmer, wöchentliche Sprints, zu Sätzen unter dem deutschen Marktdurchschnitt.",
       },
       title: "SPFx-Entwickler",
       intro:
@@ -716,7 +659,7 @@ const de = {
         },
       ],
       proofLabel: "Aus einem echten Projekt",
-      priceLine: "Wir rechnen mit {{price:change}} ab, oder zum Festpreis je Webpart oder Projekt. Alle Preise netto.",
+      priceLine: "Wir rechnen nach Aufwand ab – stundenweise oder zum Festpreis je Webpart oder Projekt, zu Sätzen unter dem deutschen Marktdurchschnitt.",
       cta: "Kleine Aufgabe gratis sichern",
       subject: "Kleine Aufgabe gratis – SPFx",
       body: "Hallo Coditu,\n\nunsere kleine Aufgabe (ein Screen oder eine Funktion):\n\n\nWo sie laufen soll (z. B. SharePoint):\n",
@@ -725,7 +668,7 @@ const de = {
       slug: "sharepoint-entwicklung-berlin",
       meta: {
         title: "SharePoint-Entwicklung Berlin",
-        description: "SharePoint- und SPFx-Entwicklung mit festem Ansprechpartner in Berlin. Wöchentliche Sprints, ab 600 € pro Webpart.",
+        description: "SharePoint- und SPFx-Entwicklung mit festem Ansprechpartner in Berlin. Wöchentliche Sprints, zu Sätzen unter dem deutschen Marktdurchschnitt.",
       },
       title: "SharePoint-Entwicklung Berlin",
       intro:
@@ -745,7 +688,7 @@ const de = {
         },
       ],
       proofLabel: "Aus einem echten Projekt",
-      priceLine: "Ein Webpart kostet {{price:webPart}} – der Preis richtet sich nach dem Aufwand. Alle Preise netto.",
+      priceLine: "Der Preis richtet sich nach dem Aufwand – unsere Sätze liegen unter dem deutschen Marktdurchschnitt.",
       cta: "Kleine Aufgabe gratis sichern",
       subject: "Kleine Aufgabe gratis – Berlin",
       body: "Hallo Coditu,\n\nunsere kleine Aufgabe (ein Screen oder eine Funktion):\n\n\nWo sie laufen soll (z. B. SharePoint):\n",
@@ -755,7 +698,7 @@ const de = {
       meta: {
         title: "SharePoint-Entwicklung Bayern",
         description:
-          "SharePoint- und SPFx-Entwicklung für Unternehmen in Bayern. Projekte können über das Förderprogramm Digitalbonus.Bayern förderfähig sein. Ab 600 € pro Webpart.",
+          "SharePoint- und SPFx-Entwicklung für Unternehmen in Bayern. Projekte können über das Förderprogramm Digitalbonus.Bayern förderfähig sein. Sätze unter dem deutschen Marktdurchschnitt.",
       },
       title: "SharePoint-Entwicklung Bayern",
       intro:
@@ -775,7 +718,7 @@ const de = {
         },
       ],
       proofLabel: "Aus einem echten Projekt",
-      priceLine: "Ein Webpart kostet {{price:webPart}} – der Preis richtet sich nach dem Aufwand. Alle Preise netto.",
+      priceLine: "Der Preis richtet sich nach dem Aufwand – unsere Sätze liegen unter dem deutschen Marktdurchschnitt.",
       cta: "Kleine Aufgabe gratis sichern",
       subject: "Kleine Aufgabe gratis – Bayern",
       body: "Hallo Coditu,\n\nunsere kleine Aufgabe (ein Screen oder eine Funktion):\n\n\nWo sie laufen soll (z. B. SharePoint):\n",
@@ -784,7 +727,7 @@ const de = {
       slug: "sharepoint-entwicklung-nrw",
       meta: {
         title: "SharePoint-Entwicklung Nordrhein-Westfalen",
-        description: "SharePoint- und SPFx-Entwicklung für Unternehmen in Nordrhein-Westfalen. Wöchentliche Sprints, ab 600 € pro Webpart.",
+        description: "SharePoint- und SPFx-Entwicklung für Unternehmen in Nordrhein-Westfalen. Wöchentliche Sprints, zu Sätzen unter dem deutschen Marktdurchschnitt.",
       },
       title: "SharePoint-Entwicklung Nordrhein-Westfalen",
       intro:
@@ -804,7 +747,7 @@ const de = {
         },
       ],
       proofLabel: "Aus einem echten Projekt",
-      priceLine: "Ein Webpart kostet {{price:webPart}} – der Preis richtet sich nach dem Aufwand. Alle Preise netto.",
+      priceLine: "Der Preis richtet sich nach dem Aufwand – unsere Sätze liegen unter dem deutschen Marktdurchschnitt.",
       cta: "Kleine Aufgabe gratis sichern",
       subject: "Kleine Aufgabe gratis – NRW",
       body: "Hallo Coditu,\n\nunsere kleine Aufgabe (ein Screen oder eine Funktion):\n\n\nWo sie laufen soll (z. B. SharePoint):\n",
@@ -825,7 +768,7 @@ const de = {
       {
         question: "Was kostet ein Projekt?",
         answer:
-          "Der Preis richtet sich nach dem Aufwand – {{price:webPart}}, {{price:change}} für laufende Änderungen. Bei größeren Projekten gibt es Rabatt und kleine Extras obendrauf. Vor dem Start bekommen Sie von uns eine Schätzung. Alle Preise netto.",
+          "Der Preis richtet sich nach dem Aufwand – unsere Sätze liegen deutlich unter dem deutschen Marktdurchschnitt für SharePoint-Entwicklung. Bei größeren Projekten gibt es Rabatt und kleine Extras obendrauf. Vor dem Start bekommen Sie von uns eine Schätzung.",
       },
       {
         question: "Wie schnell gibt es eine erste Version?",
@@ -902,8 +845,6 @@ const de = {
       service: "Leistung: {service}",
       reference: "Unsere Referenz",
     },
-    /** `{{price:…}}` in a post. The amounts and the switch are in lib/site-config.ts. */
-    prices: { webPart: "ab {price}", change: "{price} pro Stunde", onRequest: "Preis auf Anfrage" },
   },
 
   footer: {

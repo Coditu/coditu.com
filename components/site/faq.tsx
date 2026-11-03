@@ -2,7 +2,6 @@ import { Plus } from "lucide-react";
 
 import { textLink } from "@/components/ui/button";
 import { getMessages, type Locale } from "@/lib/i18n";
-import { withPrices } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
 import { Container } from "./container";
@@ -12,14 +11,11 @@ import { SectionHeader } from "./section-header";
  * FAQ: native <details> rows, all closed — keyboard and screen readers get
  * the disclosure for free, and it works without JS. No spec of its own, so it
  * reuses the section header and the Security rows (page-sections.md).
- * The FAQPage JSON-LD is built from the same messages. An answer may carry a
- * `{{price:…}}` token (lib/pricing.ts) — resolved once here, so the visible
- * text and the JSON-LD never disagree.
+ * The FAQPage JSON-LD is built from the same messages.
  */
 export function Faq({ locale }: { locale: Locale }) {
   const t = getMessages(locale);
-  const items = t.faqSection.items.map((item) => ({ ...item, answer: withPrices(locale, item.answer) }));
-  const s = { ...t.faqSection, items };
+  const s = t.faqSection;
 
   const jsonLd = {
     "@context": "https://schema.org",

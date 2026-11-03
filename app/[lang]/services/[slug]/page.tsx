@@ -7,7 +7,6 @@ import { BOOKING_URL, CONTACT_EMAIL } from "@/lib/site-config";
 import { allLandingParams, findLanding, landingPaths } from "@/lib/landing-pages";
 import { getMessages, hasLocale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/metadata";
-import { withPrices } from "@/lib/pricing";
 
 export const dynamicParams = false;
 export const generateStaticParams = () => allLandingParams();
@@ -23,21 +22,19 @@ async function resolve(params: PageProps<"/[lang]/services/[slug]">["params"]) {
 export async function generateMetadata({ params }: PageProps<"/[lang]/services/[slug]">): Promise<Metadata> {
   const { lang, page } = await resolve(params);
   const key = findLanding(lang, page.slug)!;
-  // The description carries a `{{price:...}}` token like `priceLine` below, so
-  // a SHOW_PRICES=false build never leaks a specific euro figure into the
-  // meta description Google shows, even while the page itself never did.
-  return pageMetadata(lang, landingPaths(key), { title: page.meta.title, description: withPrices(lang, page.meta.description) });
+  return pageMetadata(lang, landingPaths(key), { title: page.meta.title, description: page.meta.description });
 }
 
 /**
  * Keyword landing pages — docs/02-POSITIONING.md "Search" phase 2. One page
  * per real search phrase (playbook move #7), content drawn only from facts
- * already published elsewhere (servicesSection, referenceSection,
- * pricingSection) — see messages/de.ts "landingPages" doc comment. Fully
- * static, no client component: nothing here needs the JS budget.
+ * already published elsewhere (servicesSection, referenceSection) — see
+ * messages/de.ts "landingPages" doc comment. No price figures: see "Prices"
+ * in docs/02-POSITIONING.md. Fully static, no client component: nothing
+ * here needs the JS budget.
  */
 export default async function LandingPage({ params }: PageProps<"/[lang]/services/[slug]">) {
-  const { lang, t, page: p } = await resolve(params);
+  const { t, page: p } = await resolve(params);
   const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(p.subject)}&body=${encodeURIComponent(p.body)}`;
   // The two facts most relevant to a single web part — the same real numbers
   // referenceSection already states, not new ones.
@@ -69,7 +66,7 @@ export default async function LandingPage({ params }: PageProps<"/[lang]/service
         ))}
       </ul>
 
-      <p className="mt-6 max-w-[64ch] text-[15px] leading-normal text-ink-muted">{withPrices(lang, p.priceLine)}</p>
+      <p className="mt-6 max-w-[64ch] text-[15px] leading-normal text-ink-muted">{p.priceLine}</p>
 
       <div className="mt-10 flex flex-wrap gap-4">
         <ButtonLink href={mailto} variant="cta" size="lg">

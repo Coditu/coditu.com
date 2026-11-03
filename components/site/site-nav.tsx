@@ -1,8 +1,10 @@
+import { Linkedin } from "lucide-react";
+
 import { CoditusLockup } from "@/components/coditu/coditus-mark";
 import { ButtonLink } from "@/components/ui/button";
 import { blogPath, getPosts } from "@/lib/blog";
 import { getMessages, pages, sectionHref, type Locale } from "@/lib/i18n";
-import { BOOKING_URL } from "@/lib/site-config";
+import { BOOKING_URL, LINKEDIN_URL } from "@/lib/site-config";
 
 import { Container } from "./container";
 import { LanguageSwitch } from "./language-switch.client";
@@ -47,6 +49,16 @@ export function SiteNav({
         </nav>
 
         <div className="flex items-center gap-4">
+          <a
+            href={LINKEDIN_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={t.nav.linkedin}
+            title={t.nav.linkedin}
+            className="inline-flex size-11 items-center justify-center text-ink-muted transition-colors duration-150 hover:text-blueprint"
+          >
+            <Linkedin aria-hidden="true" size={20} strokeWidth={1.5} />
+          </a>
           <LanguageSwitch locale={locale} label={t.language.groupLabel} switchTo={t.language.switchTo} hashMap={hashMap} pathMap={pathMap} />
           <ThemeToggle label={t.nav.themeToggle} />
           <ButtonLink href={booking} variant="outline" size="sm" className="hidden lg:inline-flex">
