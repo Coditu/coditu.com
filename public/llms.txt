@@ -45,7 +45,7 @@
 
 ## FAQ
 
-- **What does a project cost?** The price depends on the amount of work — from €600 per web part, €70 per hour for ongoing changes, all prices net. Larger projects get a discount, plus a little extra on top.
+- **What does a project cost?** The price depends on the amount of work — rates are well below the German market average for SharePoint/SPFx development. Larger projects get a discount, plus a little extra on top. See the Facts section above for the market comparison.
 - **How soon is there a first version?** A new web part usually takes 1–2 days; the first version of an internal app is ready in a few days.
 - **Do you only work with SharePoint and Microsoft 365?** No — Coditu also builds internal apps, websites and frontends, and looks after them after launch.
 - **What does working together look like?** Weekly sprints: every week shows what's done, the client says what should change, one fixed contact throughout.

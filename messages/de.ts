@@ -668,7 +668,7 @@ const de = {
       slug: "sharepoint-entwicklung-berlin",
       meta: {
         title: "SharePoint-Entwicklung Berlin",
-        description: "SharePoint- und SPFx-Entwicklung mit festem Ansprechpartner in Berlin. Wöchentliche Sprints, ab 600 € pro Webpart.",
+        description: "SharePoint- und SPFx-Entwicklung mit festem Ansprechpartner in Berlin. Wöchentliche Sprints, zu Sätzen unter dem deutschen Marktdurchschnitt.",
       },
       title: "SharePoint-Entwicklung Berlin",
       intro:
@@ -698,7 +698,7 @@ const de = {
       meta: {
         title: "SharePoint-Entwicklung Bayern",
         description:
-          "SharePoint- und SPFx-Entwicklung für Unternehmen in Bayern. Projekte können über das Förderprogramm Digitalbonus.Bayern förderfähig sein. Ab 600 € pro Webpart.",
+          "SharePoint- und SPFx-Entwicklung für Unternehmen in Bayern. Projekte können über das Förderprogramm Digitalbonus.Bayern förderfähig sein. Sätze unter dem deutschen Marktdurchschnitt.",
       },
       title: "SharePoint-Entwicklung Bayern",
       intro:
@@ -727,7 +727,7 @@ const de = {
       slug: "sharepoint-entwicklung-nrw",
       meta: {
         title: "SharePoint-Entwicklung Nordrhein-Westfalen",
-        description: "SharePoint- und SPFx-Entwicklung für Unternehmen in Nordrhein-Westfalen. Wöchentliche Sprints, ab 600 € pro Webpart.",
+        description: "SharePoint- und SPFx-Entwicklung für Unternehmen in Nordrhein-Westfalen. Wöchentliche Sprints, zu Sätzen unter dem deutschen Marktdurchschnitt.",
       },
       title: "SharePoint-Entwicklung Nordrhein-Westfalen",
       intro:

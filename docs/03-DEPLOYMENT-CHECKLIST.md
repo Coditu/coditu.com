@@ -76,11 +76,6 @@ never run end-to-end against real Vercel credentials.
 
 - **Env vars at build time** (set in Vercel → Project → Settings → Environment Variables,
   not in GitHub):
-  - `NEXT_PUBLIC_SHOW_PRICES` — optional. Unset or anything other than the literal string
-    `"false"` shows prices (600 €/web part, 70 €/h, and the counted pricing cards on the
-    homepage). Set to `false` to hide them — requires a redeploy to take effect; it's a
-    **build-time** switch, not a runtime one (the site has no backend and every page stays
-    prerendered on purpose).
   - `NEXT_PUBLIC_SITE_URL` — optional, see `.env.example`. Falls back to Vercel's own
     production URL if unset, so this normally doesn't need setting explicitly.
   - No other env var is required for the build to succeed — that's a deliberate repo rule

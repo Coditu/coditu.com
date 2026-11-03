@@ -561,7 +561,7 @@ const en: Messages = {
       slug: "sharepoint-development-berlin",
       meta: {
         title: "SharePoint Development Berlin",
-        description: "SharePoint and SPFx development with a fixed contact based in Berlin. Weekly sprints, from €600 per web part.",
+        description: "SharePoint and SPFx development with a fixed contact based in Berlin. Weekly sprints, at rates below the German market average.",
       },
       title: "SharePoint Development Berlin",
       intro:
@@ -591,7 +591,7 @@ const en: Messages = {
       meta: {
         title: "SharePoint Development Bavaria",
         description:
-          "SharePoint and SPFx development for companies in Bavaria. Projects may qualify for the Digitalbonus.Bayern public funding programme. From €600 per web part.",
+          "SharePoint and SPFx development for companies in Bavaria. Projects may qualify for the Digitalbonus.Bayern public funding programme. Rates below the German market average.",
       },
       title: "SharePoint Development Bavaria",
       intro:
@@ -620,7 +620,7 @@ const en: Messages = {
       slug: "sharepoint-development-nrw",
       meta: {
         title: "SharePoint Development North Rhine-Westphalia",
-        description: "SharePoint and SPFx development for companies in North Rhine-Westphalia. Weekly sprints, from €600 per web part.",
+        description: "SharePoint and SPFx development for companies in North Rhine-Westphalia. Weekly sprints, at rates below the German market average.",
       },
       title: "SharePoint Development North Rhine-Westphalia",
       intro:
