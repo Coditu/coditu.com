@@ -5,7 +5,6 @@ import { marked } from "marked";
 
 import { getMessages, locales, otherLocale, pages, type Locale } from "@/lib/i18n";
 import { landingKeys, landingPaths } from "@/lib/landing-pages";
-import { withPrices } from "@/lib/pricing";
 
 /**
  * The blog: one Markdown file per post in `content/blog/<locale>/`, front
@@ -144,15 +143,12 @@ export function formatDate(locale: Locale, date: string) {
 }
 
 /**
- * The post body as HTML. `{{price:webPart}}` / `{{price:change}}` become our
- * starting prices, or „Preis auf Anfrage“ while `SHOW_PRICES` is off. Tables
- * get a wrapper that scrolls sideways on phones.
+ * The post body as HTML. Tables get a wrapper that scrolls sideways on phones.
  */
 export function renderPost(locale: Locale, post: Post) {
   const t = getMessages(locale).blog;
-  const markdown = withPrices(locale, post.body);
 
-  return (marked.parse(markdown, { async: false }) as string)
+  return (marked.parse(post.body, { async: false }) as string)
     .replaceAll("<table>", `<div class="table-scroll" role="region" tabindex="0" aria-label="${t.tableLabel}"><table>`)
     .replaceAll("</table>", "</table></div>");
 }

@@ -67,19 +67,17 @@ anymore. Same proven FLIP-style fly animation and five-phase state machine as be
 (`use-sequence.ts`, timing unchanged), only the source view was reskinned; `AppWindow`
 (what the blocks build into) needed zero changes — it was always content-agnostic.
 
-**Pricing:** published, not hidden. `600 €`/web part, `70 €`/hour (`lib/site-config.ts` →
-`PRICES`), deliberately ~26% under the German market median (95 €/h) — a positioning
-choice, never justified by Coditu's cost base, which must never appear on the site or in a
-client conversation (Ahmed's explicit instruction). Not a fixed per-web-part price — it
-varies with scope; the FAQ and the pricing cards say so, and larger projects get a
-discount plus "a little extra," stated loosely, nothing specific invented. The whole
-pricing display (FAQ price mentions, the homepage pricing-cards section, the blog's
-`{{price:...}}` tokens) is gated on one switch: `SHOW_PRICES` in `lib/site-config.ts`,
-driven by the build-time env var `NEXT_PUBLIC_SHOW_PRICES` (default on; set to the literal
-string `"false"` in Vercel + redeploy to hide). The pricing cards
-(`components/site/price-cards.tsx`) count up from 0 once scrolled into view
-(`components/site/count-up.client.tsx`), holding the final value before/after for
-no-JS and `prefers-reduced-motion`.
+**Pricing — historical, since superseded 2026-11-03:** this session published `600 €`/web
+part, `70 €`/hour, gated behind a `SHOW_PRICES` toggle. **All of it — the figures, the
+toggle, `PRICES`, `SHOW_PRICES`, `lib/pricing.ts`, the homepage pricing-cards section, the
+dedicated pricing page — was removed on 2026-11-03.** No euro figure appears anywhere on
+the site any more, and there's no toggle to bring one back without writing new code. See
+`docs/02-POSITIONING.md` "Prices" for the current policy and why (a cloaking-risk request
+was the trigger — showing search engines/AI a different price than visitors see — refused,
+and the whole pricing-display feature was removed as the resolution instead). The
+qualitative "below the German market average" claim lives on in the FAQ, landing pages,
+`llms.txt`, and the `was-kostet-ein-sharepoint-webpart.md`/`sharepoint-web-part-cost.md`
+blog post, which is now the one place with real market-comparison detail.
 
 **Booking:** `BOOKING_URL` → `https://cal.com/coditu/30min` (a real Coditu-branded Cal.com
 profile, not a personal one — it went through one iteration, starting on Abdelrahman's
@@ -170,12 +168,10 @@ addition could fail the gate outright.
   `docs/03-DEPLOYMENT-CHECKLIST.md` has since been resolved (or deploys are happening by
   another path) — **treat anything merged to `main` as live within minutes**, which raises
   the stakes on review before merging, especially security fixes.
-- **The dedicated pricing page was removed (2026-11-03)** — `app/[lang]/pricing/page.tsx` and
-  `pages.pricing` in `lib/locales.ts` are gone; `/de/pricing` and `/en/pricing` now 308-redirect
-  to the homepage's pricing teaser section instead of 404ing (both URLs were already indexed).
-  The homepage teaser (`components/site/price-cards.tsx`, `pricingSection` in `messages/*.ts`)
-  is unaffected and is now the only pricing surface on the site — it no longer links anywhere
-  further, since there's nowhere further to link to.
+- **No price figures appear anywhere on the site (2026-11-03).** Not just the dedicated pricing
+  page — the homepage teaser, `PRICES`, `SHOW_PRICES`, `lib/pricing.ts` and the toggle itself are
+  all gone too. See "Pricing" above and `docs/02-POSITIONING.md` "Prices" for the full policy.
+  `/de/pricing` and `/en/pricing` 308-redirect to the homepage.
 - Native-German review of `messages/de.ts` (a real speaker, not a model), before outreach.
 - **JS budget headroom is down to ~3.8 KB** — see above. Check before adding client-side
   interactivity; raising the 172 KB gate itself needs a team decision, not a unilateral one.

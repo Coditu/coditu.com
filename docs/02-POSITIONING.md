@@ -51,36 +51,33 @@ What runs instead, all of it already true:
 
 ## Prices
 
-Published, and gated behind a build-time env var so they can be switched off.
+**No figures published anywhere, as of 2026-11-03.** Rev. B (above) published 600 €/70 €/h with a
+build-time toggle to hide them; that toggle, the homepage pricing teaser, the dedicated pricing
+page, and every `{{price:…}}` token in the blog/FAQ were all removed in the same change, per
+Ahmed's explicit instruction. Nothing in this repo shows a Coditu euro figure to a visitor any
+more — not a flag you can flip back on, a structural decision. If prices are ever published again,
+that's new code, not a toggle.
 
-| | DE | EN |
-|---|---|---|
-| Web part | ab 600 € | from €600 |
-| Hourly | 70 € | €70 |
-| Alle Preise netto. | All prices net. |
+**What stays, and why:** the real reason prices came off the site was a cloaking risk — showing a
+different number to search engines/AI crawlers than to visitors is a Google-penalty-class move,
+and there was no legitimate reason to want that split. The *positioning* underneath is unchanged:
+Coditu's rates are deliberately below the German market median, and that claim is still worth
+making for SEO/GEO — just without a number attached:
 
-**Not a fixed per-web-part price.** The site never says a web part "usually" has a fixed price —
-the real driver is the amount of work, which varies by scope. 600 €/70 €/h are starting figures,
-not a price list. Larger projects get a discount, and something extra on top — stated loosely
-(`pricingSection.note` in `messages/*.ts`), not as a specific named freebie.
+- German market context (real, citable): SharePoint/SPFx work averages ~95 €/h (junior 80–100,
+  senior 120–160). This number is safe to state — it's the market's, not Coditu's own rate.
+- The qualitative claim — "below the German market average" — appears in `messages/*.ts` (FAQ
+  answer, landing page `priceLine`/meta descriptions) and in `public/llms.txt`'s Facts section.
+- The German-market-cost blog post (`was-kostet-ein-sharepoint-webpart.md` /
+  `sharepoint-web-part-cost.md`) is the one place with real detail — per the instruction that lives
+  on a blog page, not the homepage. It states the market average, says Coditu's own rate sits
+  below it, and that the exact number comes after a short conversation, not from the website.
+- Billing model (per web part / per project / per hour) is still real and can still be described —
+  it's the *number* that's gone, not the structure.
 
-Three billing models: **per web part (default), per project, per hour.** Per-piece leads, because
-hourly billing punishes a team that delivers in days — see the playbook.
-
-Market context, for defending the number: the German median for SharePoint work is 95 €/h
-(junior 80–100, senior 120–160). 70 €/h is ~26% below median. It is deliberately the affordable
-option. It is *not* justified by a low cost base — that sets margin, not price, and must never
-appear on the site or in a conversation with a client.
-
-Consistency rule: **600 € ÷ 70 €/h ≈ 8.6 hours.** Any statement about how long a web part takes has
-to land near that. `messages/de.ts` → `servicesSection.rows[0].result` and
-`referenceSection.facts` must agree with it.
-
-Toggle note: a switch that works without a redeploy would need request state, which breaks the
-"every page stays prerendered" rule `npm run budgets` enforces. Build-time env var
-(`NEXT_PUBLIC_SHOW_PRICES`) + redeploy only. This now gates a whole homepage section
-(`components/site/price-cards.tsx` → `Pricing`), not just blog/FAQ text: off, the section renders
-nothing and ships no counter JS.
+**Consequence for the content:** `servicesSection.rows[0].result` and `referenceSection.facts`
+("5–10 Stunden" / "5 to 10 hours" per web part) still state real hours — hours were never the
+cloaking risk, only euro amounts were. Those stay as they are.
 
 ## The free offer
 
@@ -105,9 +102,11 @@ optional next step. The lead is captured even if they never book.
 6. How we work (board, weekly sprints)
 7. Reference — one year of sprints
 8. Security & DSGVO
-9. Pricing teaser (dedicated pricing page removed 2026-11-03 — the homepage teaser is now the
-   only pricing surface; `/de/pricing` and `/en/pricing` 308-redirect to the teaser's anchor)
-10. FAQ · Team · Contact
+9. FAQ · Team · Contact
+
+(A pricing teaser used to sit here as step 9. Removed 2026-11-03 along with the dedicated pricing
+page and every `{{price:…}}` figure site-wide — see "Prices" below. `/de/pricing` and
+`/en/pricing` 308-redirect to the homepage.)
 
 The slider is the strongest two seconds on the site: it makes the problem visceral before a word is
 read. It was buried.

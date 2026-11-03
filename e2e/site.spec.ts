@@ -446,20 +446,6 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(section.locator("h3")).toHaveCount(4);
     });
 
-    test("pricing: follows security, precedes faq, shows a counted web part and hourly price", async ({ page }) => {
-      await page.goto(home);
-      const section = page.locator('section[aria-labelledby="pricing-title"]');
-      expect(await section.getAttribute("id")).toBe(lang === "de" ? "preise" : "pricing");
-      await expect(page.locator('section[aria-labelledby="security-title"] + section')).toHaveId(
-        lang === "de" ? "preise" : "pricing"
-      );
-      await expect(page.locator('section[aria-labelledby="pricing-title"] + section')).toHaveId("faq");
-      const cards = section.locator("li");
-      await expect(cards).toHaveCount(2);
-      await expect(cards.nth(0)).toContainText("600");
-      await expect(cards.nth(1)).toContainText("70");
-    });
-
     for (const entry of LANDING_PAGES) {
       test(`keyword landing page: ${entry.title.en} — three points, two real proof stats, a priced CTA`, async ({ page }) => {
         await page.goto(`/${lang}/services/${entry.slug[lang]}`);
@@ -486,10 +472,10 @@ for (const { lang, home, imprint, privacy } of LANGS) {
       await expect(page).toHaveURL(new RegExp(`/${otherLang}/services/${LANDING_PAGES[0].slug[otherLang]}$`));
     });
 
-    test("faq: follows pricing, all closed, opens by keyboard, JSON-LD says the same", async ({ page }) => {
+    test("faq: follows security, all closed, opens by keyboard, JSON-LD says the same", async ({ page }) => {
       await page.goto(home);
       const section = page.locator('section[aria-labelledby="faq-title"]');
-      await expect(page.locator('section[aria-labelledby="pricing-title"] + section')).toHaveId("faq");
+      await expect(page.locator('section[aria-labelledby="security-title"] + section')).toHaveId("faq");
       await expect(section.locator("details[open]")).toHaveCount(0);
 
       const first = section.locator("details").first();

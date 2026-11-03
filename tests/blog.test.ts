@@ -1,11 +1,10 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { formatDate, parsePost, renderPost } from "@/lib/blog";
 import { locales } from "@/lib/i18n";
-import de from "@/messages/de";
 
 const source = `---
 title: "Was kostet ein Webpart?"
@@ -19,7 +18,7 @@ service: 0
 review: "needs Adam"
 ---
 
-Antwort. {{price:webPart}}
+Antwort.
 
 | A | B |
 |---|---|
@@ -46,27 +45,9 @@ describe("blog", () => {
     expect(() => parsePost(source.replace("date: 2026-10-19", "date: 19.10.2026"))).toThrow(/date/);
   });
 
-  it("writes the web part price by default (SHOW_PRICES unset), and wraps tables to scroll", () => {
+  it("wraps tables to scroll", () => {
     const html = renderPost("de", parsePost(source));
-    expect(html).toContain(de.blog.prices.webPart.replace("{price}", "600 €"));
-    expect(html).not.toContain(de.blog.prices.onRequest);
     expect(html).toMatch(/<div class="table-scroll" role="region" tabindex="0" aria-label="[^"]+"><table>[\s\S]*<\/table><\/div>/);
-  });
-
-  it('writes „Preis auf Anfrage“ when NEXT_PUBLIC_SHOW_PRICES="false"', async () => {
-    // lib/site-config.ts reads process.env once at import time, so prove the
-    // off-switch works by re-importing with it stubbed, not by trusting the
-    // default. vi.resetModules() forces a fresh module graph.
-    vi.stubEnv("NEXT_PUBLIC_SHOW_PRICES", "false");
-    vi.resetModules();
-    const { renderPost: renderPostPricesOff, parsePost: parsePostPricesOff } = await import("@/lib/blog");
-    const html = renderPostPricesOff("de", parsePostPricesOff(source));
-    expect(html).toContain(de.blog.prices.onRequest);
-  });
-
-  afterEach(() => {
-    vi.unstubAllEnvs();
-    vi.resetModules();
   });
 
   it("formats a date as the day it is, in any time zone", () => {
