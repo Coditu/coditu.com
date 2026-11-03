@@ -18,10 +18,4 @@ export const pages = {
   home: { de: "/de", en: "/en" },
   imprint: { de: "/de/impressum", en: "/en/legal-notice" },
   privacy: { de: "/de/datenschutz", en: "/en/privacy" },
-  // Same segment in both languages, deliberately — like /blog, not /impressum
-  // vs /legal-notice. "Pricing" reads fine as a loanword in German tech
-  // contexts and keeps this route a plain literal folder (app/[lang]/pricing)
-  // instead of a second dynamic single-segment family alongside [legal],
-  // which Next.js doesn't allow two of at the same route level.
-  pricing: { de: "/de/pricing", en: "/en/pricing" },
 } as const satisfies Record<string, Record<Locale, string>>;

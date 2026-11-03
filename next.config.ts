@@ -6,7 +6,16 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // German is the primary language. A redirect rule, not a page, so nothing
   // under `/de` or `/en` has to read headers and both stay prerendered.
-  redirects: async () => [{ source: "/", destination: "/de", permanent: false }],
+  redirects: async () => [
+    { source: "/", destination: "/de", permanent: false },
+    // The dedicated pricing page was removed (2026-11-03), and the homepage's
+    // pricing teaser section that replaced it as the redirect target was
+    // itself removed shortly after (no prices are shown anywhere on the site
+    // now — see docs/02-POSITIONING.md "Prices"). Both URLs were already
+    // indexed, so redirect to the homepage rather than 404.
+    { source: "/de/pricing", destination: "/de", permanent: true },
+    { source: "/en/pricing", destination: "/en", permanent: true },
+  ],
   // Static, declarative — same as `redirects` above, applied by the CDN/edge
   // layer, not read in-app, so this doesn't touch "every page stays
   // prerendered" either. No prior security headers existed at all (checked

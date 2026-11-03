@@ -23,7 +23,6 @@ const en: Messages = {
     process: "how-we-work",
     reference: "reference",
     security: "security",
-    pricing: "pricing",
     team: "team",
     faq: "faq",
     contact: "contact",
@@ -44,6 +43,7 @@ const en: Messages = {
     blog: "Blog",
     booking: "Book a call",
     themeToggle: "Toggle light / dark mode",
+    linkedin: "Coditu on LinkedIn",
     menu: "Menu",
   },
 
@@ -493,59 +493,17 @@ const en: Messages = {
     },
   },
 
-  // See messages/de.ts "pricingSection" — same shape, same numbers.
-  pricingSection: {
-    title: "What it costs",
-    intro: "The price depends on the amount of work. These are the figures we start from.",
-    webPartLabel: "Per web part",
-    webPartText: "Depends on scope, usually 5–10 hours of work.",
-    hourLabel: "Per hour",
-    hourText: "For ongoing changes and smaller tasks.",
-    note: "Larger projects get a discount — and a little extra on top. Before we start, you get an estimate from us. All prices net.",
-    moreLabel: "See all prices and billing models",
-  },
-
-  // See messages/de.ts "pricingPage" — same shape, same numbers.
-  pricingPage: {
-    meta: {
-      title: "Pricing",
-      description: "How Coditu bills: per web part, per project or per hour — and the figures we start from.",
-    },
-    title: "Pricing",
-    intro:
-      "The price depends on the amount of work, not a fixed list. Here are the three ways we bill, and the starting figures.",
-    models: [
-      {
-        title: "Per web part",
-        text: "Our default for a single web part or a small app feature. A fixed price, after a short discussion.",
-      },
-      {
-        title: "Per project",
-        text: "For larger work like a whole intranet or a new app: a fixed price by scope, agreed in milestones.",
-      },
-      {
-        title: "Per hour",
-        text: "For ongoing changes and smaller tasks after go-live.",
-      },
-    ],
-    hidden: {
-      title: "Price on request",
-      text: "Send us a few sentences about what you need. Before we start, you get an estimate from us.",
-    },
-    cta: "Try us free with a small task",
-    subject: "Free small task – Pricing",
-    body: "Hello Coditu,\n\nOur small task (one screen or one feature):\n\n\nWhere it should run (e.g. SharePoint):\n",
-  },
-
   // See messages/de.ts "landingPages" — same shape, same facts, a
-  // genuinely different (not translated 1:1) English search phrase.
+  // genuinely different (not translated 1:1) English search phrase. No price
+  // figures: see "Prices" in docs/02-POSITIONING.md for why the site states
+  // only that rates are below the German market average, never a number.
   landingPages: {
     sharepointWebparts: {
       slug: "sharepoint-web-parts-development",
       meta: {
         title: "SharePoint Web Parts Development",
         description:
-          "SharePoint and SPFx web parts for your intranet, in your design, live from your SharePoint lists. Usually 1–2 days per web part, {{price:webPart}}.",
+          "SharePoint and SPFx web parts for your intranet, in your design, live from your SharePoint lists. Usually 1–2 days per web part, at rates below the German market average.",
       },
       title: "SharePoint Web Parts Development",
       intro:
@@ -565,7 +523,7 @@ const en: Messages = {
         },
       ],
       proofLabel: "From a real project",
-      priceLine: "A web part costs {{price:webPart}} — the price depends on the amount of work. All prices net.",
+      priceLine: "The price depends on the amount of work — our rates sit below the German market average.",
       cta: "Get one web part redesigned free",
       subject: "Free small task – SharePoint Web Parts",
       body: "Hello Coditu,\n\nplease redesign this web part for free (screenshot attached).\n\nWhat bothers us about it:\n\n",
@@ -574,7 +532,7 @@ const en: Messages = {
       slug: "spfx-developer",
       meta: {
         title: "SPFx Developer",
-        description: "SPFx development for SharePoint and Microsoft 365: one team, no subcontractors, weekly sprints, {{price:change}}.",
+        description: "SPFx development for SharePoint and Microsoft 365: one team, no subcontractors, weekly sprints, at rates below the German market average.",
       },
       title: "SPFx Developer",
       intro:
@@ -594,7 +552,7 @@ const en: Messages = {
         },
       ],
       proofLabel: "From a real project",
-      priceLine: "We bill at {{price:change}}, or a fixed price per web part or project. All prices net.",
+      priceLine: "We bill by effort — hourly, or at a fixed price per web part or project, at rates below the German market average.",
       cta: "Try us free with a small task",
       subject: "Free small task – SPFx",
       body: "Hello Coditu,\n\nOur small task (one screen or one feature):\n\n\nWhere it should run (e.g. SharePoint):\n",
@@ -603,7 +561,7 @@ const en: Messages = {
       slug: "sharepoint-development-berlin",
       meta: {
         title: "SharePoint Development Berlin",
-        description: "SharePoint and SPFx development with a fixed contact based in Berlin. Weekly sprints, from €600 per web part.",
+        description: "SharePoint and SPFx development with a fixed contact based in Berlin. Weekly sprints, at rates below the German market average.",
       },
       title: "SharePoint Development Berlin",
       intro:
@@ -623,7 +581,7 @@ const en: Messages = {
         },
       ],
       proofLabel: "From a real project",
-      priceLine: "A web part costs {{price:webPart}} — the price depends on the amount of work. All prices net.",
+      priceLine: "The price depends on the amount of work — our rates sit below the German market average.",
       cta: "Try us free with a small task",
       subject: "Free small task – Berlin",
       body: "Hello Coditu,\n\nOur small task (one screen or one feature):\n\n\nWhere it should run (e.g. SharePoint):\n",
@@ -633,7 +591,7 @@ const en: Messages = {
       meta: {
         title: "SharePoint Development Bavaria",
         description:
-          "SharePoint and SPFx development for companies in Bavaria. Projects may qualify for the Digitalbonus.Bayern public funding programme. From €600 per web part.",
+          "SharePoint and SPFx development for companies in Bavaria. Projects may qualify for the Digitalbonus.Bayern public funding programme. Rates below the German market average.",
       },
       title: "SharePoint Development Bavaria",
       intro:
@@ -653,7 +611,7 @@ const en: Messages = {
         },
       ],
       proofLabel: "From a real project",
-      priceLine: "A web part costs {{price:webPart}} — the price depends on the amount of work. All prices net.",
+      priceLine: "The price depends on the amount of work — our rates sit below the German market average.",
       cta: "Try us free with a small task",
       subject: "Free small task – Bavaria",
       body: "Hello Coditu,\n\nOur small task (one screen or one feature):\n\n\nWhere it should run (e.g. SharePoint):\n",
@@ -662,7 +620,7 @@ const en: Messages = {
       slug: "sharepoint-development-nrw",
       meta: {
         title: "SharePoint Development North Rhine-Westphalia",
-        description: "SharePoint and SPFx development for companies in North Rhine-Westphalia. Weekly sprints, from €600 per web part.",
+        description: "SharePoint and SPFx development for companies in North Rhine-Westphalia. Weekly sprints, at rates below the German market average.",
       },
       title: "SharePoint Development North Rhine-Westphalia",
       intro:
@@ -682,7 +640,7 @@ const en: Messages = {
         },
       ],
       proofLabel: "From a real project",
-      priceLine: "A web part costs {{price:webPart}} — the price depends on the amount of work. All prices net.",
+      priceLine: "The price depends on the amount of work — our rates sit below the German market average.",
       cta: "Try us free with a small task",
       subject: "Free small task – NRW",
       body: "Hello Coditu,\n\nOur small task (one screen or one feature):\n\n\nWhere it should run (e.g. SharePoint):\n",
@@ -697,7 +655,7 @@ const en: Messages = {
       {
         question: "What does a project cost?",
         answer:
-          "The price depends on the amount of work – {{price:webPart}}, {{price:change}} for ongoing changes. Larger projects get a discount, plus a little extra on top. Before we start, you get an estimate from us. All prices net.",
+          "The price depends on the amount of work – our rates sit well below the German market average for SharePoint development. Larger projects get a discount, plus a little extra on top. Before we start, you get an estimate from us.",
       },
       {
         question: "How soon is there a first version?",
@@ -762,7 +720,6 @@ const en: Messages = {
       service: "Service: {service}",
       reference: "Our reference",
     },
-    prices: { webPart: "from {price}", change: "{price} per hour", onRequest: "Price on request" },
   },
 
   footer: {
