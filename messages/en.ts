@@ -750,39 +750,18 @@ const en: Messages = {
       sections: <LegalSection[]>[
         {
           heading: "Information according to § 5 DDG",
-          lines: [
-            "[PLACEHOLDER: company name and legal form]",
-            "[PLACEHOLDER: street and number]",
-            "[PLACEHOLDER: postcode and city]",
-            "Germany",
-          ],
+          lines: ["1TO1 Consultancy & Management Services", "18 Merghany Street", "Heliopolis, Cairo, Egypt"],
         },
         {
           heading: "Represented by",
-          lines: ["[PLACEHOLDER: authorised representative(s)]"],
+          lines: ["Ahmed Nafie, Managing Director", { label: "+20 115 532 0685", href: "tel:+201155320685" }],
         },
         {
           heading: "Contact",
           lines: [
             { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
-            "[PLACEHOLDER: phone number]",
+            { label: "+20 122 310 4684", href: "tel:+201223104684" },
           ],
-        },
-        {
-          heading: "Register entry",
-          lines: ["[PLACEHOLDER: register court and number, if any]"],
-        },
-        {
-          heading: "VAT ID",
-          lines: ["[PLACEHOLDER: VAT identification number according to § 27a UStG, if any]"],
-        },
-        {
-          heading: "Responsible for content according to § 18 (2) MStV",
-          lines: ["[PLACEHOLDER: name and address]"],
-        },
-        {
-          heading: "Consumer dispute resolution",
-          lines: ["[PLACEHOLDER: statement on participation in dispute resolution]"],
         },
       ],
     },

@@ -875,39 +875,18 @@ const de = {
       sections: <LegalSection[]>[
         {
           heading: "Angaben gemäß § 5 DDG",
-          lines: [
-            "[PLACEHOLDER: Name des Unternehmens und Rechtsform]",
-            "[PLACEHOLDER: Straße und Hausnummer]",
-            "[PLACEHOLDER: PLZ und Ort]",
-            "Deutschland",
-          ],
+          lines: ["1TO1 Consultancy & Management Services", "18 Merghany Street", "Heliopolis, Kairo, Ägypten"],
         },
         {
           heading: "Vertreten durch",
-          lines: ["[PLACEHOLDER: vertretungsberechtigte Person(en)]"],
+          lines: ["Ahmed Nafie, Geschäftsführer", { label: "+20 115 532 0685", href: "tel:+201155320685" }],
         },
         {
           heading: "Kontakt",
           lines: [
             { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
-            "[PLACEHOLDER: Telefonnummer]",
+            { label: "+20 122 310 4684", href: "tel:+201223104684" },
           ],
-        },
-        {
-          heading: "Registereintrag",
-          lines: ["[PLACEHOLDER: Registergericht und Registernummer, falls vorhanden]"],
-        },
-        {
-          heading: "Umsatzsteuer-ID",
-          lines: ["[PLACEHOLDER: Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG, falls vorhanden]"],
-        },
-        {
-          heading: "Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV",
-          lines: ["[PLACEHOLDER: Name und Anschrift]"],
-        },
-        {
-          heading: "Verbraucherstreitbeilegung",
-          lines: ["[PLACEHOLDER: Hinweis zur Teilnahme an Streitbeilegungsverfahren]"],
         },
       ],
     },
