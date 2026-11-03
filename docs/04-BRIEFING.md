@@ -162,12 +162,14 @@ addition could fail the gate outright.
 
 ## What's still open
 
-- **Production has never actually deployed.** This is the single most important
-  operational fact in this file. `main` is fully gated and green on every commit, but the
-  GitHub Actions deploy job has been silently skipping on every run because four values
-  aren't set in the repo (3 secrets, 1 variable). **Full detail, exact names, where to get
-  each value: `docs/03-DEPLOYMENT-CHECKLIST.md`.** Ahmed is deploying at the end of this
-  work deliberately, not urgently — but don't assume anything merged to `main` is live.
+- **Production is live and deploying on every merge to `main`** — this note previously said
+  the opposite ("Production has never actually deployed"), which is now stale; verified
+  2026-11-02 by curling https://coditu.com directly: it serves the current `main` HEAD
+  (confirmed against the NRW landing page and the LinkedIn footer link, both from the
+  2026-11-01 session). Whatever blocked the GitHub Actions deploy job per
+  `docs/03-DEPLOYMENT-CHECKLIST.md` has since been resolved (or deploys are happening by
+  another path) — **treat anything merged to `main` as live within minutes**, which raises
+  the stakes on review before merging, especially security fixes.
 - Native-German review of `messages/de.ts` (a real speaker, not a model), before outreach.
 - **JS budget headroom is down to ~3.8 KB** — see above. Check before adding client-side
   interactivity; raising the 172 KB gate itself needs a team decision, not a unilateral one.
