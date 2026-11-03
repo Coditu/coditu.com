@@ -170,6 +170,12 @@ addition could fail the gate outright.
   `docs/03-DEPLOYMENT-CHECKLIST.md` has since been resolved (or deploys are happening by
   another path) — **treat anything merged to `main` as live within minutes**, which raises
   the stakes on review before merging, especially security fixes.
+- **The dedicated pricing page was removed (2026-11-03)** — `app/[lang]/pricing/page.tsx` and
+  `pages.pricing` in `lib/locales.ts` are gone; `/de/pricing` and `/en/pricing` now 308-redirect
+  to the homepage's pricing teaser section instead of 404ing (both URLs were already indexed).
+  The homepage teaser (`components/site/price-cards.tsx`, `pricingSection` in `messages/*.ts`)
+  is unaffected and is now the only pricing surface on the site — it no longer links anywhere
+  further, since there's nowhere further to link to.
 - Native-German review of `messages/de.ts` (a real speaker, not a model), before outreach.
 - **JS budget headroom is down to ~3.8 KB** — see above. Check before adding client-side
   interactivity; raising the 172 KB gate itself needs a team decision, not a unilateral one.
@@ -180,10 +186,6 @@ addition could fail the gate outright.
   delivery from Berlin/Cairo instead). Adding another is cheap — content plus one
   `lib/landing-pages.ts` registry key, the route/sitemap/language-switch plumbing is generic
   and already handles it.
-- Fully localized pricing-page URL (`/de/preise` instead of `/de/pricing`) — the keyword
-  landing pages solved this exact problem for themselves (nested under a literal `services/`
-  segment specifically to get a localized final slug without touching `[legal]`); the pricing
-  page could adopt the same trick later, it just hasn't been revisited since.
 - AVV template, "taking over an existing codebase" FAQ answer, whether "Zugriff nur, wo
   nötig" is confirmed — all still factually unresolved; AVV specifically is intentionally
   not being raised again (see above), the other two are tracked but low-priority.

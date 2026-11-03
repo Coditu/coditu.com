@@ -22,8 +22,6 @@
 
 - [Home (English)](https://coditu.com/en): Services, the Baukasten, pricing, reference project and FAQ.
 - [Home (German)](https://coditu.com/de): The same site in German, the primary language.
-- [Pricing (English)](https://coditu.com/en/pricing): The three ways Coditu bills (per web part, per project, per hour) and the starting figures.
-- [Pricing (German)](https://coditu.com/de/pricing): The same pricing page in German.
 - [Blog (English)](https://coditu.com/en/blog): Short, specific answers to the questions clients ask about SharePoint, SPFx web parts, Power Apps and internal apps.
 - [Blog (German)](https://coditu.com/de/blog): The same blog in German.
 

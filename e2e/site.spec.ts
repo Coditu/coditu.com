@@ -7,8 +7,8 @@ import { expect, test, type Page } from "@playwright/test";
  */
 
 const LANGS = [
-  { lang: "de", home: "/de", imprint: "/de/impressum", privacy: "/de/datenschutz", pricing: "/de/pricing" },
-  { lang: "en", home: "/en", imprint: "/en/legal-notice", privacy: "/en/privacy", pricing: "/en/pricing" },
+  { lang: "de", home: "/de", imprint: "/de/impressum", privacy: "/de/datenschutz" },
+  { lang: "en", home: "/en", imprint: "/en/legal-notice", privacy: "/en/privacy" },
 ] as const;
 
 /** Every keyword/regional landing page, by (de, en) slug — used for content checks below and
@@ -52,7 +52,6 @@ const HREFLANG_ROUTES = [
   { de: "/de", en: "/en" },
   { de: "/de/impressum", en: "/en/legal-notice" },
   { de: "/de/datenschutz", en: "/en/privacy" },
-  { de: "/de/pricing", en: "/en/pricing" },
   { de: BLOG_INDEX.de, en: BLOG_INDEX.en },
   ...LANDING_PAGES.map((page) => ({ de: `/de/services/${page.slug.de}`, en: `/en/services/${page.slug.en}` })),
 ] as const;
@@ -80,7 +79,7 @@ test("/ redirects to German", async ({ page }) => {
   await expect(page.locator("html")).toHaveAttribute("lang", "de");
 });
 
-for (const { lang, home, imprint, privacy, pricing } of LANGS) {
+for (const { lang, home, imprint, privacy } of LANGS) {
   test.describe(lang, () => {
     test("html lang, own title, hreflang with x-default → German", async ({ page }) => {
       await page.goto(home);
@@ -124,7 +123,6 @@ for (const { lang, home, imprint, privacy, pricing } of LANGS) {
         [home, other.home],
         [imprint, other.imprint],
         [privacy, other.privacy],
-        [pricing, other.pricing],
       ]) {
         await page.goto(from);
         await page.locator(`header a[hreflang="${other.lang}"]`).click();
@@ -133,7 +131,7 @@ for (const { lang, home, imprint, privacy, pricing } of LANGS) {
     });
 
     test("nothing invented, no old name, no old address", async ({ page }) => {
-      for (const path of [home, imprint, privacy, pricing]) {
+      for (const path of [home, imprint, privacy]) {
         await page.goto(path);
         const text = (await page.locator("body").innerText()).toLowerCase();
         // Retired locations; the team is in Berlin and Cairo (docs/00-CONTEXT.md).
@@ -460,30 +458,6 @@ for (const { lang, home, imprint, privacy, pricing } of LANGS) {
       await expect(cards).toHaveCount(2);
       await expect(cards.nth(0)).toContainText("600");
       await expect(cards.nth(1)).toContainText("70");
-
-      // Links through to the dedicated pricing page. Scoped to `section`, not
-      // `page` — the footer now has its own link with the same name.
-      await section.getByRole("link", { name: lang === "de" ? "Alle Preise und Abrechnungsarten ansehen" : "See all prices and billing models" }).click();
-      await expect(page).toHaveURL(new RegExp(`${pricing}$`));
-    });
-
-    test("pricing page: three billing models, both counted cards, a free-task CTA", async ({ page }) => {
-      await page.goto(pricing);
-      await expect(page.locator("h1")).toHaveText(lang === "de" ? "Preise" : "Pricing");
-
-      const lists = page.locator("main ul");
-      const models = lists.nth(0).locator("li");
-      await expect(models).toHaveCount(3);
-
-      const priceCards = lists.nth(1).locator("li");
-      await expect(priceCards).toHaveCount(2);
-      await expect(priceCards.nth(0)).toContainText("600");
-      await expect(priceCards.nth(1)).toContainText("70");
-
-      const subject = encodeURIComponent(lang === "de" ? "Kleine Aufgabe gratis – Preise" : "Free small task – Pricing");
-      await expect(page.locator(`a[href^="mailto:contact@coditu.com?subject=${subject}&"]`)).toHaveText(
-        lang === "de" ? "Kleine Aufgabe gratis sichern" : "Try us free with a small task",
-      );
     });
 
     for (const entry of LANDING_PAGES) {

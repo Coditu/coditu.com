@@ -105,7 +105,8 @@ optional next step. The lead is captured even if they never book.
 6. How we work (board, weekly sprints)
 7. Reference — one year of sprints
 8. Security & DSGVO
-9. Pricing teaser → pricing page
+9. Pricing teaser (dedicated pricing page removed 2026-11-03 — the homepage teaser is now the
+   only pricing surface; `/de/pricing` and `/en/pricing` 308-redirect to the teaser's anchor)
 10. FAQ · Team · Contact
 
 The slider is the strongest two seconds on the site: it makes the problem visceral before a word is

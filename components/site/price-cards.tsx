@@ -1,5 +1,4 @@
-import { textLink } from "@/components/ui/button";
-import { getMessages, pages, type Locale } from "@/lib/i18n";
+import { getMessages, type Locale } from "@/lib/i18n";
 import { PRICES, SHOW_PRICES } from "@/lib/site-config";
 
 import { Container } from "./container";
@@ -57,11 +56,6 @@ export function Pricing({ locale }: { locale: Locale }) {
           </li>
         </ul>
         <p className="mt-6 max-w-[64ch] text-[15px] leading-normal text-ink-muted">{s.note}</p>
-        <p className="mt-3">
-          <a href={pages.pricing[locale]} className={textLink}>
-            {s.moreLabel}
-          </a>
-        </p>
       </Container>
     </section>
   );
