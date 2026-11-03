@@ -7,7 +7,7 @@ import { ButtonLink, textLink } from "@/components/ui/button";
 import { blogPath, formatDate, getPost, getPosts, postPaths, renderPost } from "@/lib/blog";
 import { getMessages, hasLocale, sectionHref, type Locale } from "@/lib/i18n";
 import { OG_IMAGE, pageMetadata } from "@/lib/metadata";
-import { SITE_NAME } from "@/lib/site-config";
+import { SITE_NAME, SITE_URL } from "@/lib/site-config";
 import { getAbsoluteUrl } from "@/lib/site-url";
 
 export const dynamicParams = false;
@@ -44,7 +44,10 @@ export default async function BlogPost({ params }: PageProps<"/[lang]/blog/[slug
   const t = getMessages(lang);
   const url = getAbsoluteUrl(blogPath(lang, post.slug));
   const logo = { "@type": "ImageObject", url: getAbsoluteUrl("/icon-512.png"), width: 512, height: 512 };
-  const organization = { "@type": "Organization", name: SITE_NAME, url: getAbsoluteUrl(`/${lang}`), logo };
+  // Same `@id` as the Organization node in components/site/organization-schema.tsx
+  // — lets Google/AI answer engines resolve this to the one real entity
+  // instead of a second, ambiguous Organization per blog post.
+  const organization = { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: SITE_NAME, url: getAbsoluteUrl(`/${lang}`), logo };
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
