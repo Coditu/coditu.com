@@ -45,9 +45,21 @@
 - Pricing starts at €600 per web part or €70 per hour; all prices net. Larger projects get a discount.
 - Data lives in the client's own Microsoft 365 and SharePoint; Microsoft holds it, not Coditu. The client owns the code, the documentation and keeps full control.
 
+## FAQ
+
+- **What does a project cost?** The price depends on the amount of work — from €600 per web part, €70 per hour for ongoing changes, all prices net. Larger projects get a discount, plus a little extra on top.
+- **How soon is there a first version?** A new web part usually takes 1–2 days; the first version of an internal app is ready in a few days.
+- **Do you only work with SharePoint and Microsoft 365?** No — Coditu also builds internal apps, websites and frontends, and looks after them after launch.
+- **What does working together look like?** Weekly sprints: every week shows what's done, the client says what should change, one fixed contact throughout.
+- **You're in Berlin and Cairo — how does that work?** The fixed client contact, Adam Nafie, is based in Berlin; Berlin and Cairo are at most one hour apart; conversations happen in German or English.
+- **Who owns the code?** The client does — code, documentation and full control, no lock-in.
+- **What happens after go-live?** Coditu stays on hand for changes and maintenance, billed per request.
+
 ## Optional
 
 - [Legal notice](https://coditu.com/en/legal-notice): Provider identification for Coditu.
 - [Impressum](https://coditu.com/de/impressum): German version of the above.
 - [Privacy policy](https://coditu.com/en/privacy): How Coditu processes personal data on this website.
 - [Datenschutz](https://coditu.com/de/datenschutz): German version of the above.
+
+LinkedIn: https://www.linkedin.com/company/107461913
