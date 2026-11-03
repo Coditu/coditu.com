@@ -24,11 +24,32 @@ import { CONTACT_EMAIL, LINKEDIN_URL, SITE_NAME, SITE_URL } from "@/lib/site-con
  * entity — there is at least one unrelated company with a confusingly
  * similar name/domain (not coditu.com) that has shown up misattributed in a
  * third-party AI answer. A stable `@id`, a real, specific description, and
- * now `sameAs` pointing at the real LinkedIn company page are the honest
+ * `sameAs` pointing at the real LinkedIn company page are the honest
  * on-page + off-site citation lever together.
+ *
+ * `knowsAbout` is the same service names already in the `services` array
+ * below — not a separate invented keyword list, just that one real list
+ * surfaced on the Organization node too, for topical relevance.
  */
 export function OrganizationSchema({ locale }: { locale: Locale }) {
   const t = getMessages(locale);
+
+  // Service categories: docs/02-POSITIONING.md "Search" + the live
+  // `servicesSection.rows` (SharePoint web parts, internal apps, websites &
+  // web apps), plus the Baukasten product (`baukastenSection`). 02-POSITIONING.md
+  // wins over the older list in docs/00-CONTEXT.md where the two differ
+  // (e.g. "AI assistants using RAG" is not in the current service list).
+  // The keyword landing pages (lib/landing-pages.ts) get their own Service
+  // entries too, each with a `url` — they're specific enough to deserve one,
+  // unlike the homepage service rows, which only have an in-page anchor.
+  const rawServices = [
+    ...t.servicesSection.rows.map((row) => ({ name: row.title, description: row.text })),
+    { name: t.baukastenSection.title, description: t.baukastenSection.intro },
+    ...landingKeys.map((key) => {
+      const page = t.landingPages[key];
+      return { name: page.title, description: page.intro, url: `${SITE_URL}${landingPaths(key)[locale]}` };
+    }),
+  ];
 
   const organization = {
     "@type": "Organization",
@@ -39,6 +60,7 @@ export function OrganizationSchema({ locale }: { locale: Locale }) {
     logo: { "@type": "ImageObject", url: `${SITE_URL}/icon-512.png`, width: 512, height: 512 },
     email: CONTACT_EMAIL,
     sameAs: [LINKEDIN_URL],
+    knowsAbout: rawServices.map((service) => service.name),
     inLanguage: t.locale,
     address: [
       { "@type": "PostalAddress", addressLocality: "Berlin", addressCountry: "DE" },
@@ -51,22 +73,7 @@ export function OrganizationSchema({ locale }: { locale: Locale }) {
     },
   };
 
-  // Service categories: docs/02-POSITIONING.md "Search" + the live
-  // `servicesSection.rows` (SharePoint web parts, internal apps, websites &
-  // web apps), plus the Baukasten product (`baukastenSection`). 02-POSITIONING.md
-  // wins over the older list in docs/00-CONTEXT.md where the two differ
-  // (e.g. "AI assistants using RAG" is not in the current service list).
-  // The keyword landing pages (lib/landing-pages.ts) get their own Service
-  // entries too, each with a `url` — they're specific enough to deserve one,
-  // unlike the homepage service rows, which only have an in-page anchor.
-  const services = [
-    ...t.servicesSection.rows.map((row) => ({ name: row.title, description: row.text })),
-    { name: t.baukastenSection.title, description: t.baukastenSection.intro },
-    ...landingKeys.map((key) => {
-      const page = t.landingPages[key];
-      return { name: page.title, description: page.intro, url: `${SITE_URL}${landingPaths(key)[locale]}` };
-    }),
-  ].map((service) => ({
+  const services = rawServices.map((service) => ({
     "@type": "Service",
     provider: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
     areaServed: "DE",
