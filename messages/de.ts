@@ -883,10 +883,7 @@ const de = {
         },
         {
           heading: "Kontakt",
-          lines: [
-            { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
-            { label: "+20 122 310 4684", href: "tel:+201223104684" },
-          ],
+          lines: [{ label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` }],
         },
       ],
     },
