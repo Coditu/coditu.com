@@ -118,7 +118,7 @@ const de = {
       summary: "Beispiel: Aus Bausteinen entsteht eine Buchungs-App – mit Dashboard, Buchungen, Kalender und Login.",
       picker: {
         title: "Baukasten",
-        hint: "Bausteine wählen",
+        hint: "Erprobte Bausteine wählen",
         /**
          * The four blocks you "pick"; they fly into the app, in this order:
          * its page title, the bookings table, the calendar card, the
