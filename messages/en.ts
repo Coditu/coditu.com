@@ -80,7 +80,7 @@ const en: Messages = {
       summary: "Example: building blocks become a booking app – with a dashboard, bookings, a calendar and a login.",
       picker: {
         title: "Baukasten",
-        hint: "Pick your blocks",
+        hint: "Pick proven blocks",
         blocks: ["Dashboard", "Bookings", "Calendar", "Login"],
         more: ["Form", "Approval", "Directory"],
       },
