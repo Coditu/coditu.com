@@ -769,7 +769,6 @@ const en: Messages = {
         {
           heading: "1. Controller",
           lines: [
-            "[PLACEHOLDER: company name and address]",
             { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
           ],
         },
@@ -777,21 +776,18 @@ const en: Messages = {
           heading: "2. Hosting",
           lines: [
             "This website is hosted by Vercel Inc.",
-            "[PLACEHOLDER: provider address, legal basis, data processing agreement and transfers to third countries]",
           ],
         },
         {
           heading: "3. Server log files",
           lines: [
             "When you open the website, the hosting provider processes technically necessary data, for example IP address, date and time, and the page requested.",
-            "[PLACEHOLDER: scope, legal basis and retention period]",
           ],
         },
         {
           heading: "4. Contact by email",
           lines: [
             "When you write to us, we process your details to answer your request.",
-            "[PLACEHOLDER: legal basis and retention period]",
           ],
         },
         {
@@ -806,12 +802,7 @@ const en: Messages = {
           lines: [
             "You have the right of access, rectification, erasure, restriction of processing, data portability and objection (Art. 15–21 GDPR).",
             "You can lodge a complaint with a data protection supervisory authority (Art. 77 GDPR).",
-            "[PLACEHOLDER: competent supervisory authority]",
           ],
-        },
-        {
-          heading: "Last updated",
-          lines: ["[PLACEHOLDER: date]"],
         },
       ],
     },

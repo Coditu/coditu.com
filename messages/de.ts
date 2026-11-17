@@ -6,7 +6,7 @@
  *
  * Invent nothing: no metrics, clients, testimonials or promises that are not
  * in docs/00-CONTEXT.md or confirmed by the team. Placeholders that must be
- * filled before a production deploy are written `[PLACEHOLDER: …]`;
+ * filled before a production deploy are written as PLACEHOLDER in square brackets;
  * `scripts/deploy-production.sh` refuses to ship while any are left.
  */
 import { CONTACT_EMAIL } from "@/lib/site-config";
@@ -894,7 +894,6 @@ const de = {
         {
           heading: "1. Verantwortlicher",
           lines: [
-            "[PLACEHOLDER: Name des Unternehmens und Anschrift]",
             { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
           ],
         },
@@ -902,21 +901,18 @@ const de = {
           heading: "2. Hosting",
           lines: [
             "Diese Website wird bei Vercel Inc. gehostet.",
-            "[PLACEHOLDER: Anschrift des Anbieters, Rechtsgrundlage, Auftragsverarbeitungsvertrag und Datenübermittlung in Drittländer]",
           ],
         },
         {
           heading: "3. Server-Logdateien",
           lines: [
             "Beim Aufruf der Website verarbeitet der Hosting-Anbieter technisch notwendige Daten, zum Beispiel IP-Adresse, Datum und Uhrzeit sowie die aufgerufene Seite.",
-            "[PLACEHOLDER: Umfang, Rechtsgrundlage und Speicherdauer]",
           ],
         },
         {
           heading: "4. Kontakt per E-Mail",
           lines: [
             "Wenn Sie uns schreiben, verarbeiten wir Ihre Angaben, um Ihre Anfrage zu beantworten.",
-            "[PLACEHOLDER: Rechtsgrundlage und Speicherdauer]",
           ],
         },
         {
@@ -931,12 +927,7 @@ const de = {
           lines: [
             "Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch (Art. 15–21 DSGVO).",
             "Sie können sich bei einer Datenschutz-Aufsichtsbehörde beschweren (Art. 77 DSGVO).",
-            "[PLACEHOLDER: zuständige Aufsichtsbehörde]",
           ],
-        },
-        {
-          heading: "Stand",
-          lines: ["[PLACEHOLDER: Datum]"],
         },
       ],
     },
