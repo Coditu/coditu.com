@@ -73,8 +73,11 @@ vercel_cli() {
 # and the CLI names it by that variable when it is wrong.
 smoke_staged() {
   release_target=$1
+  # The CLI's first call on a protected project prints its bypass-token notice
+  # into stdout ahead of the response, so keep only the JSON line.
   release_body=$(vercel curl /build-health.json --deployment "$release_target" -- \
     --silent --show-error --fail --location) || return 1
+  release_body=$(printf '%s\n' "$release_body" | grep -E '^\{' | tail -n 1) || return 1
   [ "$(printf '%s' "$release_body" | jq -er '.status')" = ok ] || return 1
   [ "$(printf '%s' "$release_body" | jq -er '.commit')" = "$GITHUB_SHA" ] || return 1
 
